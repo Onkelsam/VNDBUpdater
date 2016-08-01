@@ -1,0 +1,37 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VNDBUpdater", "VNDBUpdater\VNDBUpdater.csproj", "{2983470A-577B-478F-8C9D-7144E8C05D1E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{2E2820EA-5AE1-4FAF-BF4A-80FA2A76A6AB}"
+	ProjectSection(SolutionItems) = preProject
+		.nuget\packages.config = .nuget\packages.config
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommunicationLib", "CommunicationLib\CommunicationLib.csproj", "{1C4A6F28-C160-40EE-801D-1B433CAE55FE}"
+EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "VNDBUpdaterInstall", "VNDBUpdaterInstall\VNDBUpdaterInstall.vdproj", "{0F6B8F2E-5963-4044-B832-EAD4E7B4A5F0}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2983470A-577B-478F-8C9D-7144E8C05D1E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2983470A-577B-478F-8C9D-7144E8C05D1E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2983470A-577B-478F-8C9D-7144E8C05D1E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2983470A-577B-478F-8C9D-7144E8C05D1E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1C4A6F28-C160-40EE-801D-1B433CAE55FE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1C4A6F28-C160-40EE-801D-1B433CAE55FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1C4A6F28-C160-40EE-801D-1B433CAE55FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1C4A6F28-C160-40EE-801D-1B433CAE55FE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0F6B8F2E-5963-4044-B832-EAD4E7B4A5F0}.Debug|Any CPU.ActiveCfg = Debug
+		{0F6B8F2E-5963-4044-B832-EAD4E7B4A5F0}.Release|Any CPU.ActiveCfg = Release
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

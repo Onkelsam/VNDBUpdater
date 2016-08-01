@@ -1,0 +1,85 @@
+﻿<Window x:Class="VNDBUpdater.Views.AddVisualNovels"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+        xmlns:local="clr-namespace:VNDBUpdater.ViewModels"
+        xmlns:helper="clr-namespace:VNDBUpdater.Helper"
+        Title="VNDBUpdater - Add Visual Novels" Height="516.675" Width="667"
+        Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
+
+    <Window.DataContext>
+        <local:AddVisualNovelsViewModel />
+    </Window.DataContext>
+
+    <Window.Resources>
+        <ControlTemplate x:Key="validationErrorTemplate">
+            <DockPanel>
+                <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
+                    <Grid Width="12" Height="12">
+                        <Ellipse Width="12" Height="12" Fill="Red" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        <TextBlock Foreground="White" FontWeight="Heavy" FontSize="8" HorizontalAlignment="Center" VerticalAlignment="Center" TextAlignment="Center"
+                                   ToolTip="{Binding ElementName=ErrorAdorner, Path=AdornedElement.(Validation.Errors)[0].ErrorContent}">X                                   
+                        </TextBlock>
+                    </Grid>
+                    <TextBlock Foreground="Red" FontWeight="12" Margin="2,0,0,0" Text="{Binding ElementName=ErrorAdorner, Path=AdornedElement.(Validation.Errors)[0].ErrorContent}" />                                     
+                </StackPanel>
+                <AdornedElementPlaceholder x:Name="ErrorAdorner" />          
+            </DockPanel>
+        </ControlTemplate>        
+        <SolidColorBrush x:Key="CellColor" Color="Gray" />
+    </Window.Resources>
+    
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="200*" MaxWidth="200"/>
+            <ColumnDefinition Width="100*" MaxWidth="100"/>
+            <ColumnDefinition Width="246*"/>
+            <ColumnDefinition Width="100*" MaxWidth="100"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="40*" MaxHeight="40" MinHeight="40"/>
+            <RowDefinition Height="142*"/>
+            <RowDefinition Height="250*" MaxHeight="250" MinHeight="250"/>
+        </Grid.RowDefinitions>
+
+        <DataGrid ItemsSource="{Binding Path=VisualNovelsToAdd, UpdateSourceTrigger=PropertyChanged}" SelectedItem="{Binding Path=SelectedVisualNovel}"
+                  AutoGenerateColumns="False" Grid.Row ="1" Grid.ColumnSpan="4" GridLinesVisibility="None" CanUserResizeRows="False"
+                  CanUserAddRows="False" Background="White" BorderThickness="0" CanUserDeleteRows="False" RowHeaderWidth="0" SelectionMode="Single">
+            <DataGrid.InputBindings>
+                <MouseBinding Gesture="LeftDoubleClick" Command="{Binding Commands.SetExePath}" CommandParameter="{Binding Path=SelectedVisualNovel}"/>
+            </DataGrid.InputBindings>
+            <DataGrid.Resources>
+                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="LightBlue"/>
+                <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="LightBlue"/>
+            </DataGrid.Resources>
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Visual Novel ID" Binding="{Binding Path=Basics.id}" IsReadOnly="True"/>
+                <DataGridTextColumn Header="Name" Binding="{Binding Path=Basics.title}" IsReadOnly="True" Width="*"/>
+                <DataGridTextColumn Header="Original Name" Binding="{Binding Path=Basics.original}" IsReadOnly="True"/>
+                <DataGridTextColumn Header="Installation Path" Binding="{Binding Path=ExePath}" IsReadOnly="True"/>
+                <DataGridCheckBoxColumn Header="In your List" Binding="{Binding Path=AlreadyExistsInDatabase, Mode=OneWay}" IsReadOnly="True" />
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <TextBox Margin="0,18,0,0" Validation.ErrorTemplate="{StaticResource validationErrorTemplate}">
+            <TextBox.Text>
+                <Binding Path="IDs" UpdateSourceTrigger="PropertyChanged">
+                    <Binding.ValidationRules>
+                        <helper:InputValidation />
+                    </Binding.ValidationRules>
+                </Binding>
+            </TextBox.Text>
+        </TextBox>
+
+        <Button Content="Fetch" Margin="0,18,0,0" Grid.Column="1" Command="{Binding Commands.FetchVisualNovels}"/>
+        <Button Content="Add VNs" Margin="0,18,0,0" Grid.Column="3" Command="{Binding Commands.AddVisualNovelsToDB}"/>
+        <Image Grid.Row="2" Source="{Binding Path=SelectedVisualNovel.Basics.image}"/>
+        <RichTextBox Grid.Column="1" Grid.Row="2" Grid.ColumnSpan="3" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" BorderThickness="0" >
+            <FlowDocument>
+                <Paragraph>
+                    <Run Text="{Binding Path=SelectedVisualNovel.Basics.description}"/>
+                </Paragraph>
+            </FlowDocument>
+        </RichTextBox>
+    </Grid>
+</Window>

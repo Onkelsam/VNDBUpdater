@@ -1,0 +1,53 @@
+﻿<Window x:Class="VNDBUpdater.Views.Options"
+        x:Name="Login"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:VNDBUpdater.ViewModels"
+        mc:Ignorable="d"
+        Title="VNDBUpdater - Options" Height="300" Width="300" ResizeMode="NoResize" WindowStartupLocation="CenterScreen"
+        Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="10*" />
+            <RowDefinition Height="10*" />
+        </Grid.RowDefinitions>
+        <GroupBox BorderBrush="AliceBlue" BorderThickness="2" Margin="5" Header="User Credentials">
+            <Grid Grid.ColumnSpan="2" Grid.RowSpan="2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="75"/>
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="30"/>
+                    <RowDefinition Height="30"/>
+                    <RowDefinition Height="30"/>
+                </Grid.RowDefinitions>
+                <TextBlock Text="Username:" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="3"/>
+                <TextBox Text="{Binding Path=Username}" Grid.Column="1" VerticalAlignment="Center"/>
+                <TextBlock Text="Password:" Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="3"/>
+                <PasswordBox Name="txtPassword" Grid.Row="1" Grid.Column="2" VerticalAlignment="Center"/>
+                <Button Command="{Binding Commands.Save}" CommandParameter="{Binding ElementName=txtPassword}" Content="Save" Grid.Row="2" Grid.Column="3" VerticalAlignment="Center"/>
+            </Grid>
+        </GroupBox>
+        <GroupBox Header="Settings" Margin="5" BorderThickness="2" BorderBrush="AliceBlue" Grid.Row="1">
+            <Grid Grid.ColumnSpan="2" Grid.RowSpan="2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="75"/>
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="30"/>
+                    <RowDefinition Height="30"/>
+                    <RowDefinition Height="30"/>
+                </Grid.RowDefinitions>
+                <TextBlock Text="Current Path:" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="3"/>
+                <TextBox Text="{Binding Path=InstallFolderPath, Mode=OneWay}" Grid.Column="1" VerticalAlignment="Center" IsReadOnly="True"/>
+                <Button Command="{Binding Commands.SetInstallFolderPath}" Content="Change Installation Folder Path" Grid.Row="1" Grid.Column="3" VerticalAlignment="Center"/>
+                <Button Command="{Binding Commands.StartIndexing}" Content="Start Indexing" Grid.Row="2" Grid.Column="3" VerticalAlignment="Center"/>
+            </Grid>
+        </GroupBox>
+    </Grid>
+</Window>

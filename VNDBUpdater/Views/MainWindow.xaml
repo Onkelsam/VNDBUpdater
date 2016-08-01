@@ -1,0 +1,220 @@
+﻿<Window x:Class="VNDBUpdater.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+        xmlns:local="clr-namespace:VNDBUpdater.ViewModels"
+        Title="VNDBUpdater" Height="665" Width="1213.775"        
+        Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
+
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Closing">
+            <i:InvokeCommandAction Command="{Binding Commands.CloseWindow}" />
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
+
+    <Window.Resources>
+        <Style x:Key="NoChromeButton" TargetType="{x:Type Button}">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Padding" Value="1"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Grid x:Name="Chrome" Background="{TemplateBinding Background}" SnapsToDevicePixels="true">
+                            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="{TemplateBinding Padding}" RecognizesAccessKey="True" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsEnabled" Value="false">
+                                <Setter Property="Foreground" Value="#ADADAD"/>
+                                <Setter Property="Opacity" TargetName="Chrome" Value="0.5"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="{x:Type DataGridColumnHeadersPresenter}" TargetType="{x:Type DataGridColumnHeadersPresenter}">
+            <Setter Property="Grid.ColumnSpan" Value="2"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type DataGridColumnHeadersPresenter}">
+                        <Grid>
+                            <DataGridColumnHeader IsHitTestVisible="False" Name="PART_FillerColumnHeader"/>
+                            <ItemsPresenter/>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="250*" />
+            <ColumnDefinition Width="125*" />
+            <ColumnDefinition Width="200*" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="20*" MaxHeight="20" MinHeight="20"/>
+            <RowDefinition Height="20*" MaxHeight="20" MinHeight="20" />
+            <RowDefinition Height="125*" />
+            <RowDefinition Height="125*" />
+            <RowDefinition Height="10*" />
+        </Grid.RowDefinitions>
+
+        <Menu DockPanel.Dock="Top">
+            <MenuItem Header="File">
+                <MenuItem Header="Add Visual Novels" Command="{Binding Commands.AddVisualNovels}" />
+                <MenuItem Header="Refresh Visual Novels" Command="{Binding Commands.RefreshVisualNovels}" />
+                <MenuItem Header="Synchronize with VNDB" Command="{Binding Commands.SynchronizeWithVNDB}" />
+            </MenuItem>
+            <MenuItem Header="Filter">
+                <MenuItem Header="Create Filter" Command="{Binding Commands.AddFilter}"/>
+                <MenuItem Header="Apply Filter" ItemsSource="{Binding AvailableFilters}">
+                    <MenuItem.ItemContainerStyle>
+                        <Style TargetType="{x:Type MenuItem}">
+                            <Setter Property="Command" Value="{Binding DataContext.Commands.ApplyFilter, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type MenuItem}}}" />
+                            <Setter Property="CommandParameter" Value="{Binding RelativeSource={RelativeSource Self}, Path=Header}"/>
+                        </Style>
+                    </MenuItem.ItemContainerStyle>
+                </MenuItem>
+                <MenuItem Header="Delete Filters" ItemsSource="{Binding AvailableFilters}">
+                    <MenuItem.ItemContainerStyle>
+                        <Style TargetType="{x:Type MenuItem}">
+                            <Setter Property="Command" Value="{Binding DataContext.Commands.DeleteFilter, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type MenuItem}}}" />
+                            <Setter Property="CommandParameter" Value="{Binding RelativeSource={RelativeSource Self}, Path=Header}"/>
+                        </Style>
+                    </MenuItem.ItemContainerStyle>
+                </MenuItem>
+                <MenuItem Header="Reset Filters" Command="{Binding Commands.ResetFilters}" />
+            </MenuItem>
+            <MenuItem Header="Options" Command="{Binding Commands.OpenOptions}" />
+            <MenuItem Header="About" Command="{Binding Commands.About}" />
+        </Menu>
+
+        <TabControl Grid.Row="1" Grid.Column="0" Grid.RowSpan="3" SelectedIndex="{Binding Path=SelectedVisualNovelTab}">
+            <TabItem Header="Unknown" x:Name="Unsorted"/>
+            <TabItem Header="Playing" x:Name="Reading"/>
+            <TabItem Header="Finished" x:Name="OnHold"/>
+            <TabItem Header="Stalled" x:Name="PlanToRead"/>
+            <TabItem Header="Dropped" x:Name="Completed"/>
+            <TabItem Header="Wishlist" x:Name="Wishlist"/>
+        </TabControl>
+        <DataGrid ItemsSource="{Binding Path=VisualNovelsInGrid, UpdateSourceTrigger=PropertyChanged}" SelectedItem="{Binding Path=SelectedVisualNovel}" 
+                  Grid.Row="2" Grid.RowSpan="2" Grid.Column="0"  AutoGenerateColumns="False" CanUserAddRows="False" GridLinesVisibility="None" Background="White" 
+                  BorderThickness="0" CanUserResizeRows="False" CanUserDeleteRows="False" RowHeaderWidth="0" SelectionMode="Single">
+            <DataGrid.Resources>
+                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="LightBlue"/>
+                <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="LightBlue"/>
+            </DataGrid.Resources>
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Name" Binding="{Binding Path=Basics.title}" IsReadOnly="True" Width="5*" />
+                <DataGridTextColumn Header="Original Name" Binding="{Binding Path=Basics.original}" IsReadOnly="True" Width="1*"  />
+                <DataGridTextColumn Header="VNDB Score" Binding="{Binding Path=Basics.rating}" IsReadOnly="True" Width="2*" />
+                <DataGridTextColumn Header="VNDB Popularity" Binding="{Binding Path=Basics.popularity}" IsReadOnly="True" Width="2*" />
+                <DataGridTextColumn Header="Own Score" Binding="{Binding Path=Score}" IsReadOnly="True" Width="2*" />
+            </DataGrid.Columns>
+            <DataGrid.ContextMenu>
+                <ContextMenu Name="MainMenu">
+                    <MenuItem Header="Start Game" Command="{Binding Commands.StartVisualNovel}" />
+                    <MenuItem Header="Open Folder" Command="{Binding Commands.OpenVisualNovelFolder}" />
+                    <MenuItem Header="Set Exe Path" Command="{Binding Commands.SetExePath}" CommandParameter="{Binding Path=SelectedVisualNovel}" />
+                    <Separator HorizontalAlignment="Stretch" />
+                    <MenuItem Header="Open walkthrough" Command="{Binding Commands.OpenWalkthrough}" />
+                    <MenuItem Header="Create walkthrough" Command="{Binding Commands.CreateWalkthrough}" />
+                    <Separator HorizontalAlignment="Stretch" />
+                    <MenuItem Header="View on 'VNDB'" Command="{Binding Commands.ViewVisualNovelOnVNDB}" />
+                    <MenuItem Header="Update" Command="{Binding Commands.UpdateVisualNovel}" />
+                    <MenuItem Header="Delete Visual Novel" Command="{Binding Commands.DeleteVisualNovel}" />
+                    <Separator HorizontalAlignment="Stretch" />
+                    <MenuItem Header="Set as" ItemsSource="{Binding Path=Categories}">
+                        <MenuItem.ItemContainerStyle>
+                            <Style TargetType="{x:Type MenuItem}">
+                                <Setter Property="Command" Value="{Binding DataContext.Commands.SetCategory, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type MenuItem}}}" />
+                                <Setter Property="CommandParameter" Value="{Binding RelativeSource={RelativeSource Self}, Path=Header}"/>
+                            </Style>
+                        </MenuItem.ItemContainerStyle>
+                    </MenuItem>
+                    <MenuItem Header="Search on Goolge">
+                        <MenuItem Header="Walkthrough" Command="{Binding Commands.SearchOnGoogle}" CommandParameter="Walkthrough" />
+                        <MenuItem Header="Savegame" Command="{Binding Commands.SearchOnGoogle}" CommandParameter="Savegame" />
+                    </MenuItem>
+                    <MenuItem Header="Set Score" ItemsSource="{Binding Path=Scores}">
+                        <MenuItem.ItemContainerStyle>
+                            <Style TargetType="{x:Type MenuItem}">
+                                <Setter Property="Command" Value="{Binding DataContext.Commands.SetScore, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type MenuItem}}}" />
+                                <Setter Property="CommandParameter" Value="{Binding RelativeSource={RelativeSource Self}, Path=Header}"/>
+                            </Style>
+                        </MenuItem.ItemContainerStyle>
+                    </MenuItem>
+                </ContextMenu>
+            </DataGrid.ContextMenu>
+        </DataGrid>
+
+        <GroupBox Grid.Column="2" Grid.Row="3" Header="Characters" >
+            <Button Style="{DynamicResource NoChromeButton}" Command="{Binding Commands.NextCharacter}">
+                <Image Source="{Binding Path=SelectedCharacter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, IsAsync=True}" Stretch="Fill" />
+            </Button>
+        </GroupBox>
+
+        <GroupBox Grid.Column="2" Grid.Row="1" Grid.RowSpan="2" Header="Screenshots">
+            <Button Style="{DynamicResource NoChromeButton}" Command="{Binding Commands.NextScreenshot}">
+                <Image Source="{Binding Path=SelectedScreenshot, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, IsAsync=True}" Stretch="Fill" />
+            </Button>
+        </GroupBox>
+
+        <TabControl Grid.Row="1" Grid.Column="1" SelectedIndex="{Binding SelectedTagTab}">
+            <TabItem Header="All" x:Name="All" />
+            <TabItem Header="Content" x:Name="Content" />
+            <TabItem Header="Sexual Content" x:Name="SexualContent" />
+            <TabItem Header="Technical" x:Name="Technical" />
+        </TabControl>
+        <DataGrid ItemsSource="{Binding Path=TagsInGrid, UpdateSourceTrigger=PropertyChanged}"
+                  Grid.Row="2" Grid.Column="1" CanUserAddRows="False" GridLinesVisibility="None" Background="White" BorderThickness="0" AutoGenerateColumns="False" 
+                  ScrollViewer.HorizontalScrollBarVisibility="Visible" ScrollViewer.VerticalScrollBarVisibility="Visible" CanUserResizeRows="False" CanUserDeleteRows="False" 
+                  RowHeaderWidth="0" SelectionMode="Single">
+            <DataGrid.Resources>
+                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="LightBlue"/>
+                <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="LightBlue"/>
+            </DataGrid.Resources>
+            <DataGrid.RowDetailsTemplate>
+                <DataTemplate>
+                    <Border Padding="4">
+                        <StackPanel Orientation="Vertical">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Foreground="MidnightBlue" Text="{Binding Path=Description}" HorizontalAlignment="Left" TextWrapping="Wrap" MaxWidth="250"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+                </DataTemplate>
+            </DataGrid.RowDetailsTemplate>
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Tag" Binding="{Binding Path=Name}" IsReadOnly="True" Width="*" />
+                <DataGridTextColumn Header="Score" Binding="{Binding Path=Score}" IsReadOnly="True" Selector.IsSelected="True"/>
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <GroupBox Grid.Column="1" Grid.Row="3" Header="Description">
+            <RichTextBox Grid.Column="1" Grid.Row="3" Grid.ColumnSpan="1" IsReadOnly="True" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" BorderThickness="0">
+                <FlowDocument>
+                    <Paragraph>
+                        <Run Text="{Binding Path=SelectedVisualNovel.Basics.description}" />
+                    </Paragraph>
+                </FlowDocument>
+            </RichTextBox>
+        </GroupBox>
+               
+        <StatusBar Grid.Row="4" Grid.ColumnSpan="3">
+            <StatusBarItem HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch">
+                <Grid>
+                    <ProgressBar Minimum="0" Maximum="{Binding Path=CurrentPendingTasks}" Value="{Binding Path=CompletedPendingTasks}" Height="20" HorizontalAlignment="Stretch" Foreground="{DynamicResource {x:Static SystemColors.ActiveCaptionBrushKey}}"/>
+                    <TextBlock Text="{Binding Path=StatusText}" HorizontalAlignment="Center"/>
+                </Grid>
+            </StatusBarItem>
+        </StatusBar>
+
+    </Grid>
+</Window>
