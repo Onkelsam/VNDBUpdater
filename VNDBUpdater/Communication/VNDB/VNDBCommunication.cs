@@ -3,6 +3,7 @@ using CommunicationLib.VNDB.Connection;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -61,22 +62,36 @@ namespace VNDBUpdater.Communication.VNDB
                     if (response.ResponseType == VndbResponseType.Error)
                     {
                         if (HandleError(response) == ErrorResponse.Throttled)
+                        {
+                            Trace.TraceInformation("Connecting to VNDB failed because of throttling error. Trying reconnect.");
                             Connect(); // If the connection was throttled try again (after waiting 'minwait').
+                        }                            
                         else
+                        {
+                            Trace.TraceInformation("Connecting to VNDB failed because of unknown error. Abort connection.");
                             _Status = VNDBCommunicationStatus.Error;
+                        }                            
                     }
                     else
+                    {
+                        Trace.TraceInformation("Connection to VNDB established successfully.");
                         _Status = VNDBCommunicationStatus.LoggedIn;
+                    }
+                        
                 }
                 catch (IOException ex)
                 {
                     // IOExceptins occurs if VNDB closed the stream.
                     // Just try to connect again using recursion.
+                    Trace.TraceError("Caugt exception while connecting to VNDB:" + Environment.NewLine + ex.Message + Environment.NewLine + ex.GetType().Name + Environment.NewLine + ex.StackTrace);
+                    Trace.TraceInformation("Error handled. Trying reconnect.");
                     _Status = VNDBCommunicationStatus.NotLoggedIn;
                     Connect();
                 }
                 catch (Exception ex)
                 {
+                    Trace.TraceError("Caugt exception while connecting to VNDB:" + Environment.NewLine + ex.Message + Environment.NewLine + ex.GetType().Name + Environment.NewLine + ex.StackTrace);
+                    Trace.TraceInformation("Error could not be handled. Abort connection.");
                     _Status = VNDBCommunicationStatus.Error;
                     _ErrorMessage = "Login failed. Error message: " + ex.Message + ex.GetType().ToString() + ex.GetBaseException().GetType().ToString();
                 }
@@ -122,15 +137,21 @@ namespace VNDBUpdater.Communication.VNDB
             var charInformation = GetCharInfo(IDs);
 
             foreach (var id in IDs)
-            {
-                var newVN = new VisualNovel()
-                {
-                    // Get info for each VN.
-                    Basics = basicInformation.Where(x => x.id == id).First(),
-                    Characters = charInformation.FindAll(x => x.vns.Any(y => y.Any(u => u.ToString() == id.ToString()))).ToList()
-                };
+            {                
+                var basic = basicInformation.Where(x => x.id == id).FirstOrDefault();
+                var chars = charInformation.FindAll(x => x.vns.Any(y => y.Any(u => u.ToString() == id.ToString()))).ToList();
 
-                visualNovels.Add(newVN);
+                // Check if visual novel still exists.
+                if (basic != null)
+                {
+                    var newVN = new VisualNovel()
+                    {
+                        Basics = basic,
+                        Characters = chars,
+                    };
+
+                    visualNovels.Add(newVN);
+                }
             }
         }
 
@@ -317,12 +338,14 @@ namespace VNDBUpdater.Communication.VNDB
             if (error.id == "throttled")
             {
                 // In case of 'throttled' error wait 'minwait'.
+                Trace.TraceInformation("Throttled error by VNDB detected. Waiting " + TimeSpan.FromSeconds(error.minwait).ToString() + " before proceeding with Queries.");
                 Thread.Sleep(TimeSpan.FromSeconds(error.minwait));
                 _Status = VNDBCommunicationStatus.Throttled;
                 return ErrorResponse.Throttled;
             }
             else
             {
+                Trace.TraceError("Unknown error by VNDB caught. Aborting connection.");
                 _Status = VNDBCommunicationStatus.Error;
                 _ErrorMessage = "Error while communicating with VNDB: Error ID: '" + error.id + "' Error message: '" + error.msg + "'";
                 return ErrorResponse.Unknown;

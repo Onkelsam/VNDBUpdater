@@ -10,7 +10,7 @@ namespace VNDBUpdater.Helper
     public static class FileHelper
     {
         private static string[] _Folders;
-        private const int MAXDISTANCEBETWEENSTRING = 3;
+        private const int MAXDISTANCEBETWEENSTRING = 5;
 
         private static string[] Folders
         {
@@ -101,23 +101,39 @@ namespace VNDBUpdater.Helper
             {
                 foreach (var folder in Folders)
                 {
-                    if (ComputeLevenshteinDistance(new DirectoryInfo(folder).Name.ToLower().Trim(), VN.Basics.title.ToLower().Trim()) < MAXDISTANCEBETWEENSTRING)
+                    if (new DirectoryInfo(folder).Name.ToLower().Trim() == VN.Basics.title.ToLower().Trim())
                     {
-                        foreach (var file in Directory.GetFiles(folder, "*.*", SearchOption.AllDirectories))
+                        return GetExecuteable(folder);
+                    }
+                }
+
+                // Second try. Use the LevenshteinDistance algorithm to find similiar folders.
+                for (int maxDistance = 2; maxDistance < MAXDISTANCEBETWEENSTRING; maxDistance++)
+                {
+                    foreach (var folder in Folders)
+                    {
+                        if (ComputeLevenshteinDistance(new DirectoryInfo(folder).Name.ToLower().Trim(), VN.Basics.title.ToLower().Trim()) < maxDistance)
                         {
-                            if (Path.GetExtension(file) == ".exe")
-                            {
-                                if (file.ToLower().Contains("unins"))
-                                    continue;
-
-                                if (file.Contains("エンジン設定"))
-                                    continue;
-
-                                return file;
-                            }
+                            return GetExecuteable(folder);
                         }
                     }
                 }
+            }
+
+            return string.Empty;
+        }
+
+        private static string GetExecuteable(string folder)
+        {
+            foreach (var file in Directory.GetFiles(folder, "*.exe", SearchOption.AllDirectories))
+            {
+                if (file.ToLower().Contains("unins"))
+                    continue;
+
+                if (file.Contains("エンジン設定"))
+                    continue;
+
+                return file;
             }
 
             return string.Empty;

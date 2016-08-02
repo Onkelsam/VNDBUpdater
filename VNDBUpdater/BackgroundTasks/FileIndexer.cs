@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System;
+using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 using VNDBUpdater.Data;
 using VNDBUpdater.ViewModels;
@@ -36,6 +38,8 @@ namespace VNDBUpdater.BackgroundTasks
             {
                 base.Start(MainScreen);
 
+                Trace.TraceInformation("Fileindexer started.");
+
                 _MainScreen.CurrentPendingTasks = _MainScreen.AllVisualNovels.Count(x => x.ExePath == null || x.ExePath == "");
                 _MainScreen.CompletedPendingTasks = 0;
                 _Status = BackgroundTaskState.Running;
@@ -55,14 +59,24 @@ namespace VNDBUpdater.BackgroundTasks
 
         private void Indexing()
         {
-            foreach (var vn in _MainScreen.AllVisualNovels.Where(x => x.ExePath == null || x.ExePath == ""))
+            try
             {
-                vn.CrawlExePath();
-                _MainScreen.CompletedPendingTasks++;
-            }
+                Trace.TraceInformation("FileIndexer pending Tasks: " + _MainScreen.CurrentPendingTasks.ToString());
 
-            _Status = BackgroundTaskState.Finished;
-            _MainScreen.UpdateStatusText();
+                foreach (var vn in _MainScreen.AllVisualNovels.Where(x => x.ExePath == null || x.ExePath == ""))
+                {
+                    vn.CrawlExePath();
+                    _MainScreen.CompletedPendingTasks++;
+                    Trace.TraceInformation("FileIndexer completed Tasks: " + _MainScreen.CompletedPendingTasks.ToString());
+                }
+
+                _Status = BackgroundTaskState.Finished;
+                _MainScreen.UpdateStatusText();
+            }
+            catch (Exception ex)
+            {
+                Trace.TraceError("Error caught in FileIndexer: " + Environment.NewLine + ex.Message + Environment.NewLine + ex.GetType().Name + Environment.NewLine + ex.StackTrace);
+            }
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using CommunicationLib.Redis;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using VNDBUpdater.Communication.VNDB;
@@ -35,9 +36,11 @@ namespace VNDBUpdater.Communication.Database
                     Connection = new CommunicationLib.Communication().GetRedisCommunication();
                     Connection.Connect(IP, Port, ExeAndStringPath + RedisExe, ExeAndStringPath + RedisConfig);
                     _IsConnected = true;
+                    Trace.TraceInformation("Connection to Redis DB established.");
                 }
                 catch (Exception ex)
                 {
+                    Trace.TraceError("Connection to Redis DB could not be established. Error caught: " + Environment.NewLine + ex.Message + Environment.NewLine + ex.GetType().Name + Environment.NewLine + ex.StackTrace);
                     _IsConnected = false;
                     throw new Exception("Connection to RedisDB could not be established!" + ex.Message, ex.InnerException);
                 }
