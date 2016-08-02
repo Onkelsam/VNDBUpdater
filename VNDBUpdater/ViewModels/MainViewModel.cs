@@ -45,8 +45,8 @@ namespace VNDBUpdater.ViewModels
             _AppliedFilter = new Filter();
 
             _Commands.AddCommand("RefreshVisualNovels", ExecuteRefreshVisualNovels, CanExecuteVNDBOperations);
-            _Commands.AddCommand("NextScreenshot", ExecuteNextScreenshot);
-            _Commands.AddCommand("NextCharacter", ExecuteNextCharacter);
+            _Commands.AddCommand("NextScreenshot", ExecuteNextScreenshot, VisualNovelSelected);
+            _Commands.AddCommand("NextCharacter", ExecuteNextCharacter, VisualNovelSelected);
             _Commands.AddCommand("StartVisualNovel", ExecuteStartVisualNovel, CanExecuteStartVisualNovel);
             _Commands.AddCommand("OpenVisualNovelFolder", ExecuteOpenVisualNovelFolder, CanExecuteOpenVisualNovelFolder);
             _Commands.AddCommand("ViewVisualNovelOnVNDB", ExecuteViewVisualNovelOnVNDB, VisualNovelSelected);
