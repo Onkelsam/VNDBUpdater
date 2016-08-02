@@ -111,7 +111,6 @@ namespace VNDBUpdater.BackgroundTasks
 
                 Cancel();
                 _Status = TaskStatus.RanToCompletion;
-                _MainScreen.UpdateVisualNovelGrid();
                 _MainScreen.UpdateStatusText();
 
                 Trace.TraceInformation("Refresher finished successfully.");                

@@ -464,21 +464,8 @@ namespace VNDBUpdater.ViewModels
             {
                 if (_SelectedVisualNovel.Basics != null)
                 {
-                    var selectedTab = (TagCategory)SelectedTagTab;
-
-                    foreach (var tag in _SelectedVisualNovel.Basics.tags)
-                    {
-                        Tag foundTag = TagHelper.LocalTags.FirstOrDefault(x => x.ID == tag[0]);
-
-                        if (foundTag != null)
-                        {
-                            if (foundTag.Category == selectedTab || selectedTab == TagCategory.All)
-                            {
-                                foundTag.Score = tag[1];
-                                _TagsInGrid.Add(foundTag);
-                            }
-                        }
-                    }
+                    foreach (var tag in Tag.FindMatchingTagsForCategory(_SelectedVisualNovel, (TagCategory)SelectedTagTab))
+                        _TagsInGrid.Add(tag);
                 }
             }
         }
