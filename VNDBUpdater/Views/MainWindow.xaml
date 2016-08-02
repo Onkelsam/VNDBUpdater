@@ -115,7 +115,7 @@
                 <DataGridTextColumn Header="Original Name" Binding="{Binding Path=Basics.original}" IsReadOnly="True" Width="1*"  />
                 <DataGridTextColumn Header="VNDB Score" Binding="{Binding Path=Basics.rating}" IsReadOnly="True" Width="2*" />
                 <DataGridTextColumn Header="VNDB Popularity" Binding="{Binding Path=Basics.popularity}" IsReadOnly="True" Width="2*" />
-                <DataGridTextColumn Header="Own Score" Binding="{Binding Path=Score}" IsReadOnly="True" Width="2*" />
+                <DataGridTextColumn Header="Own Score" Binding="{Binding Path=ScoreInDouble}" IsReadOnly="True" Width="2*"/>
             </DataGrid.Columns>
             <DataGrid.ContextMenu>
                 <ContextMenu Name="MainMenu">
@@ -150,6 +150,7 @@
                             </Style>
                         </MenuItem.ItemContainerStyle>
                     </MenuItem>
+                    <MenuItem Header="Set Custom Score" Command="{Binding Commands.SetCustomScore}" />
                 </ContextMenu>
             </DataGrid.ContextMenu>
         </DataGrid>

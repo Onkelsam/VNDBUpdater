@@ -182,7 +182,7 @@ namespace VNDBUpdater.Communication.VNDB
 
         public static void SetVoteList(VisualNovel VN)
         {
-            SetList<SetJSONObjects.Vote>(VN, new SetJSONObjects.Vote { vote = (VN.Score * 10) }, Connection.SetVote);
+            SetList<SetJSONObjects.Vote>(VN, new SetJSONObjects.Vote { vote = VN.Score }, Connection.SetVote);
         }
 
         public static void RemoveFromVNList(VisualNovel VN)

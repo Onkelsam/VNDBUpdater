@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
@@ -34,6 +35,14 @@ namespace VNDBUpdater.Models
         {
             get { return _Score; }
             set { _Score = value; }
+        }
+
+        public double ScoreInDouble
+        {
+            get
+            {
+                return Convert.ToDouble(_Score) / 10;
+            }
         }
 
         public VisualNovelCatergory Category

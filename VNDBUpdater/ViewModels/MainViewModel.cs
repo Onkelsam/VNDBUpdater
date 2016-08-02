@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
@@ -69,6 +70,7 @@ namespace VNDBUpdater.ViewModels
             _Commands.AddCommand("SynchronizeWithVNDB", ExecuteSynchronizeWithVNDB, CanExecuteVNDBOperations);
             _Commands.AddCommand("About", ExecuteAboutCommand);
             _Commands.AddCommand("CreateWalkthrough", ExecuteCreateWalkthrough, CanExecuteCreateWalkthrough);
+            _Commands.AddCommand("SetCustomScore", ExecuteSetCustomScore, CanExecuteVisualNovelChanges);
 
             _VisualNovelsInGrid.CollectionChanged += OnCollectionChanged;
             _TagsInGrid.CollectionChanged += OnCollectionChanged;
@@ -486,6 +488,23 @@ namespace VNDBUpdater.ViewModels
 
             foreach (var visualNovel in _AllVisualNovels.Where(x => x.Category == (VisualNovelCatergory)SelectedVisualNovelTab))
                 VisualNovelsInGrid.Add(visualNovel);
+        }
+
+        public void ExecuteSetCustomScore(object parameter)
+        {
+            string score = Microsoft.VisualBasic.Interaction.InputBox("Enter custom score:", "Score", string.Empty);
+            double scoreResult;
+
+            if (double.TryParse(score, out scoreResult))
+            {
+                if (scoreResult >= 10 && scoreResult <= 100)
+                    _SelectedVisualNovel.SetScore((int)(scoreResult));
+                else
+                    _SelectedVisualNovel.SetScore((int)(scoreResult * 10));
+
+                UpdateVisualNovelInDB(_SelectedVisualNovel);
+                UpdateVisualNovelGrid();
+            }
         }
 
         private void SetInitialScreenshot()

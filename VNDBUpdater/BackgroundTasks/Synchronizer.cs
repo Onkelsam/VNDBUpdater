@@ -170,9 +170,9 @@ namespace VNDBUpdater.BackgroundTasks
 
                     VisualNovel LocalVN = VisualNovelHelper.GetVisualNovel(vote.vn);
 
-                    if (LocalVN.Score != (vote.vote / 10))
+                    if (LocalVN.Score != vote.vote)
                     {
-                        LocalVN.Score = (vote.vote / 10);
+                        LocalVN.Score = vote.vote;
                         RedisCommunication.AddVisualNovelToDB(LocalVN);
                     }
                 }
