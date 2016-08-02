@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using VNDBUpdater.BackgroundTasks;
@@ -90,7 +91,7 @@ namespace VNDBUpdater.ViewModels
 
         public bool CanExecuteSetInstallFolderPath(object parameter)
         {
-            if (FileIndexer.Status != BackgroundTaskState.Running)
+            if (FileIndexer.Status != TaskStatus.Running)
                 return true;
             else
                 return false;
@@ -99,7 +100,7 @@ namespace VNDBUpdater.ViewModels
         public bool CanExecuteSaveCommand(object parameter)
         {
             if (_Username != null)
-                if (!string.IsNullOrEmpty(_Username) && Synchronizer.Status != BackgroundTaskState.Running && FileIndexer.Status != BackgroundTaskState.Running)
+                if (!string.IsNullOrEmpty(_Username) && Synchronizer.Status != TaskStatus.Running && FileIndexer.Status != TaskStatus.Running && Refresher.Status != TaskStatus.Running)
                     return true;
 
             return false;
@@ -113,7 +114,7 @@ namespace VNDBUpdater.ViewModels
 
         public bool CanExecuteStartIndexing(object parameter)
         {
-            if (Synchronizer.Status != BackgroundTaskState.Running && FileIndexer.Status != BackgroundTaskState.Running)
+            if (Synchronizer.Status != TaskStatus.Running && FileIndexer.Status != TaskStatus.Running && Refresher.Status != TaskStatus.Running)
                 return true;
             else
                 return false;

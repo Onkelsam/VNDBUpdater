@@ -32,11 +32,4 @@ namespace VNDBUpdater.Data
         Error,
         Throttled,
     };
-
-    public enum BackgroundTaskState
-    {
-        Running = 0,
-        NotRunning,
-        Finished
-    };
 }

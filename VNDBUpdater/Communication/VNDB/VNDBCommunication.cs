@@ -11,6 +11,7 @@ using VNDBUpdater.Communication.Database;
 using VNDBUpdater.Data;
 using VNDBUpdater.Helper;
 using VNDBUpdater.Models;
+using VNUpdater.Helper;
 
 namespace VNDBUpdater.Communication.VNDB
 {
@@ -83,14 +84,14 @@ namespace VNDBUpdater.Communication.VNDB
                 {
                     // IOExceptins occurs if VNDB closed the stream.
                     // Just try to connect again using recursion.
-                    Trace.TraceError("Caugt exception while connecting to VNDB:" + Environment.NewLine + ex.Message + Environment.NewLine + ex.GetType().Name + Environment.NewLine + ex.StackTrace);
+                    Trace.TraceError("Caught exception while connecting to VNDB:" + Environment.NewLine + ex.Message + Environment.NewLine + ex.GetType().Name + Environment.NewLine + ex.StackTrace);
                     Trace.TraceInformation("Error handled. Trying reconnect.");
                     _Status = VNDBCommunicationStatus.NotLoggedIn;
                     Connect();
                 }
                 catch (Exception ex)
                 {
-                    Trace.TraceError("Caugt exception while connecting to VNDB:" + Environment.NewLine + ex.Message + Environment.NewLine + ex.GetType().Name + Environment.NewLine + ex.StackTrace);
+                    Trace.TraceError("Caught exception while connecting to VNDB:" + Environment.NewLine + ex.Message + Environment.NewLine + ex.GetType().Name + Environment.NewLine + ex.StackTrace);
                     Trace.TraceInformation("Error could not be handled. Abort connection.");
                     _Status = VNDBCommunicationStatus.Error;
                     _ErrorMessage = "Login failed. Error message: " + ex.Message + ex.GetType().ToString() + ex.GetBaseException().GetType().ToString();
@@ -102,21 +103,20 @@ namespace VNDBUpdater.Communication.VNDB
         {
             var visualNovels = new List<VisualNovel>();
 
-            if (IDs.Count >= MAXVNSPERREQUEST)
+            var idSplitter = new VNIDsSplitter(IDs.ToArray());
+
+            idSplitter.Split();
+
+            if (idSplitter.SplittingNeccessary)
             {
-                // Divide the ids into packets with MAXVNSPERREQUEST each.
-                int[] ids = IDs.ToArray();
-                int numberOfRequests = (ids.Length / MAXVNSPERREQUEST);
-                int remainder = ids.Length - (numberOfRequests * MAXVNSPERREQUEST);
+                for (int round = 0; round < idSplitter.NumberOfRequest; round++)
+                    AddToVisualNovelsList(idSplitter.IDs.Take(round * MAXVNSPERREQUEST, MAXVNSPERREQUEST).ToList(), visualNovels);
 
-                for (int round = 0; round < numberOfRequests; round++)
-                    AddToVisualNovelsList(ids.Take(round * MAXVNSPERREQUEST, MAXVNSPERREQUEST).ToList(), visualNovels);
-
-                if (remainder > 0)
-                    AddToVisualNovelsList(ids.Take(ids.Length - remainder, remainder).ToList(), visualNovels);
+                if (idSplitter.Remainder > 0)
+                    AddToVisualNovelsList(idSplitter.IDs.Take(idSplitter.IDs.Length - idSplitter.Remainder, idSplitter.Remainder).ToList(), visualNovels);
             }
-            else if (IDs.Any())
-                AddToVisualNovelsList(IDs, visualNovels);
+            else
+                AddToVisualNovelsList(idSplitter.IDs.ToList(), visualNovels);
 
             return visualNovels.OrderBy(x => x.Basics.id).ToList();
         }

@@ -9,14 +9,15 @@ using VNDBUpdater.Data;
 using VNDBUpdater.Helper;
 using VNDBUpdater.Models;
 using VNDBUpdater.ViewModels;
+using VNUpdater.Helper;
 
 namespace VNDBUpdater.BackgroundTasks
 {
     public class Synchronizer : BackgroundTask
     {
-        private static BackgroundTaskState _Status = BackgroundTaskState.NotRunning;
+        private static TaskStatus _Status = TaskStatus.WaitingToRun;
 
-        public static BackgroundTaskState Status
+        public static TaskStatus Status
         {
             get { return _Status; }
         }
@@ -27,19 +28,21 @@ namespace VNDBUpdater.BackgroundTasks
             {
                 switch (_Status)
                 {
-                    case (BackgroundTaskState.Running):
+                    case (TaskStatus.Running):
                         return "Synchronizer is currently running. " + _MainScreen.CompletedPendingTasks + " from " + _MainScreen.CurrentPendingTasks + " Visual Novels synced.";
-                    case (BackgroundTaskState.Finished):
+                    case (TaskStatus.RanToCompletion):
                         return "Synchronizer is finished.";
+                    case (TaskStatus.Faulted):
+                        return "Error occured while running Synchronizer. Please check the eventlog.";
                     default:
-                        return "Synchronizer not running.";
+                        return string.Empty;
                 }
             }
         }
 
         public override void Start(MainViewModel MainScreen)
         {
-            if (_Status != BackgroundTaskState.Running)
+            if (_Status != TaskStatus.Running)
             {
                 base.Start(MainScreen);
 
@@ -49,13 +52,13 @@ namespace VNDBUpdater.BackgroundTasks
 
                 if (VNDBCommunication.Status != VNDBCommunicationStatus.LoggedIn)
                 {
-                    _Status = BackgroundTaskState.NotRunning;
+                    _Status = TaskStatus.WaitingToRun;
                     Cancel();
                     return;
                 }
 
                 _MainScreen.CompletedPendingTasks = 0;
-                _Status = BackgroundTaskState.Running;
+                _Status = TaskStatus.Running;
 
                 _BackgroundTask = new Task(Synchronize, _CancelToken);
                 _BackgroundTask.Start();
@@ -64,7 +67,7 @@ namespace VNDBUpdater.BackgroundTasks
 
         public static void Cancel()
         {
-            if (_Status == BackgroundTaskState.Running)
+            if (_Status == TaskStatus.Running)
             {
                 _CancelTokenSource.Cancel();
             }
@@ -88,14 +91,15 @@ namespace VNDBUpdater.BackgroundTasks
                 SynchronizeWishes(WishList);
                 SynchronizeVotes(VoteList);
 
-                _Status = BackgroundTaskState.Finished;
-                _MainScreen.UpdateStatusText();
                 Cancel();
+                _Status = TaskStatus.RanToCompletion;
+                _MainScreen.UpdateStatusText();                
 
                 Trace.TraceInformation("Synchronizer finished successfully.");
             }
             catch (Exception ex)
             {
+                _Status = TaskStatus.Faulted;
                 Trace.TraceError("Error caught in Synchronizer: " + Environment.NewLine + ex.Message + Environment.NewLine + ex.GetType().Name + Environment.NewLine + ex.StackTrace);
             }
 
@@ -177,21 +181,20 @@ namespace VNDBUpdater.BackgroundTasks
 
         private void GetVNs(List<VN> VNs)
         {
-            int[] ids = VNs.Select(x => x.vn).ToArray();
+            var idSplitter = new VNIDsSplitter(VNs.Select(x => x.vn).ToArray());
 
-            if (VNs.Count >= VNDBCommunication.MAXVNSPERREQUEST)
-            {                
-                int numberOfRequests = (ids.Length / VNDBCommunication.MAXVNSPERREQUEST);
-                int remainder = ids.Length - (numberOfRequests * VNDBCommunication.MAXVNSPERREQUEST);
+            idSplitter.Split();
 
-                for (int round = 0; round < numberOfRequests; round++)
-                    AddVNs(ids.Take(round * VNDBCommunication.MAXVNSPERREQUEST, VNDBCommunication.MAXVNSPERREQUEST), VNs);
+            if (idSplitter.SplittingNeccessary)
+            {
+                for (int round = 0; round < idSplitter.NumberOfRequest; round++)
+                    AddVNs(idSplitter.IDs.Take(round * VNDBCommunication.MAXVNSPERREQUEST, VNDBCommunication.MAXVNSPERREQUEST), VNs);
 
-                if (remainder > 0)
-                    AddVNs(ids.Take(ids.Length - remainder, remainder), VNs);
+                if (idSplitter.Remainder > 0)
+                    AddVNs(idSplitter.IDs.Take(idSplitter.IDs.Length - idSplitter.Remainder, idSplitter.Remainder), VNs);
             }
             else
-                AddVNs(ids, VNs);
+                AddVNs(idSplitter.IDs, VNs);
         }
 
         private void AddVNs(int[] ids, List<VN> VNs)

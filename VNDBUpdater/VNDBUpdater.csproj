@@ -88,8 +88,10 @@
     </ApplicationDefinition>
     <Compile Include="BackgroundTasks\BackgroundTaskBase.cs" />
     <Compile Include="BackgroundTasks\FileIndexer.cs" />
+    <Compile Include="BackgroundTasks\Refresher.cs" />
     <Compile Include="BackgroundTasks\Synchronizer.cs" />
     <Compile Include="Helper\VisualNovelHelper.cs" />
+    <Compile Include="Helper\VNIDsSplitter.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

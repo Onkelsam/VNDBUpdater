@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using VNDBUpdater.BackgroundTasks;
 using VNDBUpdater.Communication.Database;
@@ -178,7 +179,7 @@ namespace VNDBUpdater.ViewModels
         {
             get
             {
-                return VNDBCommunication.StatusString + " " + Synchronizer.StatusString + " " + FileIndexer.StatusString;
+                return VNDBCommunication.StatusString + " " + Synchronizer.StatusString + " " + FileIndexer.StatusString + " " + Refresher.StatusString;
             }
         }
 
@@ -223,33 +224,20 @@ namespace VNDBUpdater.ViewModels
 
         public void ExecuteRefreshVisualNovels(object parameter)
         {            
-            var dialogResult = MessageBox.Show("Are you sure? This can take a long time while the program won't be responding.", "Refresh", MessageBoxButton.YesNo);
+            Tag.RefreshTags();
 
-            if (dialogResult == MessageBoxResult.Yes)
-            {
-                Tag.RefreshTags();
-
-                var updatedVNs = VNDBCommunication.FetchVisualNovels(_AllVisualNovels.Select(x => x.Basics.id).ToList());
-
-                foreach (var updatedVN in updatedVNs)
-                {
-                    var vnToUpdate = _AllVisualNovels.Where(x => x.Basics.id == updatedVN.Basics.id).First();
-
-                    vnToUpdate.Basics = updatedVN.Basics;
-                    vnToUpdate.Characters = updatedVN.Characters;
-                }
-
-                UpdateVisualNovelGrid();
-            }
+            var refrehser = new Refresher();
+            refrehser.Start(this);
         }
 
         public bool CanExecuteVNDBOperations(object parameter)
         {
-            if (Synchronizer.Status == BackgroundTaskState.Running ||
+            if (Synchronizer.Status == TaskStatus.Running ||
                 !RedisCommunication.UserCredentialsAvailable() ||
                 VNDBCommunication.Status == VNDBCommunicationStatus.NotLoggedIn ||
                 VNDBCommunication.Status == VNDBCommunicationStatus.Error ||
-                FileIndexer.Status == BackgroundTaskState.Running)
+                FileIndexer.Status == TaskStatus.Running ||
+                Refresher.Status == TaskStatus.Running)
                 return false;
             else
                 return true;
@@ -380,6 +368,7 @@ namespace VNDBUpdater.ViewModels
 
         public void ExecuteCloseWindow(object parameter)
         {
+            Refresher.Cancel();
             Synchronizer.Cancel();
             FileIndexer.Cancel();
             RedisCommunication.SaveRedis();
