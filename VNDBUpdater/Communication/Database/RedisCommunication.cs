@@ -242,6 +242,7 @@ namespace VNDBUpdater.Communication.Database
         public static void SaveRedis()
         {
             SaveCurrentDB();
+            Trace.TraceInformation("Redis saved successfully.");
         }
 
         private static void WriteEntity<T>(string key, T entity) where T : class
@@ -321,6 +322,7 @@ namespace VNDBUpdater.Communication.Database
             {
                 Connection.Disconnect();
                 _IsConnected = false;
+                Trace.TraceInformation("Redis disconnected successfully.");
             }
         }
 
@@ -331,6 +333,7 @@ namespace VNDBUpdater.Communication.Database
                 Connection.Disconnect();
                 Connection.Dispose();
                 _IsConnected = false;
+                Trace.TraceInformation("Redis disposed successfully.");
             }
         }
     }

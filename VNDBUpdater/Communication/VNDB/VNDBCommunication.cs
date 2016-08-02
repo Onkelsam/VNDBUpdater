@@ -358,6 +358,7 @@ namespace VNDBUpdater.Communication.VNDB
             {
                 Connection.Disconnect();
                 _Status = VNDBCommunicationStatus.NotLoggedIn;
+                Trace.TraceInformation("VNDB unlogged successfully.");
             }
         }
 
@@ -368,6 +369,7 @@ namespace VNDBUpdater.Communication.VNDB
                 Connection.Disconnect();
                 Connection.Dispose();
                 _Status = VNDBCommunicationStatus.NotLoggedIn;
+                Trace.TraceInformation("VNDB connection disposed successfully.");
             }
         }
     }

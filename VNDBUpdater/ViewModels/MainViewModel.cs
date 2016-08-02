@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
@@ -368,12 +369,21 @@ namespace VNDBUpdater.ViewModels
 
         public void ExecuteCloseWindow(object parameter)
         {
-            Refresher.Cancel();
-            Synchronizer.Cancel();
-            FileIndexer.Cancel();
-            RedisCommunication.SaveRedis();
-            RedisCommunication.Dispose();
-            VNDBCommunication.Dispose();
+            try
+            {
+                Refresher.Cancel();
+                Synchronizer.Cancel();
+                FileIndexer.Cancel();
+                RedisCommunication.SaveRedis();
+                RedisCommunication.Dispose();
+                VNDBCommunication.Dispose();
+                Trace.TraceInformation("Gracefull shutdown successfull.");
+            }
+            catch (Exception ex)
+            {
+                Trace.TraceError("Gracefull shutdown failed.");
+                Trace.TraceError("Error occured: " + Environment.NewLine + ex.Message + Environment.NewLine + ex.GetType().Name + Environment.NewLine + ex.StackTrace);
+            }            
         }
 
         public void ExecuteSetExePath(object parameter)
