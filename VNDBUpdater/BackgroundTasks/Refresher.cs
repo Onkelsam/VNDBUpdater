@@ -82,18 +82,21 @@ namespace VNDBUpdater.BackgroundTasks
                     {                        
                         updatedVNs.AddRange(VNDBCommunication.FetchVisualNovels(idSplitter.IDs.Take(round * VNDBCommunication.MAXVNSPERREQUEST, VNDBCommunication.MAXVNSPERREQUEST).ToList()));
                         _MainScreen.CompletedPendingTasks += VNDBCommunication.MAXVNSPERREQUEST;
+                        Trace.TraceInformation("Refresher completed Tasks: " + _MainScreen.CompletedPendingTasks.ToString());
                     }
                         
                     if (idSplitter.Remainder > 0)
                     {                        
                         updatedVNs.AddRange(VNDBCommunication.FetchVisualNovels(idSplitter.IDs.Take(idSplitter.IDs.Length - idSplitter.Remainder, idSplitter.Remainder).ToList()));
                         _MainScreen.CompletedPendingTasks += idSplitter.Remainder;
+                        Trace.TraceInformation("Refresher completed Tasks: " + _MainScreen.CompletedPendingTasks.ToString());
                     }                        
                 }
                 else
                 {
                     updatedVNs.AddRange(VNDBCommunication.FetchVisualNovels(idSplitter.IDs.ToList()));
                     _MainScreen.CompletedPendingTasks += idSplitter.IDs.Length;
+                    Trace.TraceInformation("Refresher completed Tasks: " + _MainScreen.CompletedPendingTasks.ToString());
                 }                    
 
                 foreach (var vn in updatedVNs)
