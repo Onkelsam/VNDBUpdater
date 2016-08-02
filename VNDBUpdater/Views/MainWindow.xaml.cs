@@ -17,6 +17,10 @@ namespace VNDBUpdater.Views
 
             DataContext = new MainViewModel();
 
+            if (File.Exists(@"Eventlog.txt"))
+                if (new FileInfo(@"Eventlog.txt").Length > 1000000)
+                    File.Delete(@"Eventlog.txt");
+
             (DataContext as MainViewModel).GetVisualNovelsFromDatabase();
 
             if (!File.Exists(@"tags.json"))
