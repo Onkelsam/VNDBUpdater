@@ -15,6 +15,11 @@
         <StackPanel VerticalAlignment="Center">
             <Label Content="{Binding Path=Version}" HorizontalAlignment="Center" FontWeight="Bold" />
             <Label Content="{Binding Path=Copyright}"  HorizontalAlignment="Center"/>
+            <TextBlock HorizontalAlignment="Center">           
+                <Hyperlink NavigateUri="https://github.com/Onkelsam/VNDBUpdater/releases" Command="{Binding Commands.OpenGitHubLink}">
+                    GitHub-Link
+                </Hyperlink>
+            </TextBlock>
         </StackPanel>
     </Grid>
 </Window>
