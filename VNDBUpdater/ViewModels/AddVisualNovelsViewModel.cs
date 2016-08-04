@@ -10,7 +10,7 @@ namespace VNDBUpdater.ViewModels
 {
     class AddVisualNovelsViewModel : ViewModelBase
     {
-        private ProperObservableCollection<VisualNovel> _VisualNovelsToAdd;
+        private AsyncObservableCollection<VisualNovel> _VisualNovelsToAdd;
         private VisualNovel _SelectedVisualNovel;
 
         private string _IDs;
@@ -27,13 +27,13 @@ namespace VNDBUpdater.ViewModels
             _Commands.AddCommand("AddVisualNovelsToDB", ExecuteAddVisualNovelsToDB, CanExecuteAddVisualNovelsToDB);
             _Commands.AddCommand("SetExePath", ExecuteSetExePath, CanExecuteSetExePath);
 
-            _VisualNovelsToAdd = new ProperObservableCollection<VisualNovel>();
+            _VisualNovelsToAdd = new AsyncObservableCollection<VisualNovel>();
             _SelectedVisualNovel = new VisualNovel();            
 
             _VisualNovelsToAdd.CollectionChanged += OnCollectionChanged;
         }
 
-        public ProperObservableCollection<VisualNovel> VisualNovelsToAdd
+        public AsyncObservableCollection<VisualNovel> VisualNovelsToAdd
         {
             get { return _VisualNovelsToAdd; }
             set { _VisualNovelsToAdd = value; }
