@@ -93,7 +93,7 @@ namespace VNDBUpdater.BackgroundTasks
 
                 Cancel();
                 _Status = TaskStatus.RanToCompletion;
-                _MainScreen.UpdateStatusText();                
+                _MainScreen.UpdateStatusText();
 
                 Trace.TraceInformation("Synchronizer finished successfully.");
             }
@@ -101,8 +101,7 @@ namespace VNDBUpdater.BackgroundTasks
             {
                 _Status = TaskStatus.Faulted;
                 Trace.TraceError("Error caught in Synchronizer: " + Environment.NewLine + ex.Message + Environment.NewLine + ex.GetType().Name + Environment.NewLine + ex.StackTrace);
-            }
-
+            }        
         }
 
         private void SynchronizeVNs(List<VN> VNsToSynchronize)
@@ -195,6 +194,8 @@ namespace VNDBUpdater.BackgroundTasks
             }
             else
                 AddVNs(idSplitter.IDs, VNs);
+
+            _MainScreen.GetVisualNovelsFromDatabase();
         }
 
         private void AddVNs(int[] ids, List<VN> VNs)
@@ -210,13 +211,8 @@ namespace VNDBUpdater.BackgroundTasks
                 RedisCommunication.AddVisualNovelToDB(vn);
                 vn.CrawlExePath();
 
-                _MainScreen.AddOnUI(_MainScreen.AllVisualNovels, vn);
-
-                if (vn.Category == (VisualNovelCatergory)_MainScreen.SelectedVisualNovelTab)
-                    _MainScreen.AddOnUI(_MainScreen.VisualNovelsInGrid, vn);
-
                 _MainScreen.CompletedPendingTasks++;
-                _MainScreen.UpdateStatusText();
+                _MainScreen.UpdateStatusText();               
             }            
         }
     }

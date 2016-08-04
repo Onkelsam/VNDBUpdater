@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Data;
 using VNDBUpdater.BackgroundTasks;
 using VNDBUpdater.Communication.Database;
 using VNDBUpdater.Communication.VNDB;
@@ -21,8 +20,8 @@ namespace VNDBUpdater.ViewModels
     {
         private List<VisualNovel> _AllVisualNovels;
 
-        private ProperObservableCollection<VisualNovel> _VisualNovelsInGrid;
-        private ObservableCollection<Tag> _TagsInGrid;
+        private AsyncObservableCollection<VisualNovel> _VisualNovelsInGrid;
+        private AsyncObservableCollection<Tag> _TagsInGrid;
         private List<int> _Scores = new List<int>() { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
         private VisualNovel _SelectedVisualNovel;
         private List<Filter> _AvailableFilters;
@@ -37,12 +36,14 @@ namespace VNDBUpdater.ViewModels
         private int _CurrentPendingTasks;
         private int _CompletedPendingTasks;
 
+        private static object _SyncLock = new object(); 
+
         public MainViewModel()
             : base()
         {
             _AllVisualNovels = new List<VisualNovel>();
-            _VisualNovelsInGrid = new ProperObservableCollection<VisualNovel>();
-            _TagsInGrid = new ObservableCollection<Tag>();
+            _VisualNovelsInGrid = new AsyncObservableCollection<VisualNovel>();
+            _TagsInGrid = new AsyncObservableCollection<Tag>();
             _SelectedVisualNovel = new VisualNovel();
             _AvailableFilters = new List<Filter>();
             _AppliedFilter = new Filter();
@@ -72,8 +73,11 @@ namespace VNDBUpdater.ViewModels
             _Commands.AddCommand("CreateWalkthrough", ExecuteCreateWalkthrough, CanExecuteCreateWalkthrough);
             _Commands.AddCommand("SetCustomScore", ExecuteSetCustomScore, CanExecuteVisualNovelChanges);
 
-            _VisualNovelsInGrid.CollectionChanged += OnCollectionChanged;
+            _VisualNovelsInGrid.CollectionChanged += OnCollectionChanged;            
             _TagsInGrid.CollectionChanged += OnCollectionChanged;
+
+            BindingOperations.EnableCollectionSynchronization(_VisualNovelsInGrid, _SyncLock);
+            BindingOperations.EnableCollectionSynchronization(_TagsInGrid, _SyncLock);
         }
 
         public List<VisualNovel> AllVisualNovels
@@ -82,13 +86,13 @@ namespace VNDBUpdater.ViewModels
             set { _AllVisualNovels = value; }
         }
 
-        public ProperObservableCollection<VisualNovel> VisualNovelsInGrid
+        public AsyncObservableCollection<VisualNovel> VisualNovelsInGrid
         {
             get { return _VisualNovelsInGrid; }
             set { _VisualNovelsInGrid = value; }
         }
 
-        public ObservableCollection<Tag> TagsInGrid
+        public AsyncObservableCollection<Tag> TagsInGrid
         {
             get { return _TagsInGrid; }
             set { _TagsInGrid = value; }
@@ -364,7 +368,7 @@ namespace VNDBUpdater.ViewModels
 
         public void ExecuteSetScore(object parameter)
         {
-            _SelectedVisualNovel.SetScore((int)parameter);
+            _SelectedVisualNovel.SetScore((int)parameter * 10);
             UpdateVisualNovelInDB(_SelectedVisualNovel);
             UpdateVisualNovelGrid();
         }

@@ -230,7 +230,13 @@ namespace VNDBUpdater.Models
             {
                 ExePath = FileHelper.SearchForVisualNovelExe(this);
                 RedisCommunication.AddVisualNovelToDB(this);
+                OnPropertyChanged(nameof(ExePath));
             }
+        }
+
+        public void OnPropertyChanged(string property)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(property));
         }
     }
 }
