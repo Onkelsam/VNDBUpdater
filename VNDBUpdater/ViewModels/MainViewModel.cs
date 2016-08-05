@@ -13,12 +13,10 @@ using VNDBUpdater.Data;
 using VNDBUpdater.Helper;
 using VNDBUpdater.Models;
 using VNDBUpdater.Views;
+using VNUpdater.Helper;
 
 namespace VNDBUpdater.ViewModels
-{
-
-    //TODO: Fix filters.
-
+{  
     public class MainViewModel : ViewModelBase
     {
         private List<VisualNovel> _AllVisualNovels;
@@ -214,6 +212,17 @@ namespace VNDBUpdater.ViewModels
 
                 OnPropertyChanged(nameof(CompletedPendingTasks));
                 OnPropertyChanged(nameof(StatusText));
+            }
+        }
+
+        public string Title
+        {
+            get
+            {
+                if (VersionHelper.NewVersionAvailable())
+                    return "VNDBUpdater " + VersionHelper.CurrentVersion + "  New Version available! Check the 'About'-window.";
+                else
+                    return "VNDBUpdater " + VersionHelper.CurrentVersion;
             }
         }
 

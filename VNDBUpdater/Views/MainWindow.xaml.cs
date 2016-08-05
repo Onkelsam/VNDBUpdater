@@ -30,7 +30,7 @@ namespace VNDBUpdater.Views
             {
                 var BackgroundSynchronizer = new Synchronizer();
                 BackgroundSynchronizer.Start((DataContext as MainViewModel));
-            }            
+            }        
         }
     }
 }

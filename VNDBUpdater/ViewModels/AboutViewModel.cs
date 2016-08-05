@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Reflection;
+using VNUpdater.Helper;
 
 namespace VNDBUpdater.ViewModels
 {
@@ -13,12 +14,17 @@ namespace VNDBUpdater.ViewModels
 
         public string Version
         {
-            get { return ((AssemblyTitleAttribute)Attribute.GetCustomAttribute(Assembly.GetExecutingAssembly(), typeof(AssemblyTitleAttribute), false)).Title + " Version: " + Assembly.GetExecutingAssembly().GetName().Version.ToString(); }
+            get { return "VNDBUpdater Version: " + VersionHelper.CurrentVersion; }
         }
 
         public string Copyright
         {
             get { return ((AssemblyCopyrightAttribute)Attribute.GetCustomAttribute(Assembly.GetExecutingAssembly(), typeof(AssemblyCopyrightAttribute), false)).Copyright; }
+        }
+
+        public string LatestRelease
+        {
+            get { return "Latest Release: " + VersionHelper.NewestVersion; }
         }
 
         public void ExecuteOpenGitHubLink(object parameter)

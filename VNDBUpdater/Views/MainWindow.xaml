@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
         xmlns:local="clr-namespace:VNDBUpdater.ViewModels"
-        Title="VNDBUpdater" Height="665" Width="1213.775"        
+        Title="{Binding Path=Title}" Height="665" Width="1213.775"        
         Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
 
     <i:Interaction.Triggers>
