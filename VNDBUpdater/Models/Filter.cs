@@ -48,7 +48,7 @@ namespace VNDBUpdater.Models
 
         public bool ShouldVNBeFilteredOut(VisualNovel vn)
         {
-            bool containsAnd = true, containsOr = false, containsExcluded = false;
+            bool containsAnd = false, containsOr = false, containsExcluded = false;
 
             var tags = new List<Tag>();
 
@@ -57,8 +57,8 @@ namespace VNDBUpdater.Models
                     tags.Add(TagHelper.LocalTags.Where(x => x.ID == tagID[0]).First());
 
             foreach (var and in IncludedWithAnd)
-                if (!tags.Any(x => x.Name == and.Name))
-                    containsAnd = false;
+                if (tags.Any(x => x.Name == and.Name))
+                    containsAnd = true;
 
             foreach (var or in IncludedWithOr)
                 if (tags.Any(x => x.Name == or.Name))

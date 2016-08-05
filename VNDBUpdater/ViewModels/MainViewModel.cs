@@ -16,6 +16,9 @@ using VNDBUpdater.Views;
 
 namespace VNDBUpdater.ViewModels
 {
+
+    //TODO: Fix filters.
+
     public class MainViewModel : ViewModelBase
     {
         private List<VisualNovel> _AllVisualNovels;
