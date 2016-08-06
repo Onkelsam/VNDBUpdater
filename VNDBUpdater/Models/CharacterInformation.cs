@@ -1,10 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using Newtonsoft.Json;
+using System.Collections.Generic;
 using VNDBUpdater.Communication.VNDB;
 
 namespace VNDBUpdater.Models
 {
     public class CharacterInformation : VNCharacterInformation
     {
+        [JsonIgnore]
         public List<Trait> ConvertedTraits { get; set; }
 
         public CharacterInformation(VNCharacterInformation charinfo)

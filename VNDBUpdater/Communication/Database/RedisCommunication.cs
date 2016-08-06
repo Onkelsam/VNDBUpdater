@@ -83,16 +83,19 @@ namespace VNDBUpdater.Communication.Database
             {
                 var entity = ReadEntity<VisualNovel>(key);
 
+                entity.Basics = new BasicInformation(entity.Basics);
+
+                for (int i = 0; i < entity.Characters.Count; i++)
+                    entity.Characters[i] = new CharacterInformation(entity.Characters[i]);
+
+                entity.Characters.ForEach(x => { x = new CharacterInformation(x); });
+
                 existingVNs.Add(entity);
             }
 
             return existingVNs;
         }
 
-        public static VisualNovel GetVisualNovelFromDB(int id)
-        {
-            return ReadEntity<VisualNovel>("VisualNovel_" + id.ToString());
-        }
 
         public static void DeleteVisualNovel(int id)
         {

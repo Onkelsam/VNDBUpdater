@@ -58,12 +58,15 @@ namespace VNDBUpdater.Models
         {
             var TraitList = new List<Trait>();
 
-            foreach (var trait in character.traits)
+            if (character.traits != null)
             {
-                Trait foundTrait = TraitsHelper.LocalTraits.FirstOrDefault(x => x.ID == trait[0]);
+                foreach (var trait in character.traits)
+                {
+                    Trait foundTrait = TraitsHelper.LocalTraits.FirstOrDefault(x => x.ID == trait[0]);
 
-                if (foundTrait != null)
-                    TraitList.Add(foundTrait);
+                    if (foundTrait != null)
+                        TraitList.Add(foundTrait);
+                }
             }
 
             return TraitList;

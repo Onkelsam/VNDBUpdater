@@ -1,10 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using Newtonsoft.Json;
+using System.Collections.Generic;
 using VNDBUpdater.Communication.VNDB;
 
 namespace VNDBUpdater.Models
 {
     public class BasicInformation : VNInformation
     {
+        [JsonIgnore]
         public List<Tag> ConvertedTags { get; set; }
 
         public BasicInformation(VNInformation basics)

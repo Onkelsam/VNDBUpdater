@@ -61,7 +61,7 @@ namespace VNDBUpdater.Models
 
                 if (_ExePath != null)
                 {
-                    if (Path.GetExtension(_ExePath) == ".exe")
+                    if (Path.GetExtension(_ExePath) == "exe")
                         FolderPath = !string.IsNullOrEmpty(_ExePath) ? _ExePath.Replace(Path.GetFileName(_ExePath), "") : string.Empty;
                     else
                         FolderPath = _ExePath;
