@@ -22,5 +22,7 @@
 
         public const int MaxConnectionTries = 4;
         public const int MaxDistanceBetweenStringsForIndexer = 5;
+
+        public const string EventlogFileName = "Eventlog.txt";
     }
 }

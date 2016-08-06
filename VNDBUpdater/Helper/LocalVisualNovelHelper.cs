@@ -14,13 +14,16 @@ namespace VNDBUpdater.Helper
             get
             {
                 if (_LocalVisualNovels == null || !_LocalVisualNovels.Any())
-                {
-                    _LocalVisualNovels = new List<VisualNovel>();
-                    _LocalVisualNovels.AddRange(RedisCommunication.GetVisualNovelsFromDB());
-                }
+                    RefreshVisualNovels();
 
                 return _LocalVisualNovels;
             }
+        }
+
+        public static void RefreshVisualNovels()
+        {
+            _LocalVisualNovels = new List<VisualNovel>();
+            _LocalVisualNovels.AddRange(RedisCommunication.GetVisualNovelsFromDB());
         }
 
         public static bool VisualNovelExists(int ID)

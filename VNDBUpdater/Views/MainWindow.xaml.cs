@@ -1,7 +1,5 @@
-﻿using System.IO;
-using System.Windows;
+﻿using System.Windows;
 using VNDBUpdater.BackgroundTasks;
-using VNDBUpdater.Communication.Database;
 using VNDBUpdater.ViewModels;
 
 namespace VNDBUpdater.Views
@@ -17,23 +15,8 @@ namespace VNDBUpdater.Views
 
             DataContext = new MainViewModel();
 
-            if (File.Exists(@"Eventlog.txt"))
-                if (new FileInfo(@"Eventlog.txt").Length > 1000000)
-                    File.Delete(@"Eventlog.txt");
-
-            (DataContext as MainViewModel).GetVisualNovelsFromDatabase();
-
-            if (!File.Exists(@"tags.json"))
-                Models.Tag.RefreshTags();
-
-            if (!File.Exists(@"traits.json"))
-                Models.Trait.RefreshTraits();
-
-            if (RedisCommunication.UserCredentialsAvailable())
-            {
-                var BackgroundSynchronizer = new Synchronizer();
-                BackgroundSynchronizer.Start((DataContext as MainViewModel));
-            }        
+            var Startup = new StartUp();
+            Startup.Start((DataContext as MainViewModel));    
         }
     }
 }

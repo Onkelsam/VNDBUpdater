@@ -95,6 +95,13 @@ namespace VNDBUpdater.Helper
                 File.Delete(filename);
         }
 
+        public static void DeleteTooLargeFile(string filename, long maxfilesize)
+        {
+            if (File.Exists(filename))
+                if (new FileInfo(filename).Length > maxfilesize)
+                    DeleteFile(filename);
+        }
+
         public static string SearchForVisualNovelExe(VisualNovel VN)
         {
             if (Folders != null)

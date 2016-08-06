@@ -187,7 +187,7 @@ namespace VNDBUpdater.ViewModels
         {
             get
             {
-                return VNDBCommunication.StatusString + " " + Synchronizer.StatusString + " " + FileIndexer.StatusString + " " + Refresher.StatusString;
+                return VNDBCommunication.StatusString + " " + StartUp.StatusString + " " + Synchronizer.StatusString + " " + FileIndexer.StatusString + " " + Refresher.StatusString;
             }
         }
 
@@ -257,7 +257,8 @@ namespace VNDBUpdater.ViewModels
                 VNDBCommunication.Status == VNDBCommunicationStatus.NotLoggedIn ||
                 VNDBCommunication.Status == VNDBCommunicationStatus.Error ||
                 FileIndexer.Status == TaskStatus.Running ||
-                Refresher.Status == TaskStatus.Running)
+                Refresher.Status == TaskStatus.Running ||
+                StartUp.Status == TaskStatus.Running)
                 return false;
             else
                 return true;
@@ -390,6 +391,7 @@ namespace VNDBUpdater.ViewModels
         {
             try
             {
+                StartUp.Cancel();
                 Refresher.Cancel();
                 Synchronizer.Cancel();
                 FileIndexer.Cancel();

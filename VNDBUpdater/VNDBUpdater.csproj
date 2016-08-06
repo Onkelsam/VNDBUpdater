@@ -95,6 +95,7 @@
     <Compile Include="BackgroundTasks\BackgroundTaskBase.cs" />
     <Compile Include="BackgroundTasks\FileIndexer.cs" />
     <Compile Include="BackgroundTasks\Refresher.cs" />
+    <Compile Include="BackgroundTasks\StarUp.cs" />
     <Compile Include="BackgroundTasks\Synchronizer.cs" />
     <Compile Include="Data\Constants.cs" />
     <Compile Include="Helper\TraitsHelper.cs" />
