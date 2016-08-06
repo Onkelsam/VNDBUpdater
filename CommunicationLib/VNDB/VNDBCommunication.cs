@@ -90,7 +90,7 @@ namespace CommunicationLib.VNDB
 
             SetOptions(page, 25, "id");
 
-            return Query("get character details,vns (vn = [" + string.Join(",", IDs) + "] )");
+            return Query("get character basic,details,traits,vns (vn = [" + string.Join(",", IDs) + "] )");
         }
 
         public VndbResponse QueryInformation(int ID)
@@ -112,7 +112,7 @@ namespace CommunicationLib.VNDB
 
             SetOptionsToDefault();
 
-            return Query("get character details,vns (vn = " + ID + ")");
+            return Query("get character basic,details,traits,vns (vn = " + ID + ")");
         }
 
         public VndbResponse QueryVoteList(int page = 1)

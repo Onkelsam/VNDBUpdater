@@ -1,4 +1,5 @@
 ﻿using VNDBUpdater.Communication.VNDB;
+using VNUpdater.Data;
 
 namespace VNUpdater.Helper
 {
@@ -16,11 +17,11 @@ namespace VNUpdater.Helper
 
         public void Split()
         {
-            if (IDs.Length > VNDBCommunication.MAXVNSPERREQUEST)
+            if (IDs.Length > Constants.MaxVNsPerRequest)
             {
                 SplittingNeccessary = true;
-                NumberOfRequest = (IDs.Length / VNDBCommunication.MAXVNSPERREQUEST);
-                Remainder = IDs.Length - (NumberOfRequest * VNDBCommunication.MAXVNSPERREQUEST);
+                NumberOfRequest = (IDs.Length / Constants.MaxVNsPerRequest);
+                Remainder = IDs.Length - (NumberOfRequest * Constants.MaxVNsPerRequest);
             }
             else
                 SplittingNeccessary = false;

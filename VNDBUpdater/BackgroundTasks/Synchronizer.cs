@@ -9,6 +9,7 @@ using VNDBUpdater.Data;
 using VNDBUpdater.Helper;
 using VNDBUpdater.Models;
 using VNDBUpdater.ViewModels;
+using VNUpdater.Data;
 using VNUpdater.Helper;
 
 namespace VNDBUpdater.BackgroundTasks
@@ -110,12 +111,12 @@ namespace VNDBUpdater.BackgroundTasks
 
             foreach (var vn in VNsToSynchronize)
             {                
-                if (VisualNovelHelper.VisualNovelExists(vn.vn))
+                if (LocalVisualNovelHelper.VisualNovelExists(vn.vn))
                 {
                     _MainScreen.CompletedPendingTasks++;
                     Trace.TraceInformation("Synchronizer synced VNs: " + _MainScreen.CompletedPendingTasks.ToString());
 
-                    VisualNovel LocalVN = VisualNovelHelper.GetVisualNovel(vn.vn);
+                    VisualNovel LocalVN = LocalVisualNovelHelper.GetVisualNovel(vn.vn);
 
                     if (LocalVN.Category != (VisualNovelCatergory)vn.status)
                     {
@@ -137,12 +138,12 @@ namespace VNDBUpdater.BackgroundTasks
 
             foreach (var wish in WishesToSynchronize)
             {                
-                if (VisualNovelHelper.VisualNovelExists(wish.vn))
+                if (LocalVisualNovelHelper.VisualNovelExists(wish.vn))
                 {
                     _MainScreen.CompletedPendingTasks++;
                     Trace.TraceInformation("Synchronizer synced Wishes: " + _MainScreen.CompletedPendingTasks.ToString());
 
-                    VisualNovel LocalVN = VisualNovelHelper.GetVisualNovel(wish.vn);
+                    VisualNovel LocalVN = LocalVisualNovelHelper.GetVisualNovel(wish.vn);
 
                     if (LocalVN.Category != VisualNovelCatergory.Wish)
                     {
@@ -162,12 +163,12 @@ namespace VNDBUpdater.BackgroundTasks
         {
             foreach (var vote in VotesToSynchronize)
             {                
-                if (VisualNovelHelper.VisualNovelExists(vote.vn))
+                if (LocalVisualNovelHelper.VisualNovelExists(vote.vn))
                 {
                     _MainScreen.CompletedPendingTasks++;
                     Trace.TraceInformation("Synchronizer synced Votes: " + _MainScreen.CompletedPendingTasks.ToString());
 
-                    VisualNovel LocalVN = VisualNovelHelper.GetVisualNovel(vote.vn);
+                    VisualNovel LocalVN = LocalVisualNovelHelper.GetVisualNovel(vote.vn);
 
                     if (LocalVN.Score != vote.vote)
                     {
@@ -187,7 +188,7 @@ namespace VNDBUpdater.BackgroundTasks
             if (idSplitter.SplittingNeccessary)
             {
                 for (int round = 0; round < idSplitter.NumberOfRequest; round++)
-                    AddVNs(idSplitter.IDs.Take(round * VNDBCommunication.MAXVNSPERREQUEST, VNDBCommunication.MAXVNSPERREQUEST), VNs);
+                    AddVNs(idSplitter.IDs.Take(round * Constants.MaxVNsPerRequest, Constants.MaxVNsPerRequest), VNs);
 
                 if (idSplitter.Remainder > 0)
                     AddVNs(idSplitter.IDs.Take(idSplitter.IDs.Length - idSplitter.Remainder, idSplitter.Remainder), VNs);

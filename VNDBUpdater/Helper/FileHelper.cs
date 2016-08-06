@@ -4,13 +4,13 @@ using System.IO.Compression;
 using System.Windows.Forms;
 using VNDBUpdater.Communication.Database;
 using VNDBUpdater.Models;
+using VNUpdater.Data;
 
 namespace VNDBUpdater.Helper
 {
     public static class FileHelper
     {
         private static string[] _Folders;
-        private const int MAXDISTANCEBETWEENSTRING = 5;
 
         private static string[] Folders
         {
@@ -108,7 +108,7 @@ namespace VNDBUpdater.Helper
                 }
 
                 // Second try. Use the LevenshteinDistance algorithm to find similiar folders.
-                for (int maxDistance = 2; maxDistance < MAXDISTANCEBETWEENSTRING; maxDistance++)
+                for (int maxDistance = 2; maxDistance < Constants.MaxDistanceBetweenStringsForIndexer; maxDistance++)
                 {
                     foreach (var folder in Folders)
                     {

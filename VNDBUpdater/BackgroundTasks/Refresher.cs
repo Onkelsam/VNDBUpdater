@@ -8,6 +8,7 @@ using VNDBUpdater.Communication.VNDB;
 using VNDBUpdater.Helper;
 using VNDBUpdater.Models;
 using VNDBUpdater.ViewModels;
+using VNUpdater.Data;
 using VNUpdater.Helper;
 
 namespace VNDBUpdater.BackgroundTasks
@@ -80,8 +81,8 @@ namespace VNDBUpdater.BackgroundTasks
                 {
                     for (int round = 0; round < idSplitter.NumberOfRequest; round++)
                     {                        
-                        updatedVNs.AddRange(VNDBCommunication.FetchVisualNovels(idSplitter.IDs.Take(round * VNDBCommunication.MAXVNSPERREQUEST, VNDBCommunication.MAXVNSPERREQUEST).ToList()));
-                        _MainScreen.CompletedPendingTasks += VNDBCommunication.MAXVNSPERREQUEST;
+                        updatedVNs.AddRange(VNDBCommunication.FetchVisualNovels(idSplitter.IDs.Take(round * Constants.MaxVNsPerRequest, Constants.MaxVNsPerRequest).ToList()));
+                        _MainScreen.CompletedPendingTasks += Constants.MaxVNsPerRequest;
                         Trace.TraceInformation("Refresher completed Tasks: " + _MainScreen.CompletedPendingTasks.ToString());
                     }
                         

@@ -96,9 +96,14 @@
     <Compile Include="BackgroundTasks\FileIndexer.cs" />
     <Compile Include="BackgroundTasks\Refresher.cs" />
     <Compile Include="BackgroundTasks\Synchronizer.cs" />
+    <Compile Include="Data\Constants.cs" />
+    <Compile Include="Helper\TraitsHelper.cs" />
     <Compile Include="Helper\VersionHelper.cs" />
-    <Compile Include="Helper\VisualNovelHelper.cs" />
+    <Compile Include="Helper\LocalVisualNovelHelper.cs" />
     <Compile Include="Helper\VNIDsSplitter.cs" />
+    <Compile Include="Models\BasicInformation.cs" />
+    <Compile Include="Models\CharacterInformation.cs" />
+    <Compile Include="Models\Trait.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -107,6 +112,7 @@
     <Compile Include="ViewModels\AboutViewModel.cs" />
     <Compile Include="ViewModels\OptionsViewModel.cs" />
     <Compile Include="ViewModels\ThreadSafeObservableCollection.cs" />
+    <Compile Include="ViewModels\ValueConverts.cs" />
     <Compile Include="Views\About.xaml.cs">
       <DependentUpon>About.xaml</DependentUpon>
     </Compile>
@@ -119,7 +125,6 @@
     <Compile Include="Data\Enums.cs" />
     <Compile Include="Models\Filter.cs" />
     <Compile Include="Models\Tag.cs" />
-    <Compile Include="Data\TagsLookUp.cs" />
     <Compile Include="Models\VisualNovel.cs" />
     <Compile Include="Helper\ExtensionMethods.cs" />
     <Compile Include="Helper\FileHelper.cs" />

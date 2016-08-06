@@ -49,6 +49,7 @@
                 </Setter.Value>
             </Setter>
         </Style>
+        <local:TraitsListToStringConvert x:Key="TraitsListToStringConvert" />
     </Window.Resources>
 
     <Grid>
@@ -157,7 +158,19 @@
 
         <GroupBox Grid.Column="2" Grid.Row="3" Header="Characters" >
             <Button Style="{DynamicResource NoChromeButton}" Command="{Binding Commands.NextCharacter}">
-                <Image Source="{Binding Path=SelectedCharacter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, IsAsync=True}" Stretch="Fill" />
+                <Image Source="{Binding Path=SelectedCharacter.image, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, IsAsync=True}" Stretch="Fill" ToolTipService.ShowDuration="60000">
+                    <Image.ToolTip>
+                        <TextBlock TextWrapping="WrapWithOverflow" MaxWidth="500">
+                            <TextBlock.Text>
+                                <MultiBinding StringFormat="Name: {0}&#x0a;&#x0a;{1}&#x0a;&#x0a;{2}">
+                                    <Binding Path="SelectedCharacter.name" />
+                                    <Binding Path="SelectedCharacter.description" />
+                                    <Binding Path="SelectedCharacter.ConvertedTraits" Converter="{StaticResource TraitsListToStringConvert}" />
+                                </MultiBinding>
+                            </TextBlock.Text>
+                        </TextBlock>
+                    </Image.ToolTip>
+                </Image>
             </Button>
         </GroupBox>
 

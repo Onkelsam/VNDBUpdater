@@ -3,7 +3,7 @@
 namespace CommunicationLib
 {
     [Serializable]
-    internal class ConnectionException : Exception
+    public class ConnectionException : Exception
     {
         public ConnectionException()
         {

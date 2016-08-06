@@ -5,7 +5,7 @@ using VNDBUpdater.Communication.Database;
 
 namespace VNDBUpdater.Helper
 {
-    public static class VisualNovelHelper
+    public static class LocalVisualNovelHelper
     {
         private static List<VisualNovel> _LocalVisualNovels;
 

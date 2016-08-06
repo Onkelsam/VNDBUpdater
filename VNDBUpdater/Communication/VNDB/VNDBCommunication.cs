@@ -11,6 +11,7 @@ using VNDBUpdater.Communication.Database;
 using VNDBUpdater.Data;
 using VNDBUpdater.Helper;
 using VNDBUpdater.Models;
+using VNUpdater.Data;
 using VNUpdater.Helper;
 
 namespace VNDBUpdater.Communication.VNDB
@@ -20,8 +21,8 @@ namespace VNDBUpdater.Communication.VNDB
         private static IVNDBCommunication Connection;
         private static VNDBCommunicationStatus _Status = VNDBCommunicationStatus.NotLoggedIn;
 
-        public const int MAXVNSPERREQUEST = 25;
         private static string _ErrorMessage;
+        private static int _ConnectionTries = 0;
 
         public static VNDBCommunicationStatus Status
         {
@@ -54,7 +55,7 @@ namespace VNDBUpdater.Communication.VNDB
         public static void Connect()
         {
             if (_Status != VNDBCommunicationStatus.LoggedIn)
-            {
+            {                
                 try
                 {
                     Connection = new CommunicationLib.Communication().GetVNDBCommunication();
@@ -84,10 +85,22 @@ namespace VNDBUpdater.Communication.VNDB
                 {
                     // IOExceptins occurs if VNDB closed the stream.
                     // Just try to connect again using recursion.
-                    Trace.TraceError("Caught exception while connecting to VNDB:" + Environment.NewLine + ex.Message + Environment.NewLine + ex.GetType().Name + Environment.NewLine + ex.StackTrace);
-                    Trace.TraceInformation("Error handled. Trying reconnect.");
+                    Trace.TraceError("Caught exception while connecting to VNDB:" + Environment.NewLine + ex.Message + Environment.NewLine + ex.GetType().Name + Environment.NewLine + ex.StackTrace);                    
                     _Status = VNDBCommunicationStatus.NotLoggedIn;
-                    Connect();
+                    _ConnectionTries++;
+
+                    if (_ConnectionTries != Constants.MaxConnectionTries)
+                    {
+                        Trace.TraceInformation("Error handled. Trying reconnect. Current ConnectionTries: " + _ConnectionTries.ToString());
+                        Connect();
+                    }                        
+                    else
+                    {
+                        _ConnectionTries = 0;
+                        Trace.TraceInformation("Error couldn't be handled. Max ConnectionTries reached. ");
+                        _Status = VNDBCommunicationStatus.Error;
+                        _ErrorMessage = "Login failed. Error message: " + ex.Message + ex.GetType().ToString() + ex.GetBaseException().GetType().ToString();
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -110,7 +123,7 @@ namespace VNDBUpdater.Communication.VNDB
             if (idSplitter.SplittingNeccessary)
             {
                 for (int round = 0; round < idSplitter.NumberOfRequest; round++)
-                    AddToVisualNovelsList(idSplitter.IDs.Take(round * MAXVNSPERREQUEST, MAXVNSPERREQUEST).ToList(), visualNovels);
+                    AddToVisualNovelsList(idSplitter.IDs.Take(round * Constants.MaxVNsPerRequest, Constants.MaxVNsPerRequest).ToList(), visualNovels);
 
                 if (idSplitter.Remainder > 0)
                     AddToVisualNovelsList(idSplitter.IDs.Take(idSplitter.IDs.Length - idSplitter.Remainder, idSplitter.Remainder).ToList(), visualNovels);
@@ -125,8 +138,10 @@ namespace VNDBUpdater.Communication.VNDB
         {
             var visualNovel = new VisualNovel();
 
-            visualNovel.Basics = GetBasicInformation(ID).items[0];
-            visualNovel.Characters = GetCharInfo(ID);
+            visualNovel.Basics = new BasicInformation(GetBasicInformation(ID).items[0]);
+
+            foreach (var character in GetCharInfo(ID))
+                visualNovel.Characters.Add(new CharacterInformation(character));
 
             return visualNovel;
         }
@@ -144,11 +159,12 @@ namespace VNDBUpdater.Communication.VNDB
                 // Check if visual novel still exists.
                 if (basic != null)
                 {
-                    var newVN = new VisualNovel()
-                    {
-                        Basics = basic,
-                        Characters = chars,
-                    };
+                    var newVN = new VisualNovel();
+
+                    newVN.Basics = new BasicInformation(basic);
+
+                    foreach (var character in chars)
+                        newVN.Characters.Add(new CharacterInformation(character));
 
                     visualNovels.Add(newVN);
                 }

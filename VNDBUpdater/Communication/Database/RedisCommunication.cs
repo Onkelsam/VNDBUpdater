@@ -1,4 +1,5 @@
-﻿using CommunicationLib.Redis;
+﻿using CommunicationLib;
+using CommunicationLib.Redis;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -7,20 +8,18 @@ using System.Reflection;
 using VNDBUpdater.Communication.VNDB;
 using VNDBUpdater.Helper;
 using VNDBUpdater.Models;
+using VNUpdater.Data;
 
 namespace VNDBUpdater.Communication.Database
 {
     public static class RedisCommunication
     {
-        private static readonly string IP = "localhost";
-        private static readonly int Port = 6379;
-        private static readonly string RedisExe = "redis-server.exe";
-        private static readonly string RedisConfig = "redis.windows.conf";
         private static readonly string ExeAndStringPath = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location) + @"\Resources\";
 
         private static IRedisCommunication Connection;
 
         private static bool _IsConnected;
+        private static int _ConnectionTries = 0;
 
         public static bool IsConnected
         {
@@ -34,15 +33,31 @@ namespace VNDBUpdater.Communication.Database
                 try
                 {
                     Connection = new CommunicationLib.Communication().GetRedisCommunication();
-                    Connection.Connect(IP, Port, ExeAndStringPath + RedisExe, ExeAndStringPath + RedisConfig);
+                    Connection.Connect(Constants.RedisIP, Constants.RedisPort, ExeAndStringPath + Constants.RedisExe, ExeAndStringPath + Constants.RedisConfig);
                     _IsConnected = true;
                     Trace.TraceInformation("Connection to Redis DB established.");
+                }
+                catch (ConnectionException ex)
+                {
+                    Trace.TraceError("Connection to Redis DB could not be established. Error caught: " + Environment.NewLine + ex.Message + Environment.NewLine + ex.GetType().Name + Environment.NewLine + ex.StackTrace);                    
+                    _IsConnected = false;
+                    _ConnectionTries++;
+
+                    if (_ConnectionTries != Constants.MaxConnectionTries)
+                    {
+                        Trace.TraceInformation("Error handled. Trying connect again. Current ConnectionTries: " + _ConnectionTries.ToString());
+                        Connect();
+                    }
+                    else
+                    {
+                        _ConnectionTries = 0;
+                        Trace.TraceInformation("Error couldn't be handled. Max ConnectionTries reached.");
+                    }                    
                 }
                 catch (Exception ex)
                 {
                     Trace.TraceError("Connection to Redis DB could not be established. Error caught: " + Environment.NewLine + ex.Message + Environment.NewLine + ex.GetType().Name + Environment.NewLine + ex.StackTrace);
                     _IsConnected = false;
-                    throw new Exception("Connection to RedisDB could not be established!" + ex.Message, ex.InnerException);
                 }
             }
         }
@@ -57,7 +72,7 @@ namespace VNDBUpdater.Communication.Database
         {
             WriteEntity<VisualNovel>("VisualNovel_" + visualNovel.Basics.id, visualNovel);
 
-            VisualNovelHelper.ResetVisualNovels();
+            LocalVisualNovelHelper.ResetVisualNovels();
         }
 
         public static List<VisualNovel> GetVisualNovelsFromDB()
@@ -83,7 +98,7 @@ namespace VNDBUpdater.Communication.Database
         {
             DeleteKey("VisualNovel_" + id);
 
-            VisualNovelHelper.ResetVisualNovels();
+            LocalVisualNovelHelper.ResetVisualNovels();
         }
 
         public static void AddToVisualNovelSynchronizerQueue(VN VNToAdd)

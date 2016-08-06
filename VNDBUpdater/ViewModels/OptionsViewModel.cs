@@ -62,8 +62,8 @@ namespace VNDBUpdater.ViewModels
             byte[] encryptedBytes = ProtectedData.Protect(Encoding.UTF8.GetBytes((parameter as PasswordBox).Password), null, DataProtectionScope.CurrentUser);
 
             RedisCommunication.ResetDatabase();
-            VisualNovelHelper.ResetVisualNovels();
-            MainScreen.AllVisualNovels = VisualNovelHelper.LocalVisualNovels;
+            LocalVisualNovelHelper.ResetVisualNovels();
+            MainScreen.AllVisualNovels = LocalVisualNovelHelper.LocalVisualNovels;
             MainScreen.UpdateVisualNovelGrid();
 
             RedisCommunication.SetUserCredentials(_Username, Convert.ToBase64String(encryptedBytes));            

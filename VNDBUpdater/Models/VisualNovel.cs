@@ -9,6 +9,7 @@ using VNDBUpdater.Communication.Database;
 using VNDBUpdater.Communication.VNDB;
 using VNDBUpdater.Data;
 using VNDBUpdater.Helper;
+using VNUpdater.Data;
 
 namespace VNDBUpdater.Models
 {
@@ -18,13 +19,16 @@ namespace VNDBUpdater.Models
         private int _Score;
         private VisualNovelCatergory _Category;
 
-        private const string walkthroughfilename = "walkthrough.txt";
-
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public VNInformation Basics { get; set; }
-        public List<VNCharacterInformation> Characters { get; set; }
+        public BasicInformation Basics { get; set; }
+        public List<CharacterInformation> Characters { get; set; }
         public string FolderPath { get; private set; }
+
+        public VisualNovel()
+        {
+            Characters = new List<CharacterInformation>();
+        }
 
         public bool AlreadyExistsInDatabase
         {
@@ -39,10 +43,7 @@ namespace VNDBUpdater.Models
 
         public double ScoreInDouble
         {
-            get
-            {
-                return Convert.ToDouble(_Score) / 10;
-            }
+            get { return Convert.ToDouble(_Score) / 10; }
         }
 
         public VisualNovelCatergory Category
@@ -60,7 +61,7 @@ namespace VNDBUpdater.Models
 
                 if (_ExePath != null)
                 {
-                    if (_ExePath.Contains(".exe"))
+                    if (Path.GetExtension(_ExePath) == ".exe")
                         FolderPath = !string.IsNullOrEmpty(_ExePath) ? _ExePath.Replace(Path.GetFileName(_ExePath), "") : string.Empty;
                     else
                         FolderPath = _ExePath;
@@ -84,7 +85,7 @@ namespace VNDBUpdater.Models
             get
             {
                 if (!string.IsNullOrEmpty(FolderPath))
-                    return File.Exists(FolderPath + walkthroughfilename);
+                    return File.Exists(FolderPath + Constants.WalkthroughFileName);
                 else
                     return false;
             }
@@ -117,7 +118,7 @@ namespace VNDBUpdater.Models
         public void OpenWalkthrough()
         {
             if (WalkthroughAvailable)
-                Process.Start(FolderPath + walkthroughfilename);
+                Process.Start(FolderPath + Constants.WalkthroughFileName);
         }
 
         public void SetCategory(string category)
@@ -171,24 +172,24 @@ namespace VNDBUpdater.Models
                 return Basics.screens[Basics.screens.IndexOf(Basics.screens.Where(x => x.image == currentScreenshot).Select(x => x).First()) + 1].image;
         }
 
-        public string NextCharacter(string currentCharacter)
+        public CharacterInformation NextCharacter(CharacterInformation currentCharacter)
         {
             if (Characters != null)
             {
                 if (Characters.Any())
                 {
                     if (!Characters.Any(x => x.image != null))
-                        return Basics.image;
-                    else if (currentCharacter == Characters.Last().image)
-                        return Characters[0].image;
+                        return new CharacterInformation(null);
+                    else if (currentCharacter == Characters.Last())
+                        return Characters.First();
                     else
-                        return Characters[Characters.IndexOf(Characters.Where(x => x.image == currentCharacter).Select(x => x).First()) + 1].image;
+                        return Characters[Characters.IndexOf(Characters.Where(x => x.id == currentCharacter.id).Select(x => x).First()) + 1];
                 }
                 else
-                    return Basics.image;
+                    return new CharacterInformation(null);
             }
             else
-                return Basics.image;
+                return new CharacterInformation(null);
         }
 
         public bool Delete()
@@ -219,7 +220,7 @@ namespace VNDBUpdater.Models
         {
             if (InstallationPathExists && !WalkthroughAvailable)
             {
-                File.Create(FolderPath + walkthroughfilename);
+                File.Create(FolderPath + Constants.WalkthroughFileName);
                 OpenWalkthrough();
             }                
         }

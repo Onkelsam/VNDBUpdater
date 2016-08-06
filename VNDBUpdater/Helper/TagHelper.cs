@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using VNDBUpdater.Data;
 using VNDBUpdater.Models;
+using VNUpdater.Data;
 
 namespace VNDBUpdater.Helper
 {
@@ -19,8 +20,8 @@ namespace VNDBUpdater.Helper
                 {
                     var rawTags = new List<TagsLookUp>();
 
-                    if (File.Exists(@"tags.json"))
-                        rawTags = JsonConvert.DeserializeObject<List<TagsLookUp>>(File.ReadAllText(@"tags.json"));
+                    if (File.Exists(Constants.TagsJsonFileName))
+                        rawTags = JsonConvert.DeserializeObject<List<TagsLookUp>>(File.ReadAllText(Constants.TagsJsonFileName));
 
                     _LocalTags = new List<Tag>();
 
@@ -37,6 +38,18 @@ namespace VNDBUpdater.Helper
         public static void ResetTags()
         {
             _LocalTags = null;
+        }
+
+        public class TagsLookUp
+        {
+            public List<object> aliases { get; set; }
+            public double vns { get; set; }
+            public int id { get; set; }
+            public string description { get; set; }
+            public string name { get; set; }
+            public string cat { get; set; }
+            public List<object> parents { get; set; }
+            public bool meta { get; set; }
         }
     }
 }

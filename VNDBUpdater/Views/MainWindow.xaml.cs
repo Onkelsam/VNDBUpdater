@@ -26,6 +26,9 @@ namespace VNDBUpdater.Views
             if (!File.Exists(@"tags.json"))
                 Models.Tag.RefreshTags();
 
+            if (!File.Exists(@"traits.json"))
+                Models.Trait.RefreshTraits();
+
             if (RedisCommunication.UserCredentialsAvailable())
             {
                 var BackgroundSynchronizer = new Synchronizer();

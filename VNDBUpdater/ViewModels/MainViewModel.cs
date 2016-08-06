@@ -32,7 +32,7 @@ namespace VNDBUpdater.ViewModels
         private int _SelectedTagTab;
 
         private string _SelectedScreenshot;
-        private string _SelectedCharacter;
+        private CharacterInformation _SelectedCharacter;
 
         private int _CurrentPendingTasks;
         private int _CompletedPendingTasks;
@@ -161,7 +161,7 @@ namespace VNDBUpdater.ViewModels
             }
         }
 
-        public string SelectedCharacter
+        public CharacterInformation SelectedCharacter
         {
             get { return _SelectedCharacter; }
             set
@@ -236,7 +236,7 @@ namespace VNDBUpdater.ViewModels
         {
             _AllVisualNovels.Clear();
 
-            _AllVisualNovels.AddRange(VisualNovelHelper.LocalVisualNovels);
+            _AllVisualNovels.AddRange(LocalVisualNovelHelper.LocalVisualNovels);
 
             UpdateVisualNovelGrid();
         }
@@ -244,9 +244,10 @@ namespace VNDBUpdater.ViewModels
         public void ExecuteRefreshVisualNovels(object parameter)
         {            
             Tag.RefreshTags();
+            Trait.RefreshTraits();
 
-            var refrehser = new Refresher();
-            refrehser.Start(this);
+            var refresher = new Refresher();
+            refresher.Start(this);
         }
 
         public bool CanExecuteVNDBOperations(object parameter)
@@ -490,10 +491,11 @@ namespace VNDBUpdater.ViewModels
 
             if (_SelectedVisualNovel != null)
             {
-                if (_SelectedVisualNovel.Basics != null)
+                if (_SelectedVisualNovel.Basics.ConvertedTags != null)
                 {
-                    foreach (var tag in Tag.FindMatchingTagsForCategory(_SelectedVisualNovel, (TagCategory)SelectedTagTab))
-                        _TagsInGrid.Add(tag);
+                    foreach (var tag in _SelectedVisualNovel.Basics.ConvertedTags)
+                        if (tag.Category == (TagCategory)SelectedTagTab || (TagCategory)SelectedTagTab == TagCategory.All)
+                            TagsInGrid.Add(tag);
                 }
             }
         }
@@ -536,12 +538,12 @@ namespace VNDBUpdater.ViewModels
             if ((_SelectedVisualNovel != null) && (_SelectedVisualNovel.Characters != null))
             {
                 if (_SelectedVisualNovel.Characters.Any(x => x.image != null))
-                    SelectedCharacter = _SelectedVisualNovel.Characters[0].image;
+                    SelectedCharacter = _SelectedVisualNovel.Characters[0];
                 else
-                    SelectedCharacter = _SelectedVisualNovel.Basics.image;
+                    SelectedCharacter = new CharacterInformation(null);
             }
             else
-                SelectedCharacter = string.Empty;
+                SelectedCharacter = new CharacterInformation(null);
         }
     }
 }

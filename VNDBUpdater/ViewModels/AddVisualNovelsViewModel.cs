@@ -17,7 +17,7 @@ namespace VNDBUpdater.ViewModels
 
         private List<VisualNovel> ExistingVisualNovels
         {
-            get { return VisualNovelHelper.LocalVisualNovels; }
+            get { return LocalVisualNovelHelper.LocalVisualNovels; }
         }
                 
         public AddVisualNovelsViewModel()
