@@ -3,8 +3,8 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using VNDBUpdater.Communication.VNDB;
+using VNDBUpdater.Data;
 using VNDBUpdater.Helper;
-using VNUpdater.Data;
 
 namespace VNDBUpdater.Models
 {

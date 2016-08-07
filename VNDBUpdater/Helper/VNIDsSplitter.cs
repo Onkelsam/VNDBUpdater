@@ -1,7 +1,7 @@
 ﻿using VNDBUpdater.Communication.VNDB;
-using VNUpdater.Data;
+using VNDBUpdater.Data;
 
-namespace VNUpdater.Helper
+namespace VNDBUpdater.Helper
 {
     public class VNIDsSplitter
     {

@@ -31,9 +31,9 @@ namespace VNDBUpdater.ViewModels
                     }                        
                 }
 
-                foreach (var foundTraits in parentWithTraits)
+                foreach (var foundTraits in parentWithTraits.OrderBy(x => x.Key))
                 {
-                    sb.Append(foundTraits.Key + ": " + string.Join(", ", foundTraits.Value.Select(x => x.Name)));
+                    sb.AppendFormat(foundTraits.Key + ": " + string.Join(", ", foundTraits.Value.Select(x => x.Name)));
                     sb.AppendLine();
                     sb.AppendLine();
                 }

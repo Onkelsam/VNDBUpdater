@@ -9,7 +9,6 @@ using VNDBUpdater.Communication.Database;
 using VNDBUpdater.Communication.VNDB;
 using VNDBUpdater.Data;
 using VNDBUpdater.Helper;
-using VNUpdater.Data;
 
 namespace VNDBUpdater.Models
 {

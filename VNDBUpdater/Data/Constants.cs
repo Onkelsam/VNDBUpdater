@@ -1,4 +1,4 @@
-﻿namespace VNUpdater.Data
+﻿namespace VNDBUpdater.Data
 {
     public static class Constants
     {
@@ -6,6 +6,8 @@
         public const int RedisPort = 6379;
         public const string RedisExe = "redis-server.exe";
         public const string RedisConfig = "redis.windows.conf";
+        public const string DatabaseName = "LocalVNStorage.rdb";
+        public const string PathToDatabase = @"Resources\";
 
         public const int MaxVNsPerRequest = 25;
 

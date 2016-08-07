@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
@@ -13,10 +12,9 @@ using VNDBUpdater.Data;
 using VNDBUpdater.Helper;
 using VNDBUpdater.Models;
 using VNDBUpdater.Views;
-using VNUpdater.Helper;
 
 namespace VNDBUpdater.ViewModels
-{  
+{
     public class MainViewModel : ViewModelBase
     {
         private List<VisualNovel> _AllVisualNovels;
@@ -187,7 +185,7 @@ namespace VNDBUpdater.ViewModels
         {
             get
             {
-                return VNDBCommunication.StatusString + " " + StartUp.StatusString + " " + Synchronizer.StatusString + " " + FileIndexer.StatusString + " " + Refresher.StatusString;
+                return StartUp.StatusString + " " + VNDBCommunication.StatusString + " " + Synchronizer.StatusString + " " + FileIndexer.StatusString + " " + Refresher.StatusString;
             }
         }
 
@@ -398,12 +396,12 @@ namespace VNDBUpdater.ViewModels
                 RedisCommunication.SaveRedis();
                 RedisCommunication.Dispose();
                 VNDBCommunication.Dispose();
-                Trace.TraceInformation("Gracefull shutdown successfull.");
+                EventLogger.LogInformation(nameof(MainViewModel), "Shutdown successfull.");
             }
             catch (Exception ex)
             {
-                Trace.TraceError("Gracefull shutdown failed.");
-                Trace.TraceError("Error occured: " + Environment.NewLine + ex.Message + Environment.NewLine + ex.GetType().Name + Environment.NewLine + ex.StackTrace);
+                EventLogger.LogError(nameof(MainViewModel), ex);
+                EventLogger.LogInformation(nameof(MainViewModel), "Shutdown failed.");
             }            
         }
 

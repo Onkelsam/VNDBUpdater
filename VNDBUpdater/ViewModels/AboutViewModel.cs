@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Reflection;
-using VNUpdater.Helper;
+using VNDBUpdater.Helper;
 
 namespace VNDBUpdater.ViewModels
 {

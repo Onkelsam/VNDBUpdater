@@ -3,8 +3,8 @@ using System.IO;
 using System.IO.Compression;
 using System.Windows.Forms;
 using VNDBUpdater.Communication.Database;
+using VNDBUpdater.Data;
 using VNDBUpdater.Models;
-using VNUpdater.Data;
 
 namespace VNDBUpdater.Helper
 {

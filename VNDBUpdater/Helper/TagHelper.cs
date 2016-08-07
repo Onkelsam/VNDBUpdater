@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using VNDBUpdater.Data;
 using VNDBUpdater.Models;
-using VNUpdater.Data;
 
 namespace VNDBUpdater.Helper
 {

@@ -1,7 +1,7 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using VNDBUpdater.Helper;
 using VNDBUpdater.ViewModels;
 
 namespace VNDBUpdater.BackgroundTasks
@@ -39,7 +39,7 @@ namespace VNDBUpdater.BackgroundTasks
             {
                 base.Start(MainScreen);
 
-                Trace.TraceInformation("Fileindexer started.");
+                EventLogger.LogInformation(nameof(FileIndexer), "started.");
 
                 _MainScreen.CurrentPendingTasks = _MainScreen.AllVisualNovels.Count(x => x.ExePath == null || x.ExePath == "");
                 _MainScreen.CompletedPendingTasks = 0;
@@ -62,25 +62,25 @@ namespace VNDBUpdater.BackgroundTasks
         {
             try
             {
-                Trace.TraceInformation("FileIndexer pending Tasks: " + _MainScreen.CurrentPendingTasks.ToString());
+                EventLogger.LogInformation(nameof(FileIndexer), "pending Tasks: " + _MainScreen.CurrentPendingTasks.ToString());
 
                 foreach (var vn in _MainScreen.AllVisualNovels.Where(x => x.ExePath == null || x.ExePath == ""))
                 {
                     vn.CrawlExePath();
                     _MainScreen.CompletedPendingTasks++;
-                    Trace.TraceInformation("FileIndexer completed Tasks: " + _MainScreen.CompletedPendingTasks.ToString());
+                    EventLogger.LogInformation(nameof(FileIndexer), "completed Tasks: " + _MainScreen.CompletedPendingTasks.ToString());
                 }
 
                 Cancel();
                 _Status = TaskStatus.RanToCompletion;
                 _MainScreen.UpdateStatusText();
 
-                Trace.TraceInformation("Fileindexer finished successfully.");
+                EventLogger.LogInformation(nameof(FileIndexer), "finished successfully.");
             }
             catch (Exception ex)
             {
                 _Status = TaskStatus.Faulted;
-                Trace.TraceError("Error caught in FileIndexer: " + Environment.NewLine + ex.Message + Environment.NewLine + ex.GetType().Name + Environment.NewLine + ex.StackTrace);
+                EventLogger.LogError(nameof(FileIndexer), ex);
             }
         }
     }

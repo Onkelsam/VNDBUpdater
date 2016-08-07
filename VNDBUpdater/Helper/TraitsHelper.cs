@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using VNDBUpdater.Data;
 using VNDBUpdater.Models;
-using VNUpdater.Data;
 
 namespace VNDBUpdater.Helper
 {

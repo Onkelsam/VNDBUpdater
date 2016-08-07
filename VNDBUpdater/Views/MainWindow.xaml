@@ -162,7 +162,7 @@
                     <Image.ToolTip>
                         <TextBlock TextWrapping="WrapWithOverflow" MaxWidth="500">
                             <TextBlock.Text>
-                                <MultiBinding StringFormat="Name: {0}&#x0a;&#x0a;{1}&#x0a;&#x0a;{2}">
+                                <MultiBinding StringFormat="{}{0}&#x0a;&#x0a;{1}&#x0a;&#x0a;{2}">
                                     <Binding Path="SelectedCharacter.name" />
                                     <Binding Path="SelectedCharacter.description" />
                                     <Binding Path="SelectedCharacter.ConvertedTraits" Converter="{StaticResource TraitsListToStringConvert}" />

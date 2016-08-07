@@ -3,7 +3,6 @@ using CommunicationLib.VNDB.Connection;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -11,8 +10,6 @@ using VNDBUpdater.Communication.Database;
 using VNDBUpdater.Data;
 using VNDBUpdater.Helper;
 using VNDBUpdater.Models;
-using VNUpdater.Data;
-using VNUpdater.Helper;
 
 namespace VNDBUpdater.Communication.VNDB
 {
@@ -65,18 +62,18 @@ namespace VNDBUpdater.Communication.VNDB
                     {
                         if (HandleError(response) == ErrorResponse.Throttled)
                         {
-                            Trace.TraceInformation("Connecting to VNDB failed because of throttling error. Trying reconnect.");
+                            EventLogger.LogInformation(nameof(VNDBCommunication), "Connecting faild because of throttling error. Trying reconnect.");                            
                             Connect(); // If the connection was throttled try again (after waiting 'minwait').
                         }                            
                         else
                         {
-                            Trace.TraceInformation("Connecting to VNDB failed because of unknown error. Abort connection.");
+                            EventLogger.LogInformation(nameof(VNDBCommunication), "Connecting failed because of unknown error. Abort connecting procedure.");                           
                             _Status = VNDBCommunicationStatus.Error;
                         }                            
                     }
                     else
                     {
-                        Trace.TraceInformation("Connection to VNDB established successfully.");
+                        EventLogger.LogInformation(nameof(VNDBCommunication), "Connection established successfully.");
                         _Status = VNDBCommunicationStatus.LoggedIn;
                     }
                         
@@ -85,27 +82,27 @@ namespace VNDBUpdater.Communication.VNDB
                 {
                     // IOExceptins occurs if VNDB closed the stream.
                     // Just try to connect again using recursion.
-                    Trace.TraceError("Caught exception while connecting to VNDB:" + Environment.NewLine + ex.Message + Environment.NewLine + ex.GetType().Name + Environment.NewLine + ex.StackTrace);                    
+                    EventLogger.LogError(nameof(VNDBCommunication), ex);                    
                     _Status = VNDBCommunicationStatus.NotLoggedIn;
                     _ConnectionTries++;
 
                     if (_ConnectionTries != Constants.MaxConnectionTries)
                     {
-                        Trace.TraceInformation("Error handled. Trying reconnect. Current ConnectionTries: " + _ConnectionTries.ToString());
+                        EventLogger.LogInformation(nameof(VNDBCommunication), "Error was handled. Trying reconnect. Current tries: " + _ConnectionTries.ToString());                        
                         Connect();
                     }                        
                     else
                     {
                         _ConnectionTries = 0;
-                        Trace.TraceInformation("Error couldn't be handled. Max ConnectionTries reached. ");
+                        EventLogger.LogInformation(nameof(VNDBCommunication), "Error could not be handled. Maximal tries (" + Constants.MaxConnectionTries + ") reached.");                        
                         _Status = VNDBCommunicationStatus.Error;
                         _ErrorMessage = "Login failed. Error message: " + ex.Message + ex.GetType().ToString() + ex.GetBaseException().GetType().ToString();
                     }
                 }
                 catch (Exception ex)
                 {
-                    Trace.TraceError("Caught exception while connecting to VNDB:" + Environment.NewLine + ex.Message + Environment.NewLine + ex.GetType().Name + Environment.NewLine + ex.StackTrace);
-                    Trace.TraceInformation("Error could not be handled. Abort connection.");
+                    EventLogger.LogError(nameof(VNDBCommunication), ex);
+                    EventLogger.LogInformation(nameof(VNDBCommunication), "Error could not be handled. Abort connecting procedure.");                    
                     _Status = VNDBCommunicationStatus.Error;
                     _ErrorMessage = "Login failed. Error message: " + ex.Message + ex.GetType().ToString() + ex.GetBaseException().GetType().ToString();
                 }
@@ -354,14 +351,14 @@ namespace VNDBUpdater.Communication.VNDB
             if (error.id == "throttled")
             {
                 // In case of 'throttled' error wait 'minwait'.
-                Trace.TraceInformation("Throttled error by VNDB detected. Waiting " + TimeSpan.FromSeconds(error.minwait).ToString() + " before proceeding with Queries.");
+                EventLogger.LogInformation(nameof(VNDBCommunication), "Throttled error by VNDB received. Waiting: " + TimeSpan.FromSeconds(error.minwait).ToString() + " before proceeding with queries.");                
                 Thread.Sleep(TimeSpan.FromSeconds(error.minwait));
                 _Status = VNDBCommunicationStatus.Throttled;
                 return ErrorResponse.Throttled;
             }
             else
             {
-                Trace.TraceError("Unknown error by VNDB caught. Aborting connection.");
+                EventLogger.LogInformation(nameof(VNDBCommunication), "Unknown error by VNDB received. Aborting connection.");                
                 _Status = VNDBCommunicationStatus.Error;
                 _ErrorMessage = "Error while communicating with VNDB: Error ID: '" + error.id + "' Error message: '" + error.msg + "'";
                 return ErrorResponse.Unknown;
@@ -374,7 +371,7 @@ namespace VNDBUpdater.Communication.VNDB
             {
                 Connection.Disconnect();
                 _Status = VNDBCommunicationStatus.NotLoggedIn;
-                Trace.TraceInformation("VNDB unlogged successfully.");
+                EventLogger.LogInformation(nameof(VNDBCommunication), "Disconnected successfully.");                
             }
         }
 
@@ -382,10 +379,9 @@ namespace VNDBUpdater.Communication.VNDB
         {
             if (_Status == VNDBCommunicationStatus.LoggedIn)
             {
-                Connection.Disconnect();
+                Disconnect();
                 Connection.Dispose();
-                _Status = VNDBCommunicationStatus.NotLoggedIn;
-                Trace.TraceInformation("VNDB connection disposed successfully.");
+                EventLogger.LogInformation(nameof(VNDBCommunication), "Was disposed successfully.");                
             }
         }
     }

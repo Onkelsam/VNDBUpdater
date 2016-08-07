@@ -1,15 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using VNDBUpdater.Communication.Database;
 using VNDBUpdater.Communication.VNDB;
+using VNDBUpdater.Data;
 using VNDBUpdater.Helper;
 using VNDBUpdater.Models;
 using VNDBUpdater.ViewModels;
-using VNUpdater.Data;
-using VNUpdater.Helper;
 
 namespace VNDBUpdater.BackgroundTasks
 {
@@ -46,7 +44,7 @@ namespace VNDBUpdater.BackgroundTasks
             {
                 base.Start(MainScreen);
 
-                Trace.TraceInformation("Refresher started.");
+                EventLogger.LogInformation(nameof(Refresher), "started.");                
 
                 _MainScreen.CurrentPendingTasks = _MainScreen.AllVisualNovels.Count;
                 _MainScreen.CompletedPendingTasks = 0;
@@ -69,7 +67,7 @@ namespace VNDBUpdater.BackgroundTasks
         {
             try
             {
-                Trace.TraceInformation("Refresher pending Tasks: " + _MainScreen.CurrentPendingTasks.ToString());
+                EventLogger.LogInformation(nameof(Refresher), "pending Tasks: " + _MainScreen.CurrentPendingTasks.ToString());
 
                 var updatedVNs = new List<VisualNovel>();
 
@@ -83,21 +81,21 @@ namespace VNDBUpdater.BackgroundTasks
                     {                        
                         updatedVNs.AddRange(VNDBCommunication.FetchVisualNovels(idSplitter.IDs.Take(round * Constants.MaxVNsPerRequest, Constants.MaxVNsPerRequest).ToList()));
                         _MainScreen.CompletedPendingTasks += Constants.MaxVNsPerRequest;
-                        Trace.TraceInformation("Refresher completed Tasks: " + _MainScreen.CompletedPendingTasks.ToString());
+                        EventLogger.LogInformation(nameof(Refresher), "completed Tasks: " + _MainScreen.CompletedPendingTasks.ToString());                        
                     }
                         
                     if (idSplitter.Remainder > 0)
                     {                        
                         updatedVNs.AddRange(VNDBCommunication.FetchVisualNovels(idSplitter.IDs.Take(idSplitter.IDs.Length - idSplitter.Remainder, idSplitter.Remainder).ToList()));
                         _MainScreen.CompletedPendingTasks += idSplitter.Remainder;
-                        Trace.TraceInformation("Refresher completed Tasks: " + _MainScreen.CompletedPendingTasks.ToString());
+                        EventLogger.LogInformation(nameof(Refresher), "completed Tasks: " + _MainScreen.CompletedPendingTasks.ToString());
                     }                        
                 }
                 else
                 {
                     updatedVNs.AddRange(VNDBCommunication.FetchVisualNovels(idSplitter.IDs.ToList()));
                     _MainScreen.CompletedPendingTasks += idSplitter.IDs.Length;
-                    Trace.TraceInformation("Refresher completed Tasks: " + _MainScreen.CompletedPendingTasks.ToString());
+                    EventLogger.LogInformation(nameof(Refresher), "completed Tasks: " + _MainScreen.CompletedPendingTasks.ToString());
                 }                    
 
                 foreach (var vn in updatedVNs)
@@ -117,12 +115,12 @@ namespace VNDBUpdater.BackgroundTasks
                 _Status = TaskStatus.RanToCompletion;
                 _MainScreen.UpdateStatusText();
 
-                Trace.TraceInformation("Refresher finished successfully.");                
+                EventLogger.LogInformation(nameof(Refresher), "finished successfully.");                 
             }
             catch (Exception ex)
             {
                 _Status = TaskStatus.Faulted;
-                Trace.TraceError("Error caught in Refresher: " + Environment.NewLine + ex.Message + Environment.NewLine + ex.GetType().Name + Environment.NewLine + ex.StackTrace);
+                EventLogger.LogError(nameof(Refresher), ex);
             }
         }
     }

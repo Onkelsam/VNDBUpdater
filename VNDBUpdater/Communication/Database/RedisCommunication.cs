@@ -2,19 +2,18 @@
 using CommunicationLib.Redis;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using VNDBUpdater.Communication.VNDB;
+using VNDBUpdater.Data;
 using VNDBUpdater.Helper;
 using VNDBUpdater.Models;
-using VNUpdater.Data;
 
 namespace VNDBUpdater.Communication.Database
 {
     public static class RedisCommunication
     {
-        private static readonly string ExeAndStringPath = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location) + @"\Resources\";
+        private static readonly string ExeAndStringPath = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location) + @"\" + Constants.PathToDatabase;
 
         private static IRedisCommunication Connection;
 
@@ -35,28 +34,28 @@ namespace VNDBUpdater.Communication.Database
                     Connection = new CommunicationLib.Communication().GetRedisCommunication();
                     Connection.Connect(Constants.RedisIP, Constants.RedisPort, ExeAndStringPath + Constants.RedisExe, ExeAndStringPath + Constants.RedisConfig);
                     _IsConnected = true;
-                    Trace.TraceInformation("Connection to Redis DB established.");
+                    EventLogger.LogInformation(nameof(RedisCommunication), "Connection to RedisDB established successfully.");                    
                 }
                 catch (ConnectionException ex)
                 {
-                    Trace.TraceError("Connection to Redis DB could not be established. Error caught: " + Environment.NewLine + ex.Message + Environment.NewLine + ex.GetType().Name + Environment.NewLine + ex.StackTrace);                    
+                    EventLogger.LogError(nameof(RedisCommunication), ex);                    
                     _IsConnected = false;
                     _ConnectionTries++;
 
                     if (_ConnectionTries != Constants.MaxConnectionTries)
                     {
-                        Trace.TraceInformation("Error handled. Trying connect again. Current ConnectionTries: " + _ConnectionTries.ToString());
+                        EventLogger.LogInformation(nameof(RedisCommunication), "Error was handled. Trying reconnect. Current tries: " + _ConnectionTries.ToString());                        
                         Connect();
                     }
                     else
                     {
                         _ConnectionTries = 0;
-                        Trace.TraceInformation("Error couldn't be handled. Max ConnectionTries reached.");
+                        EventLogger.LogInformation(nameof(RedisCommunication), "Error could not be handled. Maximal tries (" + Constants.MaxConnectionTries + ") reached.");
                     }                    
                 }
                 catch (Exception ex)
                 {
-                    Trace.TraceError("Connection to Redis DB could not be established. Error caught: " + Environment.NewLine + ex.Message + Environment.NewLine + ex.GetType().Name + Environment.NewLine + ex.StackTrace);
+                    EventLogger.LogError(nameof(RedisCommunication), ex);                    
                     _IsConnected = false;
                 }
             }
@@ -183,7 +182,7 @@ namespace VNDBUpdater.Communication.Database
             foreach (var key in GetAllKeys("*"))
                 DeleteKey(key);
 
-            FileHelper.DeleteFile(@"Resources\LocalVNStorage.rdb");
+            FileHelper.DeleteFile(Constants.PathToDatabase + Constants.DatabaseName);
         }
 
         private static List<T> ReadList<T>(string ListName, int amount) where T : class, new()
@@ -260,7 +259,7 @@ namespace VNDBUpdater.Communication.Database
         public static void SaveRedis()
         {
             SaveCurrentDB();
-            Trace.TraceInformation("Redis saved successfully.");
+            EventLogger.LogInformation(nameof(RedisCommunication), "Database saved successfully.");            
         }
 
         private static void WriteEntity<T>(string key, T entity) where T : class
@@ -328,10 +327,8 @@ namespace VNDBUpdater.Communication.Database
 
         private static void CheckConnection()
         {
-            Connect();
-
-            if (!IsConnected)
-                throw new Exception("Connection to RedisDB does not exist!");
+            if (!_IsConnected)
+                Connect();
         }
 
         public static void Disconnect()
@@ -340,7 +337,7 @@ namespace VNDBUpdater.Communication.Database
             {
                 Connection.Disconnect();
                 _IsConnected = false;
-                Trace.TraceInformation("Redis disconnected successfully.");
+                EventLogger.LogInformation(nameof(RedisCommunication), "Disconnected successfully.");
             }
         }
 
@@ -348,10 +345,10 @@ namespace VNDBUpdater.Communication.Database
         {
             if (IsConnected)
             {
-                Connection.Disconnect();
+                Disconnect();
                 Connection.Dispose();
                 _IsConnected = false;
-                Trace.TraceInformation("Redis disposed successfully.");
+                EventLogger.LogInformation(nameof(RedisCommunication), "Was disposed successfully.");
             }
         }
     }

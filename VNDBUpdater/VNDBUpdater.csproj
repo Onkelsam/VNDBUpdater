@@ -7,8 +7,8 @@
     <ProjectGuid>{2983470A-577B-478F-8C9D-7144E8C05D1E}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>VNUpdater</RootNamespace>
-    <AssemblyName>VNUpdater</AssemblyName>
+    <RootNamespace>VNDBUpdater</RootNamespace>
+    <AssemblyName>VNDBUpdater</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -95,9 +95,10 @@
     <Compile Include="BackgroundTasks\BackgroundTaskBase.cs" />
     <Compile Include="BackgroundTasks\FileIndexer.cs" />
     <Compile Include="BackgroundTasks\Refresher.cs" />
-    <Compile Include="BackgroundTasks\StarUp.cs" />
+    <Compile Include="BackgroundTasks\StartUp.cs" />
     <Compile Include="BackgroundTasks\Synchronizer.cs" />
     <Compile Include="Data\Constants.cs" />
+    <Compile Include="Helper\EventLogger.cs" />
     <Compile Include="Helper\TraitsHelper.cs" />
     <Compile Include="Helper\VersionHelper.cs" />
     <Compile Include="Helper\LocalVisualNovelHelper.cs" />
@@ -113,7 +114,7 @@
     <Compile Include="ViewModels\AboutViewModel.cs" />
     <Compile Include="ViewModels\OptionsViewModel.cs" />
     <Compile Include="ViewModels\ThreadSafeObservableCollection.cs" />
-    <Compile Include="ViewModels\ValueConverts.cs" />
+    <Compile Include="ViewModels\ValueConverters.cs" />
     <Compile Include="Views\About.xaml.cs">
       <DependentUpon>About.xaml</DependentUpon>
     </Compile>

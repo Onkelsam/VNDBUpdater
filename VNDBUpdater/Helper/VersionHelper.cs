@@ -6,7 +6,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace VNUpdater.Helper
+namespace VNDBUpdater.Helper
 {
     public static class VersionHelper
     {

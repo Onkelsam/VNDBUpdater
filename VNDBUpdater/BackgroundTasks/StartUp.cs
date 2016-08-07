@@ -1,12 +1,11 @@
 ﻿using System;
-using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
 using VNDBUpdater.Communication.Database;
+using VNDBUpdater.Data;
 using VNDBUpdater.Helper;
 using VNDBUpdater.Models;
 using VNDBUpdater.ViewModels;
-using VNUpdater.Data;
 
 namespace VNDBUpdater.BackgroundTasks
 {
@@ -41,7 +40,7 @@ namespace VNDBUpdater.BackgroundTasks
             {
                 base.Start(MainScreen);
 
-                Trace.TraceInformation("StartUp started.");
+                EventLogger.LogInformation(nameof(StartUp), "started.");                
 
                 _Status = TaskStatus.Running;
 
@@ -71,7 +70,8 @@ namespace VNDBUpdater.BackgroundTasks
                     Trait.RefreshTraits();
 
                 LocalVisualNovelHelper.RefreshVisualNovels();
-                
+
+                _Status = TaskStatus.RanToCompletion;
                 _MainScreen.UpdateStatusText();
                 _MainScreen.GetVisualNovelsFromDatabase();
 
@@ -82,14 +82,13 @@ namespace VNDBUpdater.BackgroundTasks
                 }
 
                 Cancel();
-                _Status = TaskStatus.RanToCompletion;
 
-                Trace.TraceInformation("StartUp finished.");
+                EventLogger.LogInformation(nameof(StartUp), "finished successfully.");                
             }
             catch (Exception ex)
             {
                 _Status = TaskStatus.Faulted;
-                Trace.TraceError("Error caught in StartUp: " + Environment.NewLine + ex.Message + Environment.NewLine + ex.GetType().Name + Environment.NewLine + ex.StackTrace);
+                EventLogger.LogError(nameof(StartUp), ex);
             }
         }
     }
