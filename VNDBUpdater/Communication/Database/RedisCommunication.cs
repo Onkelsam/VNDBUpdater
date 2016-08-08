@@ -61,6 +61,13 @@ namespace VNDBUpdater.Communication.Database
             }
         }
 
+        public static void Reconnect()
+        {
+            ResetDatabase();
+            Disconnect();
+            Connect();
+        }
+
         public static void AddVisualNovelsToDB(List<VisualNovel> visualNovels)
         {
             foreach (var visualNovel in visualNovels)

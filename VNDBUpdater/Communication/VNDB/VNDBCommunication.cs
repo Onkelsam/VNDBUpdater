@@ -109,6 +109,12 @@ namespace VNDBUpdater.Communication.VNDB
             }
         }
 
+        public static void Reconnect()
+        {
+            Disconnect();
+            Connect();
+        }
+
         public static List<VisualNovel> FetchVisualNovels(List<int> IDs)
         {
             var visualNovels = new List<VisualNovel>();

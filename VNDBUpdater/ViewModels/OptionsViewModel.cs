@@ -59,26 +59,7 @@ namespace VNDBUpdater.ViewModels
             if ((parameter as PasswordBox).SecurePassword.Length == 0)
                 return;
 
-            byte[] encryptedBytes = ProtectedData.Protect(Encoding.UTF8.GetBytes((parameter as PasswordBox).Password), null, DataProtectionScope.CurrentUser);
-
-            RedisCommunication.ResetDatabase();
-            LocalVisualNovelHelper.ResetVisualNovels();
-            MainScreen.AllVisualNovels = LocalVisualNovelHelper.LocalVisualNovels;
-            MainScreen.UpdateVisualNovelGrid();
-
-            RedisCommunication.SetUserCredentials(_Username, Convert.ToBase64String(encryptedBytes));            
-
-            VNDBCommunication.Disconnect();
-            VNDBCommunication.Connect();
-
-            if (VNDBCommunication.Status == VNDBCommunicationStatus.LoggedIn)
-            {
-                Synchronizer.Cancel();
-                var BackgroundSynchronizer = new Synchronizer();
-                BackgroundSynchronizer.Start(MainScreen);
-            }
-
-            MainScreen.UpdateStatusText();
+            Login(ProtectedData.Protect(Encoding.UTF8.GetBytes((parameter as PasswordBox).Password), null, DataProtectionScope.CurrentUser));
         }
 
         public void ExecuteSetInstallFolderPath(object parameter)
@@ -118,6 +99,27 @@ namespace VNDBUpdater.ViewModels
                 return true;
             else
                 return false;
+        }
+
+        private void Login(byte[] encryptedPassword)
+        {
+            RedisCommunication.Reconnect();
+            RedisCommunication.SetUserCredentials(_Username, Convert.ToBase64String(encryptedPassword));
+
+            LocalVisualNovelHelper.ResetVisualNovels();
+            MainScreen.AllVisualNovels = LocalVisualNovelHelper.LocalVisualNovels;
+            MainScreen.UpdateVisualNovelGrid();
+            
+            VNDBCommunication.Reconnect();
+
+            if (VNDBCommunication.Status == VNDBCommunicationStatus.LoggedIn)
+            {
+                Synchronizer.Cancel();
+                var BackgroundSynchronizer = new Synchronizer();
+                BackgroundSynchronizer.Start(MainScreen);
+            }
+
+            MainScreen.UpdateStatusText();
         }
     }
 }
