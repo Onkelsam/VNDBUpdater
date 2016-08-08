@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
         xmlns:local="clr-namespace:VNDBUpdater.ViewModels"
+        xmlns:converters="clr-namespace:VNDBUpdater.ValueConverts"
         Title="{Binding Path=Title}" Height="665" Width="1213.775"        
         Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
 
@@ -49,7 +50,7 @@
                 </Setter.Value>
             </Setter>
         </Style>
-        <local:TraitsListToStringConvert x:Key="TraitsListToStringConvert" />
+        <converters:TraitsListConverter x:Key="TraitsListToStringConvert" />
     </Window.Resources>
 
     <Grid>

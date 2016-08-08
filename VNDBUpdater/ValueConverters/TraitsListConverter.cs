@@ -6,9 +6,9 @@ using System.Text;
 using System.Windows.Data;
 using VNDBUpdater.Models;
 
-namespace VNDBUpdater.ViewModels
+namespace VNDBUpdater.ValueConverts
 {
-    public class TraitsListToStringConvert : IValueConverter
+    public class TraitsListConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {

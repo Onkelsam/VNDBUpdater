@@ -185,7 +185,10 @@ namespace VNDBUpdater.ViewModels
         {
             get
             {
-                return StartUp.StatusString + " " + VNDBCommunication.StatusString + " " + Synchronizer.StatusString + " " + FileIndexer.StatusString + " " + Refresher.StatusString;
+                if (StartUp.Status == TaskStatus.Running)
+                    return StartUp.StatusString;
+                else
+                    return VNDBCommunication.StatusString + " " + Synchronizer.StatusString + " " + FileIndexer.StatusString + " " + Refresher.StatusString;
             }
         }
 

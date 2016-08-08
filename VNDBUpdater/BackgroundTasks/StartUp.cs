@@ -40,7 +40,7 @@ namespace VNDBUpdater.BackgroundTasks
             {
                 base.Start(MainScreen);
 
-                EventLogger.LogInformation(nameof(StartUp), "started.");                
+                EventLogger.LogInformation(nameof(StartUp), "Started. Version: " + VersionHelper.CurrentVersion + " New Version available: " + VersionHelper.NewVersionAvailable().ToString());                
 
                 _Status = TaskStatus.Running;
 
