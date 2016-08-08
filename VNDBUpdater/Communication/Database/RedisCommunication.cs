@@ -20,6 +20,8 @@ namespace VNDBUpdater.Communication.Database
         private static bool _IsConnected;
         private static int _ConnectionTries = 0;
 
+        private static object Lock = new object();
+
         public static bool IsConnected
         {
             get { return _IsConnected; }
@@ -27,38 +29,43 @@ namespace VNDBUpdater.Communication.Database
 
         private static void Connect()
         {
-            if (!_IsConnected)
+            // Lock this specific method as it can occur that the MainViewModel.GetFiltersFromDatabase is as fast as the startup task.
+            // that doesn't really matter. At least it doesn't lead to errors but it still is not nice to establish a connection two times.
+            lock(Lock)
             {
-                try
+                if (!_IsConnected)
                 {
-                    Connection = new CommunicationLib.Communication().GetRedisCommunication();
-                    Connection.Connect(Constants.RedisIP, Constants.RedisPort, ExeAndStringPath + Constants.RedisExe, ExeAndStringPath + Constants.RedisConfig);
-                    _IsConnected = true;
-                    EventLogger.LogInformation(nameof(RedisCommunication), "Connection to RedisDB established successfully.");                    
-                }
-                catch (ConnectionException ex)
-                {
-                    EventLogger.LogError(nameof(RedisCommunication), ex);                    
-                    _IsConnected = false;
-                    _ConnectionTries++;
-
-                    if (_ConnectionTries != Constants.MaxConnectionTries)
+                    try
                     {
-                        EventLogger.LogInformation(nameof(RedisCommunication), "Error was handled. Trying reconnect. Current tries: " + _ConnectionTries.ToString());                        
-                        Connect();
+                        Connection = new CommunicationLib.Communication().GetRedisCommunication();
+                        Connection.Connect(Constants.RedisIP, Constants.RedisPort, ExeAndStringPath + Constants.RedisExe, ExeAndStringPath + Constants.RedisConfig);
+                        _IsConnected = true;
+                        EventLogger.LogInformation(nameof(RedisCommunication), "Connection to RedisDB established successfully.");
                     }
-                    else
+                    catch (ConnectionException ex)
                     {
-                        _ConnectionTries = 0;
-                        EventLogger.LogInformation(nameof(RedisCommunication), "Error could not be handled. Maximal tries (" + Constants.MaxConnectionTries + ") reached.");
-                    }                    
+                        EventLogger.LogError(nameof(RedisCommunication), ex);
+                        _IsConnected = false;
+                        _ConnectionTries++;
+
+                        if (_ConnectionTries != Constants.MaxConnectionTries)
+                        {
+                            EventLogger.LogInformation(nameof(RedisCommunication), "Error was handled. Trying reconnect. Current tries: " + _ConnectionTries.ToString());
+                            Connect();
+                        }
+                        else
+                        {
+                            _ConnectionTries = 0;
+                            EventLogger.LogInformation(nameof(RedisCommunication), "Error could not be handled. Maximal tries (" + Constants.MaxConnectionTries + ") reached.");
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        EventLogger.LogError(nameof(RedisCommunication), ex);
+                        _IsConnected = false;
+                    }
                 }
-                catch (Exception ex)
-                {
-                    EventLogger.LogError(nameof(RedisCommunication), ex);                    
-                    _IsConnected = false;
-                }
-            }
+            }            
         }
 
         public static void Reconnect()
@@ -93,8 +100,6 @@ namespace VNDBUpdater.Communication.Database
 
                 for (int i = 0; i < entity.Characters.Count; i++)
                     entity.Characters[i] = new CharacterInformation(entity.Characters[i]);
-
-                entity.Characters.ForEach(x => { x = new CharacterInformation(x); });
 
                 existingVNs.Add(entity);
             }

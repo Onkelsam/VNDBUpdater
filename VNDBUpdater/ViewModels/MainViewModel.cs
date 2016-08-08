@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
@@ -513,15 +514,17 @@ namespace VNDBUpdater.ViewModels
 
         public void ExecuteSetCustomScore(object parameter)
         {
-            string score = Microsoft.VisualBasic.Interaction.InputBox("Enter custom score:", "Score", string.Empty);
+            string score = Microsoft.VisualBasic.Interaction.InputBox("Enter custom score:", "Score", string.Empty).Replace(',','.');
             double scoreResult;
 
-            if (double.TryParse(score, out scoreResult))
+            if (double.TryParse(score, NumberStyles.Any, CultureInfo.InvariantCulture, out scoreResult))
             {
-                if (scoreResult >= 10 && scoreResult <= 100)
-                    _SelectedVisualNovel.SetScore((int)(scoreResult));
-                else
-                    _SelectedVisualNovel.SetScore((int)(scoreResult * 10));
+                int result = (int)(scoreResult * 10);
+
+                if (result < 0 || result > 100)
+                    return;
+
+                _SelectedVisualNovel.SetScore(result);
 
                 UpdateVisualNovelInDB(_SelectedVisualNovel);
                 UpdateVisualNovelGrid();

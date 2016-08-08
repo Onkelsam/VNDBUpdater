@@ -70,9 +70,7 @@ namespace VNDBUpdater.BackgroundTasks
                     Trait.RefreshTraits();
 
                 LocalVisualNovelHelper.RefreshVisualNovels();
-
-                _Status = TaskStatus.RanToCompletion;
-                _MainScreen.UpdateStatusText();
+                
                 _MainScreen.GetVisualNovelsFromDatabase();
 
                 if (RedisCommunication.UserCredentialsAvailable())
@@ -81,6 +79,8 @@ namespace VNDBUpdater.BackgroundTasks
                     BackgroundSynchronizer.Start(_MainScreen);
                 }
 
+                _Status = TaskStatus.RanToCompletion;
+                _MainScreen.UpdateStatusText();
                 Cancel();
 
                 EventLogger.LogInformation(nameof(StartUp), "finished successfully.");                
