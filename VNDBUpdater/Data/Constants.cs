@@ -1,4 +1,6 @@
-﻿namespace VNDBUpdater.Data
+﻿using System.Collections.Generic;
+
+namespace VNDBUpdater.Data
 {
     public static class Constants
     {
@@ -27,5 +29,17 @@
         public const int MaxDistanceBetweenStringsForIndexer = 5;
 
         public const string EventlogFileName = "Eventlog.txt";
+
+        public static readonly Dictionary<int?, string> VNLengthMapper = new Dictionary<int?, string>()
+        {
+            { 0, "Unknown" },
+            { 1, "Very short (< 2 hours)" },
+            { 2, "Short (2 - 10 hours)" },
+            { 3, "Medium (10 - 30 hours)" },
+            { 4, "Long (30 - 50 hours)" },
+            { 5, "Very long (> 50 hours)" }
+        };
+
+        public static readonly List<int> PossibleScores = new List<int>() { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
     }
 }

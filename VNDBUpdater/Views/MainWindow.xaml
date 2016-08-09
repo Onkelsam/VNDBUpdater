@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
         xmlns:local="clr-namespace:VNDBUpdater.ViewModels"
-        xmlns:converters="clr-namespace:VNDBUpdater.ValueConverts"
+        xmlns:converters="clr-namespace:VNDBUpdater.ValueConverters"
         Title="{Binding Path=Title}" Height="665" Width="1213.775"        
         Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
 
@@ -51,6 +51,7 @@
             </Setter>
         </Style>
         <converters:TraitsListConverter x:Key="TraitsListToStringConvert" />
+        <converters:AliasesConverter x:Key="AliasesConverter" />
     </Window.Resources>
 
     <Grid>
@@ -119,6 +120,25 @@
                 <DataGridTextColumn Header="VNDB Popularity" Binding="{Binding Path=Basics.popularity}" IsReadOnly="True" Width="2*" />
                 <DataGridTextColumn Header="Own Score" Binding="{Binding Path=ScoreInDouble}" IsReadOnly="True" Width="2*"/>
             </DataGrid.Columns>
+            <DataGrid.RowDetailsTemplate>
+                <DataTemplate>
+                    <Border Padding="4">
+                        <StackPanel Orientation="Vertical">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Foreground="MidnightBlue" HorizontalAlignment="Left" TextWrapping="Wrap" MaxWidth="500">
+                                    <TextBlock.Text>
+                                        <MultiBinding StringFormat="{}Aliases: {0}&#x0a;Length: {1}&#x0a;Released: {2}">
+                                            <Binding Path="Basics.aliases" Converter="{StaticResource AliasesConverter }" />
+                                            <Binding Path="Basics.Length" Mode="OneWay"/>
+                                            <Binding Path="Basics.released" />
+                                        </MultiBinding>
+                                    </TextBlock.Text>
+                                </TextBlock>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+                </DataTemplate>
+            </DataGrid.RowDetailsTemplate>
             <DataGrid.ContextMenu>
                 <ContextMenu Name="MainMenu">
                     <MenuItem Header="Start Game" Command="{Binding Commands.StartVisualNovel}" />

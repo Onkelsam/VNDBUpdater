@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System.Collections.Generic;
 using VNDBUpdater.Communication.VNDB;
+using VNDBUpdater.Data;
 
 namespace VNDBUpdater.Models
 {
@@ -8,6 +9,17 @@ namespace VNDBUpdater.Models
     {
         [JsonIgnore]
         public List<Tag> ConvertedTags { get; set; }
+
+        public string Length
+        {
+            get
+            {
+                if (length == null)
+                    return Constants.VNLengthMapper[0];
+                else
+                    return Constants.VNLengthMapper[length];
+            }
+        }
 
         public BasicInformation(VNInformation basics)
         {

@@ -22,7 +22,6 @@ namespace VNDBUpdater.ViewModels
 
         private AsyncObservableCollection<VisualNovel> _VisualNovelsInGrid;
         private AsyncObservableCollection<Tag> _TagsInGrid;
-        private List<int> _Scores = new List<int>() { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
         private VisualNovel _SelectedVisualNovel;
         private List<Filter> _AvailableFilters;
         private Filter _AppliedFilter;
@@ -100,7 +99,7 @@ namespace VNDBUpdater.ViewModels
 
         public List<int> Scores
         {
-            get { return _Scores; }
+            get { return Constants.PossibleScores; }
         }
 
         public List<string> Categories
@@ -400,7 +399,6 @@ namespace VNDBUpdater.ViewModels
                 RedisCommunication.SaveRedis();
                 RedisCommunication.Dispose();
                 VNDBCommunication.Dispose();
-                FileHelper.BackupDatabase();
                 EventLogger.LogInformation(nameof(MainViewModel), "Shutdown successfull.");
             }
             catch (Exception ex)

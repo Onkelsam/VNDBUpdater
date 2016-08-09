@@ -6,7 +6,7 @@ using System.Text;
 using System.Windows.Data;
 using VNDBUpdater.Models;
 
-namespace VNDBUpdater.ValueConverts
+namespace VNDBUpdater.ValueConverters
 {
     public class TraitsListConverter : IValueConverter
     {
