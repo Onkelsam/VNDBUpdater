@@ -30,8 +30,6 @@ namespace VNDBUpdater.Helper
 
                     foreach (var trait in _LocalTraits)
                         trait.SetParentTraits(rawTraits.Where(x => x.id == trait.ID).Select(x => x.parents).First().ToList());
-
-                    return _LocalTraits;
                 }
 
                 return _LocalTraits;

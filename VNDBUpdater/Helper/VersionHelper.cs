@@ -19,8 +19,12 @@ namespace VNDBUpdater.Helper
         {
             get
             {
-                var releases = new GitHubClient(new ProductHeaderValue("VNDBUpdater")).Repository.Release.GetAll("Onkelsam", "VNDBUpdater").Result;
-                return releases[0].TagName;
+                try
+                {
+                    var releases = new GitHubClient(new ProductHeaderValue("VNDBUpdater")).Repository.Release.GetAll("Onkelsam", "VNDBUpdater").Result;
+                    return releases[0].TagName;
+                }
+                catch { return ""; }                
             }
         }
 

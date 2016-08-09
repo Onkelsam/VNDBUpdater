@@ -15,6 +15,8 @@ namespace VNDBUpdater.Views
 
             DataContext = new MainViewModel();
 
+            ShowInTaskbar = false;
+            
             var Startup = new StartUp();
             Startup.Start((DataContext as MainViewModel));    
         }

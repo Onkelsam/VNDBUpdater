@@ -272,26 +272,31 @@ namespace VNDBUpdater.Communication.VNDB
             int page = 1;
 
             do
-            {
-                VndbResponse result = Connection.QueryCharacterInformation(IDs.ToArray(), page);
-
-                if (result.ResponseType == VndbResponseType.Error)
-                {
-                    if (HandleError(result) == ErrorResponse.Throttled)
-                        result = Connection.QueryCharacterInformation(IDs.ToArray(), page);
-                    else
-                        return new List<VNCharacterInformation>();
-                }
+            {                
+                convertedResult = JsonConvert.DeserializeObject<VNCharacterInformationRoot>(QueryChar(Connection.QueryCharacterInformation, page, IDs.ToArray()).Payload);
 
                 page++;
-
-                convertedResult = JsonConvert.DeserializeObject<VNCharacterInformationRoot>(result.Payload);
 
                 Chars.AddRange(convertedResult.items);
 
             } while (convertedResult.more);
 
             return Chars;
+        }
+
+        private static VndbResponse QueryChar(Func<int[], int, VndbResponse> Query, int page, int[] IDs)
+        {
+            VndbResponse result = Query(IDs, page);
+
+            if (result.ResponseType == VndbResponseType.Error)
+            {
+                if (HandleError(result) == ErrorResponse.Throttled)
+                    return QueryChar(Query, page, IDs);
+                else
+                    return null;
+            }
+            else
+                return result;
         }
 
         private static void SetList<T>(VisualNovel VN, T setObject, Func<int, T, VndbResponse> SetQuery)

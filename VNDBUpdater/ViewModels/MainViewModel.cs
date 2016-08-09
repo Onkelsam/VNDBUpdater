@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Hardcodet.Wpf.TaskbarNotification;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
@@ -6,6 +7,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
+using System.Windows.Media;
 using VNDBUpdater.BackgroundTasks;
 using VNDBUpdater.Communication.Database;
 using VNDBUpdater.Communication.VNDB;
@@ -16,6 +18,9 @@ using VNDBUpdater.Views;
 
 namespace VNDBUpdater.ViewModels
 {
+    // TODO:    - Implement 'real' options-menu. Including spoiler levels, minimize to tray or taskbar etc.
+    // TODO:    - Implement a proper check if the github api limit has been exceeded.
+
     public class MainViewModel : ViewModelBase
     {
         private List<VisualNovel> _AllVisualNovels;
@@ -71,6 +76,8 @@ namespace VNDBUpdater.ViewModels
             _Commands.AddCommand("About", ExecuteAboutCommand);
             _Commands.AddCommand("CreateWalkthrough", ExecuteCreateWalkthrough, CanExecuteCreateWalkthrough);
             _Commands.AddCommand("SetCustomScore", ExecuteSetCustomScore, CanExecuteVisualNovelChanges);
+            _Commands.AddCommand("ShowMainWindow", ExecuteShowMainWindow);
+            _Commands.AddCommand("MinimizeWindow", ExecuteMinimizeWindow);
 
             _VisualNovelsInGrid.CollectionChanged += OnCollectionChanged;            
             _TagsInGrid.CollectionChanged += OnCollectionChanged;
@@ -400,6 +407,7 @@ namespace VNDBUpdater.ViewModels
                 RedisCommunication.Dispose();
                 VNDBCommunication.Dispose();
                 EventLogger.LogInformation(nameof(MainViewModel), "Shutdown successfull.");
+                Application.Current.Shutdown();
             }
             catch (Exception ex)
             {
@@ -530,12 +538,27 @@ namespace VNDBUpdater.ViewModels
             }
         }
 
+        public void ExecuteShowMainWindow(object parameter)
+        {
+            var mainWindow = GetTaskbarWindow(parameter);
+            mainWindow.Show();
+            mainWindow.WindowState = WindowState.Normal;            
+        }
+
         private void SetInitialScreenshot()
         {
             if (_SelectedVisualNovel != null)
                 SelectedScreenshot = _SelectedVisualNovel.Basics.image;
             else
                 SelectedScreenshot = string.Empty;
+        }
+
+        public void ExecuteMinimizeWindow(object parameter)
+        {
+            var mainWindow = (parameter as MainWindow);
+
+            if (mainWindow.WindowState == WindowState.Minimized)
+                mainWindow.Hide();
         }
 
         private void SetInitialCharacter()
@@ -549,6 +572,47 @@ namespace VNDBUpdater.ViewModels
             }
             else
                 SelectedCharacter = new CharacterInformation(null);
+        }
+
+        private Window GetTaskbarWindow(object commandParameter)
+        {
+            var tb = commandParameter as TaskbarIcon;
+            return tb == null ? null : TryFindParent<Window>(tb);
+        }
+
+        private T TryFindParent<T>(DependencyObject child) where T : DependencyObject
+        {
+            DependencyObject parentObject = GetParentObject(child);
+
+            if (parentObject == null) return null;
+
+            T parent = parentObject as T;
+            if (parent != null)
+                return parent;            
+            else
+                return TryFindParent<T>(parentObject);
+        }
+
+        private DependencyObject GetParentObject(DependencyObject child)
+        {
+            if (child == null)
+                return null;
+
+            ContentElement contentElement = child as ContentElement;
+
+            if (contentElement != null)
+            {
+                DependencyObject parent = ContentOperations.GetParent(contentElement);
+
+                if (parent != null)
+                    return parent;
+
+                FrameworkContentElement fce = contentElement as FrameworkContentElement;
+
+                return fce != null ? fce.Parent : null;
+            }
+
+            return VisualTreeHelper.GetParent(child);
         }
     }
 }

@@ -4,12 +4,17 @@
         xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
         xmlns:local="clr-namespace:VNDBUpdater.ViewModels"
         xmlns:converters="clr-namespace:VNDBUpdater.ValueConverters"
-        Title="{Binding Path=Title}" Height="665" Width="1213.775"        
-        Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
+        xmlns:tb="http://www.hardcodet.net/taskbar"
+        x:Name="MainView"
+        Title="{Binding Path=Title}" Height="665" Width="1213.775" 
+        Background="{DynamicResource {x:Static SystemColors.MenuBarBrushKey}}">
 
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="Closing">
             <i:InvokeCommandAction Command="{Binding Commands.CloseWindow}" />
+        </i:EventTrigger>
+        <i:EventTrigger EventName="StateChanged">
+            <i:InvokeCommandAction Command="{Binding Commands.MinimizeWindow}" CommandParameter="{Binding ElementName=MainView}"/>
         </i:EventTrigger>
     </i:Interaction.Triggers>
 
@@ -62,13 +67,21 @@
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="20*" MaxHeight="20" MinHeight="20"/>
-            <RowDefinition Height="20*" MaxHeight="20" MinHeight="20" />
+            <RowDefinition Height="20*" MaxHeight="20" MinHeight="20"/>
             <RowDefinition Height="125*" />
             <RowDefinition Height="125*" />
             <RowDefinition Height="10*" />
         </Grid.RowDefinitions>
 
-        <Menu DockPanel.Dock="Top">
+        <tb:TaskbarIcon IconSource="pack://application:,,,/MainIcon.ico" ToolTipText="VNDBUpdater" DoubleClickCommand="{Binding Commands.ShowMainWindow}" DoubleClickCommandParameter="{Binding RelativeSource={RelativeSource Self}}">
+            <tb:TaskbarIcon.ContextMenu>
+                <ContextMenu >
+                    <MenuItem Header="Close" Command="{Binding Commands.CloseWindow}" />
+                </ContextMenu>
+            </tb:TaskbarIcon.ContextMenu>
+        </tb:TaskbarIcon>
+
+        <Menu Background="{DynamicResource {x:Static SystemColors.MenuBarBrushKey}}" Grid.ColumnSpan="3">
             <MenuItem Header="File">
                 <MenuItem Header="Add Visual Novels" Command="{Binding Commands.AddVisualNovels}" />
                 <MenuItem Header="Refresh Visual Novels" Command="{Binding Commands.RefreshVisualNovels}" />
@@ -98,7 +111,7 @@
             <MenuItem Header="About" Command="{Binding Commands.About}" />
         </Menu>
 
-        <TabControl Grid.Row="1" Grid.Column="0" Grid.RowSpan="3" SelectedIndex="{Binding Path=SelectedVisualNovelTab}">
+        <TabControl Grid.Row="1" Grid.Column="0" Grid.RowSpan="3" SelectedIndex="{Binding Path=SelectedVisualNovelTab}" Background="{DynamicResource {x:Static SystemColors.GradientInactiveCaptionBrushKey}}" BorderBrush="{DynamicResource {x:Static SystemColors.MenuBarBrushKey}}" Foreground="{DynamicResource ButtonHoverBorderBrush}" HorizontalAlignment="Left" VerticalAlignment="Top">
             <TabItem Header="Unknown" x:Name="Unsorted"/>
             <TabItem Header="Playing" x:Name="Reading"/>
             <TabItem Header="Finished" x:Name="OnHold"/>
@@ -107,12 +120,8 @@
             <TabItem Header="Wishlist" x:Name="Wishlist"/>
         </TabControl>
         <DataGrid ItemsSource="{Binding Path=VisualNovelsInGrid, UpdateSourceTrigger=PropertyChanged}" SelectedItem="{Binding Path=SelectedVisualNovel}" 
-                  Grid.Row="2" Grid.RowSpan="2" Grid.Column="0"  AutoGenerateColumns="False" CanUserAddRows="False" GridLinesVisibility="None" Background="White" 
-                  BorderThickness="0" CanUserResizeRows="False" CanUserDeleteRows="False" RowHeaderWidth="0" SelectionMode="Single">
-            <DataGrid.Resources>
-                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="LightBlue"/>
-                <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="LightBlue"/>
-            </DataGrid.Resources>
+                  Grid.Row="2" Grid.RowSpan="2" Grid.Column="0"  AutoGenerateColumns="False" CanUserAddRows="False" GridLinesVisibility="None" 
+                  BorderThickness="0" CanUserResizeRows="False" CanUserDeleteRows="False" RowHeaderWidth="0" SelectionMode="Single" Background="{DynamicResource {x:Static SystemColors.ControlLightLightBrushKey}}" AlternationCount="1">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Name" Binding="{Binding Path=Basics.title}" IsReadOnly="True" Width="5*" />
                 <DataGridTextColumn Header="Original Name" Binding="{Binding Path=Basics.original}" IsReadOnly="True" Width="1*"  />
@@ -120,12 +129,16 @@
                 <DataGridTextColumn Header="VNDB Popularity" Binding="{Binding Path=Basics.popularity}" IsReadOnly="True" Width="2*" />
                 <DataGridTextColumn Header="Own Score" Binding="{Binding Path=ScoreInDouble}" IsReadOnly="True" Width="2*"/>
             </DataGrid.Columns>
+            <DataGrid.Resources>
+                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="LightBlue"/>
+                <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="LightBlue"/>
+            </DataGrid.Resources>
             <DataGrid.RowDetailsTemplate>
                 <DataTemplate>
                     <Border Padding="4">
                         <StackPanel Orientation="Vertical">
                             <StackPanel Orientation="Horizontal">
-                                <TextBlock Foreground="MidnightBlue" HorizontalAlignment="Left" TextWrapping="Wrap" MaxWidth="500">
+                                <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" MaxWidth="500">
                                     <TextBlock.Text>
                                         <MultiBinding StringFormat="{}Aliases: {0}&#x0a;Length: {1}&#x0a;Released: {2}">
                                             <Binding Path="Basics.aliases" Converter="{StaticResource AliasesConverter }" />
@@ -177,7 +190,7 @@
             </DataGrid.ContextMenu>
         </DataGrid>
 
-        <GroupBox Grid.Column="2" Grid.Row="3" Header="Characters" >
+        <GroupBox Grid.Column="2" Grid.Row="3" Header="Characters" BorderThickness="0">
             <Button Style="{DynamicResource NoChromeButton}" Command="{Binding Commands.NextCharacter}">
                 <Image Source="{Binding Path=SelectedCharacter.image, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, IsAsync=True}" Stretch="Fill" ToolTipService.ShowDuration="60000">
                     <Image.ToolTip>
@@ -195,7 +208,7 @@
             </Button>
         </GroupBox>
 
-        <GroupBox Grid.Column="2" Grid.Row="1" Grid.RowSpan="2" Header="Screenshots">
+        <GroupBox Grid.Column="2" Grid.Row="1" Grid.RowSpan="2" Header="Screenshots" BorderThickness="0">
             <Button Style="{DynamicResource NoChromeButton}" Command="{Binding Commands.NextScreenshot}">
                 <Image Source="{Binding Path=SelectedScreenshot, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, IsAsync=True}" Stretch="Fill" />
             </Button>
@@ -208,9 +221,9 @@
             <TabItem Header="Technical" x:Name="Technical" />
         </TabControl>
         <DataGrid ItemsSource="{Binding Path=TagsInGrid, UpdateSourceTrigger=PropertyChanged}"
-                  Grid.Row="2" Grid.Column="1" CanUserAddRows="False" GridLinesVisibility="None" Background="White" BorderThickness="0" AutoGenerateColumns="False" 
-                  ScrollViewer.HorizontalScrollBarVisibility="Visible" ScrollViewer.VerticalScrollBarVisibility="Visible" CanUserResizeRows="False" CanUserDeleteRows="False" 
-                  RowHeaderWidth="0" SelectionMode="Single">
+                  Grid.Row="2" Grid.Column="1" CanUserAddRows="False" GridLinesVisibility="None" BorderThickness="0" AutoGenerateColumns="False" 
+                  ScrollViewer.VerticalScrollBarVisibility="Visible" CanUserResizeRows="False" CanUserDeleteRows="False" 
+                  RowHeaderWidth="0" SelectionMode="Single" Background="{DynamicResource {x:Static SystemColors.ControlLightLightBrushKey}}">
             <DataGrid.Resources>
                 <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="LightBlue"/>
                 <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="LightBlue"/>
@@ -220,7 +233,7 @@
                     <Border Padding="4">
                         <StackPanel Orientation="Vertical">
                             <StackPanel Orientation="Horizontal">
-                                <TextBlock Foreground="MidnightBlue" Text="{Binding Path=Description}" HorizontalAlignment="Left" TextWrapping="Wrap" MaxWidth="250"/>
+                                <TextBlock Text="{Binding Path=Description}" HorizontalAlignment="Left" TextWrapping="Wrap" MaxWidth="250"/>
                             </StackPanel>
                         </StackPanel>
                     </Border>
@@ -232,8 +245,8 @@
             </DataGrid.Columns>
         </DataGrid>
 
-        <GroupBox Grid.Column="1" Grid.Row="3" Header="Description">
-            <RichTextBox Grid.Column="1" Grid.Row="3" Grid.ColumnSpan="1" IsReadOnly="True" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" BorderThickness="0">
+        <GroupBox Grid.Column="1" Grid.Row="3" Header="Description" BorderThickness="0">
+            <RichTextBox Grid.Column="1" Grid.Row="3" Grid.ColumnSpan="1" IsReadOnly="True" BorderThickness="0" Background="{DynamicResource {x:Static SystemColors.MenuBarBrushKey}}">
                 <FlowDocument>
                     <Paragraph>
                         <Run Text="{Binding Path=SelectedVisualNovel.Basics.description}" />
@@ -241,11 +254,11 @@
                 </FlowDocument>
             </RichTextBox>
         </GroupBox>
-               
+
         <StatusBar Grid.Row="4" Grid.ColumnSpan="3">
             <StatusBarItem HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch">
                 <Grid>
-                    <ProgressBar Minimum="0" Maximum="{Binding Path=CurrentPendingTasks}" Value="{Binding Path=CompletedPendingTasks}" Height="20" HorizontalAlignment="Stretch" Foreground="{DynamicResource {x:Static SystemColors.ActiveCaptionBrushKey}}"/>
+                    <ProgressBar Minimum="0" Maximum="{Binding Path=CurrentPendingTasks}" Value="{Binding Path=CompletedPendingTasks}" Height="20" HorizontalAlignment="Stretch" Style="{DynamicResource ProgressBarStyle}" OverridesDefaultStyle="True" Foreground="{DynamicResource ProgressBarBackgroundBrush}" Background="{x:Null}"/>
                     <TextBlock Text="{Binding Path=StatusText}" HorizontalAlignment="Center"/>
                 </Grid>
             </StatusBarItem>
