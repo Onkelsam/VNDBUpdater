@@ -400,6 +400,7 @@ namespace VNDBUpdater.ViewModels
                 RedisCommunication.SaveRedis();
                 RedisCommunication.Dispose();
                 VNDBCommunication.Dispose();
+                FileHelper.BackupDatabase();
                 EventLogger.LogInformation(nameof(MainViewModel), "Shutdown successfull.");
             }
             catch (Exception ex)

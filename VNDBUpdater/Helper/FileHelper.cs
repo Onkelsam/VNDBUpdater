@@ -102,6 +102,12 @@ namespace VNDBUpdater.Helper
                     DeleteFile(filename);
         }
 
+        public static void BackupDatabase()
+        {
+            if (File.Exists(Constants.PathToDatabase + Constants.DatabaseName))
+                File.Copy(Constants.PathToDatabase + Constants.DatabaseName, Constants.PathToDatabase + Constants.BackupDatabaseName, true);
+        }
+
         public static string SearchForVisualNovelExe(VisualNovel VN)
         {
             if (Folders != null)

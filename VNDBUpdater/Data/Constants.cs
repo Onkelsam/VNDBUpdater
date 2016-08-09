@@ -8,6 +8,7 @@
         public const string RedisConfig = "redis.windows.conf";
         public const string DatabaseName = "LocalVNStorage.rdb";
         public const string PathToDatabase = @"Resources\";
+        public const string BackupDatabaseName = "LocalVNStorage_Backup.rdb";        
 
         public const int MaxVNsPerRequest = 25;
 

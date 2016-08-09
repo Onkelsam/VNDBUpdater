@@ -61,6 +61,7 @@ namespace VNDBUpdater.BackgroundTasks
         {
             try
             {
+                FileHelper.BackupDatabase();
                 FileHelper.DeleteTooLargeFile(Constants.EventlogFileName, 1000000);
 
                 if (!File.Exists(Constants.TagsJsonFileName))
