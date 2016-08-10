@@ -14,16 +14,19 @@ That is, of course, not 100% accurate. In my testing 50 of 360 VNs could not be 
 
 <b> Version </b>
 
-1.0.6061.25714
+1.2.6066.41824
 
 <b> Technologies used </b>
 
 - [VndbClient](https://github.com/FredTheBarber/VndbClient) - Client for communication with VNDB. Made some changes.
 - [StackExchange.Redis](https://github.com/StackExchange/StackExchange.Redis) - Client for communication with Redis.
 - [Redis](http://redis.io/) - Database used.
+- [WPF Notifyicon](https://bitbucket.org/hardcodet/notifyicon-wpf/src) - Minimize program to system tray.
 
 <b> Screenshots </b>
 
-![alt tag](http://i.imgur.com/j6hj1BL.png)
+![alt tag](http://i.imgur.com/Whv8Gpy.png)
 
-![alt tag](http://i.imgur.com/iKizLVi.png)
+![alt tag](http://i.imgur.com/dNCLGVO.png)
+
+![alt tag](http://i.imgur.com/O1eOCge.png)
