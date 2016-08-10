@@ -1,5 +1,4 @@
-﻿using Hardcodet.Wpf.TaskbarNotification;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
@@ -7,34 +6,30 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
-using System.Windows.Media;
 using VNDBUpdater.BackgroundTasks;
 using VNDBUpdater.Communication.Database;
 using VNDBUpdater.Communication.VNDB;
 using VNDBUpdater.Data;
 using VNDBUpdater.Helper;
 using VNDBUpdater.Models;
+using VNDBUpdater.Models.Internal;
 using VNDBUpdater.Views;
 
 namespace VNDBUpdater.ViewModels
 {
-    // TODO:    - Implement 'real' options-menu. Including spoiler levels, minimize to tray or taskbar etc.
-    // TODO:    - Implement a proper check if the github api limit has been exceeded.
-
     public class MainViewModel : ViewModelBase
     {
-        private List<VisualNovel> _AllVisualNovels;
-
         private AsyncObservableCollection<VisualNovel> _VisualNovelsInGrid;
         private AsyncObservableCollection<Tag> _TagsInGrid;
         private VisualNovel _SelectedVisualNovel;
         private List<Filter> _AvailableFilters;
         private Filter _AppliedFilter;
+        private WindowHandler _WindowHandler;
 
         private int _SelectedVisualNovelTab;
         private int _SelectedTagTab;
 
-        private string _SelectedScreenshot;
+        private VNScreenshot _SelectedScreenshot;
         private CharacterInformation _SelectedCharacter;
 
         private int _CurrentPendingTasks;
@@ -45,12 +40,12 @@ namespace VNDBUpdater.ViewModels
         public MainViewModel()
             : base()
         {
-            _AllVisualNovels = new List<VisualNovel>();
             _VisualNovelsInGrid = new AsyncObservableCollection<VisualNovel>();
             _TagsInGrid = new AsyncObservableCollection<Tag>();
             _SelectedVisualNovel = new VisualNovel();
             _AvailableFilters = new List<Filter>();
             _AppliedFilter = new Filter();
+            _WindowHandler = new WindowHandler();
 
             _Commands.AddCommand("RefreshVisualNovels", ExecuteRefreshVisualNovels, CanExecuteVNDBOperations);
             _Commands.AddCommand("NextScreenshot", ExecuteNextScreenshot, VisualNovelSelected);
@@ -77,19 +72,13 @@ namespace VNDBUpdater.ViewModels
             _Commands.AddCommand("CreateWalkthrough", ExecuteCreateWalkthrough, CanExecuteCreateWalkthrough);
             _Commands.AddCommand("SetCustomScore", ExecuteSetCustomScore, CanExecuteVisualNovelChanges);
             _Commands.AddCommand("ShowMainWindow", ExecuteShowMainWindow);
-            _Commands.AddCommand("MinimizeWindow", ExecuteMinimizeWindow);
+            _Commands.AddCommand("StateChanged", ExecuteStateChanged);
 
             _VisualNovelsInGrid.CollectionChanged += OnCollectionChanged;            
             _TagsInGrid.CollectionChanged += OnCollectionChanged;
 
             BindingOperations.EnableCollectionSynchronization(_VisualNovelsInGrid, _SyncLock);
             BindingOperations.EnableCollectionSynchronization(_TagsInGrid, _SyncLock);
-        }
-
-        public List<VisualNovel> AllVisualNovels
-        {
-            get { return _AllVisualNovels; }
-            set { _AllVisualNovels = value; }
         }
 
         public AsyncObservableCollection<VisualNovel> VisualNovelsInGrid
@@ -120,11 +109,17 @@ namespace VNDBUpdater.ViewModels
             set
             {
                 _SelectedVisualNovel = value;
+                _SelectedCharacter = null;
+                _SelectedScreenshot = null;
 
                 UpdateTagGrid();
-                SetInitialScreenshot();
-                SetInitialCharacter();
 
+                if (VisualNovelSelected(null))
+                {
+                    ExecuteNextCharacter(null);
+                    ExecuteNextScreenshot(null);
+                }
+                
                 OnPropertyChanged(nameof(SelectedVisualNovel));
             }
         }
@@ -155,7 +150,7 @@ namespace VNDBUpdater.ViewModels
             }
         }
 
-        public string SelectedScreenshot
+        public VNScreenshot SelectedScreenshot
         {
             get { return _SelectedScreenshot; }
             set
@@ -234,21 +229,6 @@ namespace VNDBUpdater.ViewModels
             }
         }
 
-        public void AddOnUI<T>(ICollection<T> collection, T item)
-        {
-            Action<T> add = collection.Add;
-            Application.Current.Dispatcher.BeginInvoke(add, item);
-        }
-
-        public void GetVisualNovelsFromDatabase()
-        {
-            _AllVisualNovels.Clear();
-
-            _AllVisualNovels.AddRange(LocalVisualNovelHelper.LocalVisualNovels);
-
-            UpdateVisualNovelGrid();
-        }
-
         public void ExecuteRefreshVisualNovels(object parameter)
         {            
             Tag.RefreshTags();
@@ -261,7 +241,7 @@ namespace VNDBUpdater.ViewModels
         public bool CanExecuteVNDBOperations(object parameter)
         {
             if (Synchronizer.Status == TaskStatus.Running ||
-                !RedisCommunication.UserCredentialsAvailable() ||
+                UserHelper.CurrentUser.EncryptedPassword == null ||
                 VNDBCommunication.Status == VNDBCommunicationStatus.NotLoggedIn ||
                 VNDBCommunication.Status == VNDBCommunicationStatus.Error ||
                 FileIndexer.Status == TaskStatus.Running ||
@@ -275,11 +255,12 @@ namespace VNDBUpdater.ViewModels
         public void ExecuteUpdateVisualNovel(object parameter)
         {
             _SelectedVisualNovel.Update();
+            OnPropertyChanged(nameof(SelectedVisualNovel));
         }
 
         public void ExecuteNextScreenshot(object parameter)
         {
-            SelectedScreenshot = _SelectedVisualNovel.NextScreenshot(SelectedScreenshot);
+            SelectedScreenshot = _SelectedVisualNovel.GetNextScreenshot(SelectedScreenshot);
         }
 
         public void ExecuteNextCharacter(object paramter)
@@ -343,22 +324,20 @@ namespace VNDBUpdater.ViewModels
 
         public void ExecuteAddVisualNovels(object parameter)
         {
-            var window = new AddVisualNovels(_AllVisualNovels.ToList());
-            window.Closing += OnWindowAddVisualNovels_Closing;
-            window.Show();
+            _WindowHandler.Open(new AddVisualNovels(LocalVisualNovelHelper.LocalVisualNovels), OnWindowAddVisualNovels_Closing);
         }
 
         private void OnWindowAddVisualNovels_Closing(object sender, CancelEventArgs e)
         {
             (sender as AddVisualNovels).Closing -= OnWindowAddVisualNovels_Closing;
-            GetVisualNovelsFromDatabase();
+            UpdateVisualNovelGrid();
         }
 
         public void ExecuteDeleteVisualNovel(object parameter)
         {
             if (_SelectedVisualNovel.Delete())
             {
-                _AllVisualNovels.Remove(_AllVisualNovels.First(x => x.Basics.id == _SelectedVisualNovel.Basics.id));
+                LocalVisualNovelHelper.RemoveVisualNovel(_SelectedVisualNovel);
                 UpdateVisualNovelGrid();
             }
         }
@@ -384,14 +363,12 @@ namespace VNDBUpdater.ViewModels
         public void ExecuteSetCategory(object parameter)
         {
             _SelectedVisualNovel.SetCategory(parameter.ToString());
-            UpdateVisualNovelInDB(_SelectedVisualNovel);
             UpdateVisualNovelGrid();
         }
 
         public void ExecuteSetScore(object parameter)
         {
             _SelectedVisualNovel.SetScore((int)parameter * 10);
-            UpdateVisualNovelInDB(_SelectedVisualNovel);
             UpdateVisualNovelGrid();
         }
 
@@ -406,7 +383,8 @@ namespace VNDBUpdater.ViewModels
                 RedisCommunication.SaveRedis();
                 RedisCommunication.Dispose();
                 VNDBCommunication.Dispose();
-                EventLogger.LogInformation(nameof(MainViewModel), "Shutdown successfull.");
+                _WindowHandler.CloseAllWindows();
+                EventLogger.LogInformation(nameof(MainViewModel), "Shutdown successfull.");                
                 Application.Current.Shutdown();
             }
             catch (Exception ex)
@@ -420,15 +398,11 @@ namespace VNDBUpdater.ViewModels
         {
             var visualNovel = parameter as VisualNovel;
             visualNovel.SetExePath();
-
-            UpdateVisualNovelInDB(visualNovel);
         }
 
         public void ExecuteAddFilter(object parameter)
         {
-            var window = new CreateFilter();
-            window.Closing += OnWindowAddAndEditFilter_Closing;
-            window.Show();
+            _WindowHandler.Open(new CreateFilter(), OnWindowAddAndEditFilter_Closing);
         }
 
         private void OnWindowAddAndEditFilter_Closing(object sender, CancelEventArgs e)
@@ -448,8 +422,7 @@ namespace VNDBUpdater.ViewModels
 
         public void ExecuteAboutCommand(object parameter)
         {
-            var about = new About();
-            about.Show();
+            _WindowHandler.Open(new About());
         }
 
         public void ExecuteSynchronizeWithVNDB(object parameter)
@@ -461,7 +434,10 @@ namespace VNDBUpdater.ViewModels
 
         public void ExecuteResetFilters(object parameter)
         {
-            GetVisualNovelsFromDatabase();
+            foreach (var vn in LocalVisualNovelHelper.LocalVisualNovels)
+                vn.IsFilteredOut = false;
+
+            UpdateVisualNovelGrid();
         }
 
         public void ExecuteSearchOnGoogle(object parameter)
@@ -472,30 +448,24 @@ namespace VNDBUpdater.ViewModels
         public void ExecuteApplyFilter(object parameter)
         {
             var filter = parameter as Filter;
-            var filteredVNs = new List<VisualNovel>();
+            var editedVNs = new List<VisualNovel>();
 
-            foreach (var vn in _AllVisualNovels)
+            foreach (var vn in LocalVisualNovelHelper.LocalVisualNovels)
             {
-                if (!filter.ShouldVNBeFilteredOut(vn))
-                    filteredVNs.Add(vn);
+                vn.IsFilteredOut = filter.ShouldVNBeFilteredOut(vn);
+                editedVNs.Add(vn);
             }
 
-            _AllVisualNovels = filteredVNs;
+            LocalVisualNovelHelper.AddVisualNovels(editedVNs);
+
             UpdateVisualNovelGrid();
         }
 
         public void ExecuteOpenOptions(object parameter)
         {
-            var options = new Options(this);
-            options.Show();
+            _WindowHandler.Open(new Options(this));
         }
         
-        private void UpdateVisualNovelInDB(VisualNovel visualNovel)
-        {
-            if (visualNovel != null)
-                RedisCommunication.AddVisualNovelToDB(visualNovel);
-        }
-
         private void UpdateTagGrid()
         {
             TagsInGrid.Clear();
@@ -506,7 +476,8 @@ namespace VNDBUpdater.ViewModels
                 {
                     foreach (var tag in _SelectedVisualNovel.Basics.ConvertedTags)
                         if (tag.Category == (TagCategory)SelectedTagTab || (TagCategory)SelectedTagTab == TagCategory.All)
-                            TagsInGrid.Add(tag);
+                            if (tag.ShowTag())
+                                TagsInGrid.Add(tag);
                 }
             }
         }
@@ -515,7 +486,7 @@ namespace VNDBUpdater.ViewModels
         {
             VisualNovelsInGrid.Clear();
 
-            foreach (var visualNovel in _AllVisualNovels.Where(x => x.Category == (VisualNovelCatergory)SelectedVisualNovelTab))
+            foreach (var visualNovel in LocalVisualNovelHelper.LocalVisualNovels.Where(x => x.Category == (VisualNovelCatergory)SelectedVisualNovelTab && x.IsFilteredOut == false))
                 VisualNovelsInGrid.Add(visualNovel);
         }
 
@@ -533,86 +504,21 @@ namespace VNDBUpdater.ViewModels
 
                 _SelectedVisualNovel.SetScore(result);
 
-                UpdateVisualNovelInDB(_SelectedVisualNovel);
                 UpdateVisualNovelGrid();
             }
         }
 
         public void ExecuteShowMainWindow(object parameter)
         {
-            var mainWindow = GetTaskbarWindow(parameter);
-            mainWindow.Show();
-            mainWindow.WindowState = WindowState.Normal;            
+            _WindowHandler.Show(parameter);         
         }
 
-        private void SetInitialScreenshot()
+        public void ExecuteStateChanged(object parameter)
         {
-            if (_SelectedVisualNovel != null)
-                SelectedScreenshot = _SelectedVisualNovel.Basics.image;
-            else
-                SelectedScreenshot = string.Empty;
-        }
+            var window = (parameter as MainWindow);
 
-        public void ExecuteMinimizeWindow(object parameter)
-        {
-            var mainWindow = (parameter as MainWindow);
-
-            if (mainWindow.WindowState == WindowState.Minimized)
-                mainWindow.Hide();
-        }
-
-        private void SetInitialCharacter()
-        {
-            if ((_SelectedVisualNovel != null) && (_SelectedVisualNovel.Characters != null))
-            {
-                if (_SelectedVisualNovel.Characters.Any(x => x.image != null))
-                    SelectedCharacter = _SelectedVisualNovel.Characters[0];
-                else
-                    SelectedCharacter = new CharacterInformation(null);
-            }
-            else
-                SelectedCharacter = new CharacterInformation(null);
-        }
-
-        private Window GetTaskbarWindow(object commandParameter)
-        {
-            var tb = commandParameter as TaskbarIcon;
-            return tb == null ? null : TryFindParent<Window>(tb);
-        }
-
-        private T TryFindParent<T>(DependencyObject child) where T : DependencyObject
-        {
-            DependencyObject parentObject = GetParentObject(child);
-
-            if (parentObject == null) return null;
-
-            T parent = parentObject as T;
-            if (parent != null)
-                return parent;            
-            else
-                return TryFindParent<T>(parentObject);
-        }
-
-        private DependencyObject GetParentObject(DependencyObject child)
-        {
-            if (child == null)
-                return null;
-
-            ContentElement contentElement = child as ContentElement;
-
-            if (contentElement != null)
-            {
-                DependencyObject parent = ContentOperations.GetParent(contentElement);
-
-                if (parent != null)
-                    return parent;
-
-                FrameworkContentElement fce = contentElement as FrameworkContentElement;
-
-                return fce != null ? fce.Parent : null;
-            }
-
-            return VisualTreeHelper.GetParent(child);
-        }
+            if (window.WindowState == WindowState.Minimized)
+                _WindowHandler.Minimize(window);
+        }   
     }
 }

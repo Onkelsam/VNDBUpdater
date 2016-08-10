@@ -41,5 +41,7 @@ namespace VNDBUpdater.Data
         };
 
         public static readonly List<int> PossibleScores = new List<int>() { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+
+        public static readonly List<string> ExcludedExeFileNames = new List<string>() { "unins", "エンジン設定" };
     }
 }

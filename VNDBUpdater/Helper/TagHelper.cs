@@ -25,9 +25,7 @@ namespace VNDBUpdater.Helper
                     _LocalTags = new List<Tag>();
 
                     foreach (var tag in rawTags)                    
-                        _LocalTags.Add(new Tag { Name = tag.name, Description = tag.description, Category = ExtensionMethods.ParseEnum<TagCategory>(tag.cat), ID = tag.id });
-
-                    return _LocalTags;
+                        _LocalTags.Add(new Tag { ID = tag.id, Name = tag.name, Description = tag.description, Category = ExtensionMethods.ParseEnum<TagCategory>(tag.cat) });
                 }                              
 
                 return _LocalTags;

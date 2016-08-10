@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using VNDBUpdater.Communication.Database;
 using VNDBUpdater.Communication.VNDB;
 using VNDBUpdater.Data;
 using VNDBUpdater.Helper;
@@ -70,7 +69,7 @@ namespace VNDBUpdater.ViewModels
         {
             foreach (var visualNovel in VNDBCommunication.FetchVisualNovels(GetIDsAsInt()))
             {
-                if (!_VisualNovelsToAdd.Any(x => x.Basics.id == visualNovel.Basics.id))
+                if (!_VisualNovelsToAdd.Any(x => x.Basics.VNDBInformation.id == visualNovel.Basics.VNDBInformation.id))
                     _VisualNovelsToAdd.Add(visualNovel);            
             }
 
@@ -89,7 +88,7 @@ namespace VNDBUpdater.ViewModels
             foreach (var visualNovel in newVisualNovels)
                 visualNovel.SetCategory(VisualNovelCatergory.Unknown);
 
-            RedisCommunication.AddVisualNovelsToDB(newVisualNovels);
+            LocalVisualNovelHelper.AddVisualNovels(newVisualNovels);
         }
 
         public bool CanExecuteSetExePath(object paramter)

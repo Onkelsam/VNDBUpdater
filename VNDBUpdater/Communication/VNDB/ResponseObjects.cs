@@ -16,7 +16,7 @@ namespace VNDBUpdater.Communication.VNDB
         public object wikipedia { get; set; }
     }
 
-    public class VNScreenshots
+    public class VNScreenshot
     {
         public int height { get; set; }
         public bool nsfw { get; set; }
@@ -43,7 +43,7 @@ namespace VNDBUpdater.Communication.VNDB
         public string aliases { get; set; }
         public double popularity { get; set; }
         public object original { get; set; }
-        public List<VNScreenshots> screens { get; set; }
+        public List<VNScreenshot> screens { get; set; }
         public bool image_nsfw { get; set; }
     }
     

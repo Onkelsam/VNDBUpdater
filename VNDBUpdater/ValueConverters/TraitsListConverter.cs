@@ -20,15 +20,18 @@ namespace VNDBUpdater.ValueConverters
 
                 foreach (var trait in traits)
                 {
-                    var parentTrait = trait.LastParentTrait(trait);
-
-                    if (parentWithTraits.ContainsKey(parentTrait.Name))
-                        parentWithTraits[parentTrait.Name].Add(trait);
-                    else
+                    if (trait.ShowTrait())
                     {
-                        parentWithTraits.Add(parentTrait.Name, new List<Trait>());
-                        parentWithTraits[parentTrait.Name].Add(trait);
-                    }                        
+                        var parentTrait = trait.LastParentTrait(trait);
+
+                        if (parentWithTraits.ContainsKey(parentTrait.Name))
+                            parentWithTraits[parentTrait.Name].Add(trait);
+                        else
+                        {
+                            parentWithTraits.Add(parentTrait.Name, new List<Trait>());
+                            parentWithTraits[parentTrait.Name].Add(trait);
+                        }
+                    }                                       
                 }
 
                 foreach (var foundTraits in parentWithTraits.OrderBy(x => x.Key))

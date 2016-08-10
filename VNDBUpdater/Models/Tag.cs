@@ -7,14 +7,15 @@ using VNDBUpdater.Data;
 using VNDBUpdater.Helper;
 
 namespace VNDBUpdater.Models
-{   
+{
     public class Tag
     {
         public string Name { get; set; }
-        public double Score { get; set; }
         public string Description { get; set; }
         public int ID { get; set; }
         public TagCategory Category { get; set; }
+        public double Score { get; private set; }
+        public SpoilerLevel Spoiler { get; private set; }
 
         public static void RefreshTags()
         {
@@ -34,16 +35,33 @@ namespace VNDBUpdater.Models
 
             foreach (var tag in rawInfo.tags)
             {
-                Tag foundTag = TagHelper.LocalTags.FirstOrDefault(x => x.ID == tag[0]);
+                var foundTag = TagHelper.LocalTags.FirstOrDefault(x => x.ID == tag[0]);               
 
                 if (foundTag != null)
-                {
+                {                    
                     foundTag.Score = tag[1];
-                    TagList.Add(foundTag);
+                    foundTag.Spoiler = ExtensionMethods.ParseEnum<SpoilerLevel>(tag[2].ToString());
+
+                    var newTag = new Tag()
+                    {
+                        Category = foundTag.Category,
+                        Description = foundTag.Description,
+                        ID = foundTag.ID,
+                        Name = foundTag.Name,
+                        Score = foundTag.Score,
+                        Spoiler = foundTag.Spoiler
+                    };
+
+                    TagList.Add(newTag);
                 }
             }
 
             return TagList;
+        }
+
+        public bool ShowTag()
+        {
+            return (int)UserHelper.CurrentUser.Settings.SpoilerSetting >= (int)Spoiler;
         }
 
         public override string ToString()

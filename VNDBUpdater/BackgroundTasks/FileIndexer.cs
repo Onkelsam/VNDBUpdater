@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using VNDBUpdater.Helper;
+using VNDBUpdater.Models;
 using VNDBUpdater.ViewModels;
 
 namespace VNDBUpdater.BackgroundTasks
@@ -24,7 +26,7 @@ namespace VNDBUpdater.BackgroundTasks
                     case (TaskStatus.Running):
                         return "Fileindexer is currently running. " + _MainScreen.CompletedPendingTasks + " of " + _MainScreen.CurrentPendingTasks + " Visual Novels indexed.";
                     case (TaskStatus.RanToCompletion):
-                        return "Fileindexer is finished. " + _MainScreen.AllVisualNovels.Count(x => x.ExePath == null || x.ExePath == "") + " could not be indexed.";
+                        return "Fileindexer is finished. " + LocalVisualNovelHelper.LocalVisualNovels.Count(x => x.ExePath == null || x.ExePath == "") + " could not be indexed.";
                     case (TaskStatus.Faulted):
                         return "Error occured while running Fileindexer. Please check the eventlog.";
                     default:
@@ -41,7 +43,7 @@ namespace VNDBUpdater.BackgroundTasks
 
                 EventLogger.LogInformation(nameof(FileIndexer), "started.");
 
-                _MainScreen.CurrentPendingTasks = _MainScreen.AllVisualNovels.Count(x => x.ExePath == null || x.ExePath == "");
+                _MainScreen.CurrentPendingTasks = LocalVisualNovelHelper.LocalVisualNovels.Count(x => x.ExePath == null || x.ExePath == "");
                 _MainScreen.CompletedPendingTasks = 0;
                 _Status = TaskStatus.Running;
 
@@ -64,14 +66,18 @@ namespace VNDBUpdater.BackgroundTasks
             {
                 EventLogger.LogInformation(nameof(FileIndexer), "pending Tasks: " + _MainScreen.CurrentPendingTasks.ToString());
 
-                foreach (var vn in _MainScreen.AllVisualNovels.Where(x => x.ExePath == null || x.ExePath == ""))
+                var crawledVNs = new List<VisualNovel>();
+
+                foreach (var vn in LocalVisualNovelHelper.LocalVisualNovels.Where(x => x.ExePath == null || x.ExePath == ""))
                 {
                     vn.CrawlExePath();
+                    crawledVNs.Add(vn);                 
                     _MainScreen.CompletedPendingTasks++;
                     EventLogger.LogInformation(nameof(FileIndexer), "completed Tasks: " + _MainScreen.CompletedPendingTasks.ToString());
                 }
 
-                Cancel();
+                LocalVisualNovelHelper.AddVisualNovels(crawledVNs);
+
                 _Status = TaskStatus.RanToCompletion;
                 _MainScreen.UpdateStatusText();
 

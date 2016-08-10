@@ -6,10 +6,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
-using VNDBUpdater.Communication.Database;
 using VNDBUpdater.Data;
 using VNDBUpdater.Helper;
 using VNDBUpdater.Models;
+using VNDBUpdater.Models.Internal;
 
 namespace VNDBUpdater.Communication.VNDB
 {
@@ -33,11 +33,11 @@ namespace VNDBUpdater.Communication.VNDB
                 switch (_Status)
                 {
                     case (VNDBCommunicationStatus.LoggedIn):
-                        return "Currently logged in as '" + RedisCommunication.GetUsername() + "'.";
+                        return "Currently logged in as '" + UserHelper.CurrentUser.Username + "'.";
                     case (VNDBCommunicationStatus.NotLoggedIn):
                         return "Currently not logged in. Please specify your Login-Credentials in the Options-Menu.";
                     case (VNDBCommunicationStatus.Throttled):
-                        return "Currently logged in as '" + RedisCommunication.GetUsername() + "'. Throttled by VNDB. Please be patient.";
+                        return "Currently logged in as '" + UserHelper.CurrentUser.Username + "'. Throttled by VNDB. Please be patient.";
                     default:
                         return ErrorMessage;
                 }
@@ -56,7 +56,7 @@ namespace VNDBUpdater.Communication.VNDB
                 try
                 {
                     Connection = new CommunicationLib.Communication().GetVNDBCommunication();
-                    var response = Connection.Connect(RedisCommunication.GetUsername(), RedisCommunication.GetUserPassword());
+                    var response = Connection.Connect(UserHelper.CurrentUser.Username, Convert.ToBase64String(UserHelper.CurrentUser.EncryptedPassword));
 
                     if (response.ResponseType == VndbResponseType.Error)
                     {
@@ -126,15 +126,15 @@ namespace VNDBUpdater.Communication.VNDB
             if (idSplitter.SplittingNeccessary)
             {
                 for (int round = 0; round < idSplitter.NumberOfRequest; round++)
-                    AddToVisualNovelsList(idSplitter.IDs.Take(round * Constants.MaxVNsPerRequest, Constants.MaxVNsPerRequest).ToList(), visualNovels);
+                    visualNovels.AddRange(AddToVisualNovelsList(idSplitter.IDs.Take(round * Constants.MaxVNsPerRequest, Constants.MaxVNsPerRequest).ToList()));
 
                 if (idSplitter.Remainder > 0)
-                    AddToVisualNovelsList(idSplitter.IDs.Take(idSplitter.IDs.Length - idSplitter.Remainder, idSplitter.Remainder).ToList(), visualNovels);
+                    visualNovels.AddRange(AddToVisualNovelsList(idSplitter.IDs.Take(idSplitter.IDs.Length - idSplitter.Remainder, idSplitter.Remainder).ToList()));
             }
             else
-                AddToVisualNovelsList(idSplitter.IDs.ToList(), visualNovels);
+                visualNovels.AddRange(AddToVisualNovelsList(idSplitter.IDs.ToList()));
 
-            return visualNovels.OrderBy(x => x.Basics.id).ToList();
+            return visualNovels;
         }
 
         public static VisualNovel FetchVisualNovel(int ID)
@@ -149,15 +149,17 @@ namespace VNDBUpdater.Communication.VNDB
             return visualNovel;
         }
 
-        private static void AddToVisualNovelsList(List<int> IDs, List<VisualNovel> visualNovels)
+        private static List<VisualNovel> AddToVisualNovelsList(List<int> IDs)
         {
-            var basicInformation = GetBasicInformation(IDs).items;
-            var charInformation = GetCharInfo(IDs);
+            var vns = new List<VisualNovel>();
+
+            List<VNInformation> basicInformation = GetBasicInformation(IDs).items;
+            List<VNCharacterInformation> charInformation = GetCharInfo(IDs);
 
             foreach (var id in IDs)
             {                
-                var basic = basicInformation.Where(x => x.id == id).FirstOrDefault();
-                var chars = charInformation.FindAll(x => x.vns.Any(y => y.Any(u => u.ToString() == id.ToString()))).ToList();
+                VNInformation basic = basicInformation.Where(x => x.id == id).SingleOrDefault();
+                List<VNCharacterInformation> chars = charInformation.FindAll(x => x.vns.Any(y => y.Any(u => u.ToString() == id.ToString()))).ToList();
 
                 // Check if visual novel still exists.
                 if (basic != null)
@@ -169,9 +171,11 @@ namespace VNDBUpdater.Communication.VNDB
                     foreach (var character in chars)
                         newVN.Characters.Add(new CharacterInformation(character));
 
-                    visualNovels.Add(newVN);
+                    vns.Add(newVN);
                 }
             }
+
+            return vns;
         }
 
         public static List<VN> GetVisualNovelListFromVNDB()
@@ -228,7 +232,7 @@ namespace VNDBUpdater.Communication.VNDB
                 if (HandleError(result) == ErrorResponse.Throttled)
                     return GetBasicInformation(IDs);
                 else
-                    return new VNInformationRoot();
+                    return null;
             }
             else
                 return JsonConvert.DeserializeObject<VNInformationRoot>(result.Payload);
@@ -243,7 +247,7 @@ namespace VNDBUpdater.Communication.VNDB
                 if (HandleError(result) == ErrorResponse.Throttled)
                     return GetBasicInformation(ID);
                 else
-                    return new VNInformationRoot();
+                    return null;
             }
             else
                 return JsonConvert.DeserializeObject<VNInformationRoot>(result.Payload);
@@ -301,7 +305,7 @@ namespace VNDBUpdater.Communication.VNDB
 
         private static void SetList<T>(VisualNovel VN, T setObject, Func<int, T, VndbResponse> SetQuery)
         {
-            VndbResponse result = SetQuery(VN.Basics.id, setObject);
+            VndbResponse result = SetQuery(VN.Basics.VNDBInformation.id, setObject);
 
             if (result.ResponseType == VndbResponseType.Error)
             {
@@ -312,7 +316,7 @@ namespace VNDBUpdater.Communication.VNDB
 
         private static void RemoveFromList(VisualNovel VN, Func<int, VndbResponse> Query)
         {
-            VndbResponse result = Query(VN.Basics.id);
+            VndbResponse result = Query(VN.Basics.VNDBInformation.id);
 
             if (result.ResponseType == VndbResponseType.Error)
             {

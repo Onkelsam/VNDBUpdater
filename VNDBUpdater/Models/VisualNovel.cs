@@ -5,10 +5,10 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Windows;
-using VNDBUpdater.Communication.Database;
 using VNDBUpdater.Communication.VNDB;
 using VNDBUpdater.Data;
 using VNDBUpdater.Helper;
+using VNDBUpdater.Models.Internal;
 
 namespace VNDBUpdater.Models
 {
@@ -23,6 +23,7 @@ namespace VNDBUpdater.Models
         public BasicInformation Basics { get; set; }
         public List<CharacterInformation> Characters { get; set; }
         public string FolderPath { get; private set; }
+        public bool IsFilteredOut { get; set; }
 
         public VisualNovel()
         {
@@ -31,7 +32,7 @@ namespace VNDBUpdater.Models
 
         public bool AlreadyExistsInDatabase
         {
-            get { return RedisCommunication.VisualNovelExistsInDatabase(Basics.id); }
+            get { return LocalVisualNovelHelper.VisualNovelExists(Basics.VNDBInformation.id); }
         }
 
         public int Score
@@ -104,14 +105,14 @@ namespace VNDBUpdater.Models
 
         public void ViewOnVNDB()
         {
-            Process.Start("https://vndb.org/v" + Basics.id);
+            Process.Start("https://vndb.org/v" + Basics.VNDBInformation.id);
         }
         public void SearchOnGoolge(string parameter)
         {
-            if (Basics.original != null)
-                Process.Start("https://www.google.de/#q=" + Basics.original.ToString() + "+" + parameter);
+            if (Basics.VNDBInformation.original != null)
+                Process.Start("https://www.google.de/#q=" + Basics.VNDBInformation.original.ToString() + "+" + parameter);
             else
-                Process.Start("https://www.google.de/#q=" + Basics.title + "+" + parameter);         
+                Process.Start("https://www.google.de/#q=" + Basics.VNDBInformation.title + "+" + parameter);         
         }
 
         public void OpenWalkthrough()
@@ -136,6 +137,8 @@ namespace VNDBUpdater.Models
                 VNDBCommunication.SetWishList(this);
             else
                 VNDBCommunication.SetVNList(this);
+
+            LocalVisualNovelHelper.AddVisualNovel(this);
         }
 
         /// <summary>
@@ -149,26 +152,43 @@ namespace VNDBUpdater.Models
                 VNDBCommunication.RemoveFromScoreList(this);
             else
                 VNDBCommunication.SetVoteList(this);
+
+            LocalVisualNovelHelper.AddVisualNovel(this);
         }
 
         public void Update()
         {
-            VisualNovel updatedVisualNovel = VNDBCommunication.FetchVisualNovel(Basics.id);
+            VisualNovel updatedVisualNovel = VNDBCommunication.FetchVisualNovel(Basics.VNDBInformation.id);
 
             Basics = updatedVisualNovel.Basics;
             Characters = updatedVisualNovel.Characters;
 
-            RedisCommunication.AddVisualNovelToDB(this);
+            LocalVisualNovelHelper.AddVisualNovel(this);
         }
 
-        public string NextScreenshot(string currentScreenshot)
+        public VNScreenshot GetNextScreenshot(VNScreenshot currentScreenshot)
         {
-            if (!Basics.screens.Any() || currentScreenshot == Basics.screens.Last().image)
-                return Basics.image;
-            else if (currentScreenshot == Basics.image)
-                return Basics.screens[0].image;
+            if (UserHelper.CurrentUser.Settings.ShowNSFWImages)
+            {
+                if (!Basics.VNDBInformation.screens.Any() || currentScreenshot == Basics.VNDBInformation.screens.Last() || currentScreenshot == null)
+                    return new VNScreenshot() { image = Basics.VNDBInformation.image };
+                else
+                    return Basics.VNDBInformation.screens.NextOf(currentScreenshot);
+            }
             else
-                return Basics.screens[Basics.screens.IndexOf(Basics.screens.Where(x => x.image == currentScreenshot).Select(x => x).First()) + 1].image;
+            {
+                if (!Basics.VNDBInformation.screens.Any() || currentScreenshot == Basics.VNDBInformation.screens.Last() && !Basics.VNDBInformation.image_nsfw || currentScreenshot == null)
+                    return new VNScreenshot() { image = Basics.VNDBInformation.image };
+                else
+                {
+                    VNScreenshot screen = Basics.VNDBInformation.screens.NextOf(currentScreenshot);
+
+                    if (screen.nsfw)
+                        return GetNextScreenshot(screen);
+                    else
+                        return screen;
+                }
+            }            
         }
 
         public CharacterInformation NextCharacter(CharacterInformation currentCharacter)
@@ -177,27 +197,23 @@ namespace VNDBUpdater.Models
             {
                 if (Characters.Any())
                 {
-                    if (!Characters.Any(x => x.image != null))
-                        return new CharacterInformation(null);
-                    else if (currentCharacter == Characters.Last())
-                        return Characters.First();
+                    if (!Characters.Any(x => x.VNDBInformation.image != null))
+                        return new CharacterInformation(new VNCharacterInformation());
                     else
-                        return Characters[Characters.IndexOf(Characters.Where(x => x.id == currentCharacter.id).Select(x => x).First()) + 1];
+                        return Characters.NextOf(currentCharacter);
                 }
-                else
-                    return new CharacterInformation(null);
             }
-            else
-                return new CharacterInformation(null);
+
+            return new CharacterInformation(new VNCharacterInformation());
         }
 
         public bool Delete()
         {
-            var dialogResult = MessageBox.Show("Are you sure?", Basics.title, MessageBoxButton.YesNo);
+            var dialogResult = MessageBox.Show("Are you sure?", Basics.VNDBInformation.title, MessageBoxButton.YesNo);
 
             if (dialogResult == MessageBoxResult.Yes)
             {
-                RedisCommunication.DeleteVisualNovel(Basics.id);
+                LocalVisualNovelHelper.RemoveVisualNovel(this);
                 VNDBCommunication.RemoveFromScoreList(this);
                 VNDBCommunication.RemoveFromWishList(this);
                 VNDBCommunication.RemoveFromVNList(this);
@@ -213,6 +229,8 @@ namespace VNDBUpdater.Models
 
             if (!string.IsNullOrEmpty(path))
                 ExePath = path;
+
+            LocalVisualNovelHelper.AddVisualNovel(this);
         }
 
         public void CreateWalkthrough()
@@ -220,16 +238,15 @@ namespace VNDBUpdater.Models
             if (InstallationPathExists && !WalkthroughAvailable)
             {
                 File.Create(FolderPath + Constants.WalkthroughFileName);
-                OpenWalkthrough();
+                LocalVisualNovelHelper.AddVisualNovel(this);
             }                
         }
 
         public void CrawlExePath()
         {
-            if (!InstallationPathExists && (RedisCommunication.GetInstallFolder() != null))
+            if (!InstallationPathExists && (UserHelper.CurrentUser.Settings.InstallFolderPath != null))
             {
                 ExePath = FileHelper.SearchForVisualNovelExe(this);
-                RedisCommunication.AddVisualNovelToDB(this);
                 OnPropertyChanged(nameof(ExePath));
             }
         }

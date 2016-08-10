@@ -1,10 +1,6 @@
 ﻿using Octokit;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace VNDBUpdater.Helper
 {
@@ -24,7 +20,11 @@ namespace VNDBUpdater.Helper
                     var releases = new GitHubClient(new ProductHeaderValue("VNDBUpdater")).Repository.Release.GetAll("Onkelsam", "VNDBUpdater").Result;
                     return releases[0].TagName;
                 }
-                catch { return ""; }                
+                catch (Exception ex)
+                {
+                    EventLogger.LogError(nameof(VersionHelper), ex);
+                    return string.Empty;
+                }                
             }
         }
 

@@ -5,7 +5,7 @@
         xmlns:local="clr-namespace:VNDBUpdater.ViewModels"
         xmlns:helper="clr-namespace:VNDBUpdater.Helper"
         Title="VNDBUpdater - Add Visual Novels" Height="516.675" Width="667"
-        Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
+        Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" Topmost="True">
 
     <Window.DataContext>
         <local:AddVisualNovelsViewModel />
@@ -37,7 +37,7 @@
             <ColumnDefinition Width="100*" MaxWidth="100"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition Height="40*" MaxHeight="40" MinHeight="40"/>
+            <RowDefinition Height="60*" MaxHeight="50" MinHeight="50"/>
             <RowDefinition Height="142*"/>
             <RowDefinition Height="250*" MaxHeight="250" MinHeight="250"/>
         </Grid.RowDefinitions>
@@ -53,15 +53,15 @@
                 <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="LightBlue"/>
             </DataGrid.Resources>
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Visual Novel ID" Binding="{Binding Path=Basics.id}" IsReadOnly="True"/>
-                <DataGridTextColumn Header="Name" Binding="{Binding Path=Basics.title}" IsReadOnly="True" Width="*"/>
-                <DataGridTextColumn Header="Original Name" Binding="{Binding Path=Basics.original}" IsReadOnly="True"/>
+                <DataGridTextColumn Header="Visual Novel ID" Binding="{Binding Path=Basics.VNDBInformation.id}" IsReadOnly="True"/>
+                <DataGridTextColumn Header="Name" Binding="{Binding Path=Basics.VNDBInformation.title}" IsReadOnly="True" Width="*"/>
+                <DataGridTextColumn Header="Original Name" Binding="{Binding Path=Basics.VNDBInformation.original}" IsReadOnly="True"/>
                 <DataGridTextColumn Header="Installation Path" Binding="{Binding Path=ExePath}" IsReadOnly="True"/>
                 <DataGridCheckBoxColumn Header="In your List" Binding="{Binding Path=AlreadyExistsInDatabase, Mode=OneWay}" IsReadOnly="True" />
             </DataGrid.Columns>
         </DataGrid>
 
-        <TextBox Margin="0,18,0,0" Validation.ErrorTemplate="{StaticResource validationErrorTemplate}">
+        <TextBox  Validation.ErrorTemplate="{StaticResource validationErrorTemplate}" Margin="0,19,0,0">
             <TextBox.Text>
                 <Binding Path="IDs" UpdateSourceTrigger="PropertyChanged">
                     <Binding.ValidationRules>
@@ -71,13 +71,13 @@
             </TextBox.Text>
         </TextBox>
 
-        <Button Content="Fetch" Margin="0,18,0,0" Grid.Column="1" Command="{Binding Commands.FetchVisualNovels}"/>
-        <Button Content="Add VNs" Margin="0,18,0,0" Grid.Column="3" Command="{Binding Commands.AddVisualNovelsToDB}"/>
-        <Image Grid.Row="2" Source="{Binding Path=SelectedVisualNovel.Basics.image}"/>
+        <Button Content="Fetch"  Grid.Column="1" Command="{Binding Commands.FetchVisualNovels}" Margin="0,19,0,0"/>
+        <Button Content="Add VNs"  Grid.Column="3" Command="{Binding Commands.AddVisualNovelsToDB}" Margin="0,19,0,0"/>
+        <Image Grid.Row="2" Source="{Binding Path=SelectedVisualNovel.Basics.VNDBInformation.image}"/>
         <RichTextBox Grid.Column="1" Grid.Row="2" Grid.ColumnSpan="3" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" BorderThickness="0" >
             <FlowDocument>
                 <Paragraph>
-                    <Run Text="{Binding Path=SelectedVisualNovel.Basics.description}"/>
+                    <Run Text="{Binding Path=SelectedVisualNovel.Basics.VNDBInformation.description}"/>
                 </Paragraph>
             </FlowDocument>
         </RichTextBox>

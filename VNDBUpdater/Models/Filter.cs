@@ -52,7 +52,7 @@ namespace VNDBUpdater.Models
 
             var tags = new List<Tag>();
 
-            foreach (var tagID in vn.Basics.tags)
+            foreach (var tagID in vn.Basics.VNDBInformation.tags)
                 if (TagHelper.LocalTags.Any(x => x.ID == tagID[0]))
                     tags.Add(TagHelper.LocalTags.Where(x => x.ID == tagID[0]).First());
 

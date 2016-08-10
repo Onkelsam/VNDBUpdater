@@ -1,8 +1,8 @@
 ﻿using System;
 using System.IO;
 using System.IO.Compression;
+using System.Linq;
 using System.Windows.Forms;
-using VNDBUpdater.Communication.Database;
 using VNDBUpdater.Data;
 using VNDBUpdater.Models;
 
@@ -18,7 +18,7 @@ namespace VNDBUpdater.Helper
             {
                 if (_Folders == null)
                 {
-                    var InstallFolder = RedisCommunication.GetInstallFolder();
+                    var InstallFolder = UserHelper.CurrentUser.Settings.InstallFolderPath;
 
                     if (InstallFolder != null)
                     {
@@ -69,7 +69,7 @@ namespace VNDBUpdater.Helper
             if (!string.IsNullOrWhiteSpace(fileDialog.SelectedPath))
                 return fileDialog.SelectedPath;
             else
-                return RedisCommunication.GetInstallFolder();
+                return UserHelper.CurrentUser.Settings.InstallFolderPath;
         }
 
         public static void Decompress(FileInfo fileToDecompress)
@@ -114,7 +114,7 @@ namespace VNDBUpdater.Helper
             {
                 foreach (var folder in Folders)
                 {
-                    if (new DirectoryInfo(folder).Name.ToLower().Trim() == VN.Basics.title.ToLower().Trim())
+                    if (new DirectoryInfo(folder).Name.ToLower().Trim() == VN.Basics.VNDBInformation.title.ToLower().Trim())
                     {
                         return GetExecuteable(folder);
                     }
@@ -125,7 +125,7 @@ namespace VNDBUpdater.Helper
                 {
                     foreach (var folder in Folders)
                     {
-                        if (ComputeLevenshteinDistance(new DirectoryInfo(folder).Name.ToLower().Trim(), VN.Basics.title.ToLower().Trim()) < maxDistance)
+                        if (ComputeLevenshteinDistance(new DirectoryInfo(folder).Name.ToLower().Trim(), VN.Basics.VNDBInformation.title.ToLower().Trim()) < maxDistance)
                         {
                             return GetExecuteable(folder);
                         }
@@ -140,10 +140,7 @@ namespace VNDBUpdater.Helper
         {
             foreach (var file in Directory.GetFiles(folder, "*.exe", SearchOption.AllDirectories))
             {
-                if (file.ToLower().Contains("unins"))
-                    continue;
-
-                if (file.Contains("エンジン設定"))
+                if (Constants.ExcludedExeFileNames.Any(x => file.Contains(x.ToLower())))
                     continue;
 
                 return file;

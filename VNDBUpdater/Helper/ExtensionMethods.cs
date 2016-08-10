@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace VNDBUpdater.Helper
 {
@@ -14,6 +15,11 @@ namespace VNDBUpdater.Helper
         public static T ParseEnum<T>(string value)
         {
             return (T)Enum.Parse(typeof(T), value, true);
+        }
+
+        public static T NextOf<T>(this IList<T> list, T item)
+        {
+            return list[(list.IndexOf(item) + 1) == list.Count ? 0 : (list.IndexOf(item) + 1)];
         }
     }
 }

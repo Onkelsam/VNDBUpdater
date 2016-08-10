@@ -116,12 +116,16 @@
     <Compile Include="Data\Constants.cs" />
     <Compile Include="Helper\EventLogger.cs" />
     <Compile Include="Helper\TraitsHelper.cs" />
+    <Compile Include="Helper\UserHelper.cs" />
     <Compile Include="Helper\VersionHelper.cs" />
     <Compile Include="Helper\LocalVisualNovelHelper.cs" />
     <Compile Include="Helper\VNIDsSplitter.cs" />
-    <Compile Include="Models\BasicInformation.cs" />
-    <Compile Include="Models\CharacterInformation.cs" />
+    <Compile Include="Models\Internal\BasicInformation.cs" />
+    <Compile Include="Models\Internal\CharacterInformation.cs" />
+    <Compile Include="Models\Internal\WindowHandler.cs" />
+    <Compile Include="Models\Internal\UserOptions.cs" />
     <Compile Include="Models\Trait.cs" />
+    <Compile Include="Models\User.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

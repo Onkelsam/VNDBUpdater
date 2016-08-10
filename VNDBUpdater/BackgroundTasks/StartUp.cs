@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Threading.Tasks;
-using VNDBUpdater.Communication.Database;
 using VNDBUpdater.Data;
 using VNDBUpdater.Helper;
 using VNDBUpdater.Models;
@@ -40,6 +39,8 @@ namespace VNDBUpdater.BackgroundTasks
             {
                 base.Start(MainScreen);
 
+                FileHelper.DeleteTooLargeFile(Constants.EventlogFileName, 1000000);
+
                 EventLogger.LogInformation(nameof(StartUp), "Started. Version: " + VersionHelper.CurrentVersion + " New Version available: " + VersionHelper.NewVersionAvailable().ToString());                
 
                 _Status = TaskStatus.Running;
@@ -61,28 +62,22 @@ namespace VNDBUpdater.BackgroundTasks
         {
             try
             {
-                FileHelper.BackupDatabase();
-                FileHelper.DeleteTooLargeFile(Constants.EventlogFileName, 1000000);
+                FileHelper.BackupDatabase();                
 
                 if (!File.Exists(Constants.TagsJsonFileName))
                     Tag.RefreshTags();
 
                 if (!File.Exists(Constants.TraitsJsonFileName))
                     Trait.RefreshTraits();
-
-                LocalVisualNovelHelper.RefreshVisualNovels();
-                
-                _MainScreen.GetVisualNovelsFromDatabase();
-
-                if (RedisCommunication.UserCredentialsAvailable())
+               
+                if (UserHelper.CurrentUser.Username != null)
                 {
                     var BackgroundSynchronizer = new Synchronizer();
                     BackgroundSynchronizer.Start(_MainScreen);
                 }
 
                 _Status = TaskStatus.RanToCompletion;
-                _MainScreen.UpdateStatusText();
-                Cancel();
+                _MainScreen.UpdateStatusText();                
 
                 EventLogger.LogInformation(nameof(StartUp), "finished successfully.");                
             }

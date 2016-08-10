@@ -7,14 +7,14 @@
         xmlns:tb="http://www.hardcodet.net/taskbar"
         x:Name="MainView"
         Title="{Binding Path=Title}" Height="665" Width="1213.775" 
-        Background="{DynamicResource {x:Static SystemColors.MenuBarBrushKey}}">
+        Background="{DynamicResource {x:Static SystemColors.MenuBarBrushKey}}" Topmost="True">
 
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="Closing">
             <i:InvokeCommandAction Command="{Binding Commands.CloseWindow}" />
         </i:EventTrigger>
         <i:EventTrigger EventName="StateChanged">
-            <i:InvokeCommandAction Command="{Binding Commands.MinimizeWindow}" CommandParameter="{Binding ElementName=MainView}"/>
+            <i:InvokeCommandAction Command="{Binding Commands.StateChanged}" CommandParameter="{Binding ElementName=MainView}"/>
         </i:EventTrigger>
     </i:Interaction.Triggers>
 
@@ -73,7 +73,12 @@
             <RowDefinition Height="10*" />
         </Grid.RowDefinitions>
 
-        <tb:TaskbarIcon IconSource="pack://application:,,,/MainIcon.ico" ToolTipText="VNDBUpdater" DoubleClickCommand="{Binding Commands.ShowMainWindow}" DoubleClickCommandParameter="{Binding RelativeSource={RelativeSource Self}}">
+        <tb:TaskbarIcon IconSource="pack://application:,,,/MainIcon.ico" DoubleClickCommand="{Binding Commands.ShowMainWindow}" DoubleClickCommandParameter="{Binding RelativeSource={RelativeSource Self}}">
+            <tb:TaskbarIcon.TrayToolTip>
+                <ToolTip Style="{x:Null}" >
+                    <TextBlock Text="VNDBUpdater" Style="{x:Null}" FontSize="11"/>
+                </ToolTip>
+            </tb:TaskbarIcon.TrayToolTip>
             <tb:TaskbarIcon.ContextMenu>
                 <ContextMenu >
                     <MenuItem Header="Close" Command="{Binding Commands.CloseWindow}" />
@@ -123,10 +128,10 @@
                   Grid.Row="2" Grid.RowSpan="2" Grid.Column="0"  AutoGenerateColumns="False" CanUserAddRows="False" GridLinesVisibility="None" 
                   BorderThickness="0" CanUserResizeRows="False" CanUserDeleteRows="False" RowHeaderWidth="0" SelectionMode="Single" Background="{DynamicResource {x:Static SystemColors.ControlLightLightBrushKey}}" AlternationCount="1">
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Name" Binding="{Binding Path=Basics.title}" IsReadOnly="True" Width="5*" />
-                <DataGridTextColumn Header="Original Name" Binding="{Binding Path=Basics.original}" IsReadOnly="True" Width="1*"  />
-                <DataGridTextColumn Header="VNDB Score" Binding="{Binding Path=Basics.rating}" IsReadOnly="True" Width="2*" />
-                <DataGridTextColumn Header="VNDB Popularity" Binding="{Binding Path=Basics.popularity}" IsReadOnly="True" Width="2*" />
+                <DataGridTextColumn Header="Name" Binding="{Binding Path=Basics.VNDBInformation.title}" IsReadOnly="True" Width="5*" />
+                <DataGridTextColumn Header="Original Name" Binding="{Binding Path=Basics.VNDBInformation.original}" IsReadOnly="True" Width="1*"  />
+                <DataGridTextColumn Header="VNDB Score" Binding="{Binding Path=Basics.VNDBInformation.rating}" IsReadOnly="True" Width="2*" />
+                <DataGridTextColumn Header="VNDB Popularity" Binding="{Binding Path=Basics.VNDBInformation.popularity}" IsReadOnly="True" Width="2*" />
                 <DataGridTextColumn Header="Own Score" Binding="{Binding Path=ScoreInDouble}" IsReadOnly="True" Width="2*"/>
             </DataGrid.Columns>
             <DataGrid.Resources>
@@ -141,9 +146,9 @@
                                 <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" MaxWidth="500">
                                     <TextBlock.Text>
                                         <MultiBinding StringFormat="{}Aliases: {0}&#x0a;Length: {1}&#x0a;Released: {2}">
-                                            <Binding Path="Basics.aliases" Converter="{StaticResource AliasesConverter }" />
+                                            <Binding Path="Basics.VNDBInformation.aliases" Converter="{StaticResource AliasesConverter }" />
                                             <Binding Path="Basics.Length" Mode="OneWay"/>
-                                            <Binding Path="Basics.released" />
+                                            <Binding Path="Basics.VNDBInformation.released" />
                                         </MultiBinding>
                                     </TextBlock.Text>
                                 </TextBlock>
@@ -190,15 +195,15 @@
             </DataGrid.ContextMenu>
         </DataGrid>
 
-        <GroupBox Grid.Column="2" Grid.Row="3" Header="Characters" BorderThickness="0">
+        <GroupBox Grid.Column="2" Grid.Row="3" Header="Characters" BorderBrush="AliceBlue" BorderThickness="2">
             <Button Style="{DynamicResource NoChromeButton}" Command="{Binding Commands.NextCharacter}">
-                <Image Source="{Binding Path=SelectedCharacter.image, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, IsAsync=True}" Stretch="Fill" ToolTipService.ShowDuration="60000">
+                <Image Source="{Binding Path=SelectedCharacter.VNDBInformation.image, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, IsAsync=True}" Stretch="Fill" ToolTipService.ShowDuration="60000">
                     <Image.ToolTip>
-                        <TextBlock TextWrapping="WrapWithOverflow" MaxWidth="500">
+                        <TextBlock TextWrapping="WrapWithOverflow" MaxWidth="600">
                             <TextBlock.Text>
                                 <MultiBinding StringFormat="{}{0}&#x0a;&#x0a;{1}&#x0a;&#x0a;{2}">
-                                    <Binding Path="SelectedCharacter.name" />
-                                    <Binding Path="SelectedCharacter.description" />
+                                    <Binding Path="SelectedCharacter.VNDBInformation.name" />
+                                    <Binding Path="SelectedCharacter.VNDBInformation.description" />
                                     <Binding Path="SelectedCharacter.ConvertedTraits" Converter="{StaticResource TraitsListToStringConvert}" />
                                 </MultiBinding>
                             </TextBlock.Text>
@@ -208,9 +213,9 @@
             </Button>
         </GroupBox>
 
-        <GroupBox Grid.Column="2" Grid.Row="1" Grid.RowSpan="2" Header="Screenshots" BorderThickness="0">
+        <GroupBox Grid.Column="2" Grid.Row="1" Grid.RowSpan="2" Header="Screenshots" BorderBrush="AliceBlue" BorderThickness="2">
             <Button Style="{DynamicResource NoChromeButton}" Command="{Binding Commands.NextScreenshot}">
-                <Image Source="{Binding Path=SelectedScreenshot, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, IsAsync=True}" Stretch="Fill" />
+                <Image Source="{Binding Path=SelectedScreenshot.image, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, IsAsync=True}" Stretch="Fill" />
             </Button>
         </GroupBox>
 
@@ -245,11 +250,11 @@
             </DataGrid.Columns>
         </DataGrid>
 
-        <GroupBox Grid.Column="1" Grid.Row="3" Header="Description" BorderThickness="0">
+        <GroupBox Grid.Column="1" Grid.Row="3" Header="Description" BorderBrush="AliceBlue" BorderThickness="2">
             <RichTextBox Grid.Column="1" Grid.Row="3" Grid.ColumnSpan="1" IsReadOnly="True" BorderThickness="0" Background="{DynamicResource {x:Static SystemColors.MenuBarBrushKey}}">
                 <FlowDocument>
                     <Paragraph>
-                        <Run Text="{Binding Path=SelectedVisualNovel.Basics.description}" />
+                        <Run Text="{Binding Path=SelectedVisualNovel.Basics.VNDBInformation.description}" />
                     </Paragraph>
                 </FlowDocument>
             </RichTextBox>

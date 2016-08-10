@@ -4,10 +4,10 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
-using VNDBUpdater.Communication.VNDB;
 using VNDBUpdater.Data;
 using VNDBUpdater.Helper;
 using VNDBUpdater.Models;
+using VNDBUpdater.Models.Internal;
 
 namespace VNDBUpdater.Communication.Database
 {
@@ -31,7 +31,7 @@ namespace VNDBUpdater.Communication.Database
         {
             // Lock this specific method as it can occur that the MainViewModel.GetFiltersFromDatabase is as fast as the startup task.
             // that doesn't really matter. At least it doesn't lead to errors but it still is not nice to establish a connection two times.
-            lock(Lock)
+            lock (Lock)
             {
                 if (!_IsConnected)
                 {
@@ -65,7 +65,7 @@ namespace VNDBUpdater.Communication.Database
                         _IsConnected = false;
                     }
                 }
-            }            
+            }
         }
 
         public static void Reconnect()
@@ -75,17 +75,9 @@ namespace VNDBUpdater.Communication.Database
             Connect();
         }
 
-        public static void AddVisualNovelsToDB(List<VisualNovel> visualNovels)
-        {
-            foreach (var visualNovel in visualNovels)
-                AddVisualNovelToDB(visualNovel);
-        }
-
         public static void AddVisualNovelToDB(VisualNovel visualNovel)
         {
-            WriteEntity<VisualNovel>("VisualNovel_" + visualNovel.Basics.id, visualNovel);
-
-            LocalVisualNovelHelper.ResetVisualNovels();
+            WriteEntity<VisualNovel>("VisualNovel_" + visualNovel.Basics.VNDBInformation.id, visualNovel);
         }
 
         public static List<VisualNovel> GetVisualNovelsFromDB()
@@ -96,10 +88,10 @@ namespace VNDBUpdater.Communication.Database
             {
                 var entity = ReadEntity<VisualNovel>(key);
 
-                entity.Basics = new BasicInformation(entity.Basics);
+                entity.Basics = new BasicInformation(entity.Basics.VNDBInformation);
 
                 for (int i = 0; i < entity.Characters.Count; i++)
-                    entity.Characters[i] = new CharacterInformation(entity.Characters[i]);
+                    entity.Characters[i] = new CharacterInformation(entity.Characters[i].VNDBInformation);
 
                 existingVNs.Add(entity);
             }
@@ -111,82 +103,6 @@ namespace VNDBUpdater.Communication.Database
         public static void DeleteVisualNovel(int id)
         {
             DeleteKey("VisualNovel_" + id);
-
-            LocalVisualNovelHelper.ResetVisualNovels();
-        }
-
-        public static void AddToVisualNovelSynchronizerQueue(VN VNToAdd)
-        {
-            WriteToList<VN>("VisualNovelSynchronizerQueue", VNToAdd);
-        }
-
-        public static List<VN> ReadFromVisualNovelSynchronizerQueue(int amount)
-        {
-            return ReadList<VN>("VisualNovelSynchronizerQueue", amount);
-        }
-
-        public static void AddToWishListSynchronizerQueue(Wish WishToAdd)
-        {
-            WriteToList<Wish>("WishSynchronizerQueue", WishToAdd);
-        }
-
-        public static List<Wish> ReadFromWishSynchronizerQueue(int amount)
-        {
-            return ReadList<Wish>("WishSynchronizerQueue", amount);
-        }
-
-        public static void AddToVoteListSynchronizerQueue(Vote VoteToAdd)
-        {
-            WriteToList<Vote>("VoteSynchronizerQueue", VoteToAdd);
-        }
-
-        public static List<Vote> ReadFromVoteListSynchronzierQueue(int amount)
-        {
-            return ReadList<Vote>("VoteSynchronizerQueue", amount);
-        }
-
-        public static void AddToSetVNDBSynchronizationQueue(VisualNovel VN)
-        {
-            WriteToList<VisualNovel>("SetVNDBSynchronizationQueue", VN);
-        }
-
-        public static List<VisualNovel> ReadFromSetVNDBSynchronizationQueue(int amount)
-        {
-            return ReadList<VisualNovel>("SetVNDBSynchronizationQueue", amount);
-        }
-
-        public static int GetPendingSynchronizationTasks()
-        {
-            return
-                  GetPendingVoteSynchronizationTasks()
-                + GetPendingWishSynchronizationTasks()
-                + GetPendingVisualNovelSynchronizationTasks()
-                + GetPendingSetVNDBSynchronizationTasks();
-        }
-
-        public static int GetPendingVoteSynchronizationTasks()
-        {
-            return Convert.ToInt32(GetNumberOfItemsOnList("VoteSynchronizerQueue"));
-        }
-
-        public static int GetPendingWishSynchronizationTasks()
-        {
-            return Convert.ToInt32(GetNumberOfItemsOnList("WishSynchronizerQueue"));
-        }
-
-        public static int GetPendingVisualNovelSynchronizationTasks()
-        {
-            return Convert.ToInt32(GetNumberOfItemsOnList("VisualNovelSynchronizerQueue"));
-        }
-
-        public static int GetPendingSetVNDBSynchronizationTasks()
-        {
-            return Convert.ToInt32(GetNumberOfItemsOnList("SetVNDBSynchronizationQueue"));
-        }
-
-        public static bool VisualNovelExistsInDatabase(int ID)
-        {
-            return KeyExists("VisualNovel_" + ID.ToString());
         }
 
         public static void ResetDatabase()
@@ -195,21 +111,6 @@ namespace VNDBUpdater.Communication.Database
                 DeleteKey(key);
 
             FileHelper.DeleteFile(Constants.PathToDatabase + Constants.DatabaseName);
-        }
-
-        private static List<T> ReadList<T>(string ListName, int amount) where T : class, new()
-        {
-            var retval = new List<T>();
-
-            for (int i = 0; i < amount; i++)
-            {
-                var read = ReadFromList<T>(ListName);
-
-                if (read != null)
-                    retval.Add(read);
-            }
-
-            return retval;
         }
 
         public static void SaveFilter(Filter filter)
@@ -237,41 +138,20 @@ namespace VNDBUpdater.Communication.Database
             return filters;
         }
 
-        public static void SetUserCredentials(string username, string password)
+        public static User GetUser()
         {
-            WriteEntity<string>("Username", username);
-            WriteEntity<string>("Password", password);
+            return ReadEntity<User>("User");
         }
 
-        public static string GetUsername()
+        public static void SetUser(User user)
         {
-            return ReadEntity<string>("Username");
-        }
-
-        public static string GetUserPassword()
-        {
-            return ReadEntity<string>("Password");
-        }
-
-        public static void SetInstallFolder(string folderPath)
-        {
-            WriteEntity<string>("InstallFolder", folderPath);
-        }
-
-        public static string GetInstallFolder()
-        {
-            return ReadEntity<string>("InstallFolder");
-        }
-
-        public static bool UserCredentialsAvailable()
-        {
-            return KeyExists("Username");
+            WriteEntity<User>("User", user);
         }
 
         public static void SaveRedis()
         {
             SaveCurrentDB();
-            EventLogger.LogInformation(nameof(RedisCommunication), "Database saved successfully.");            
+            EventLogger.LogInformation(nameof(RedisCommunication), "Database saved successfully.");
         }
 
         private static void WriteEntity<T>(string key, T entity) where T : class
@@ -281,32 +161,11 @@ namespace VNDBUpdater.Communication.Database
             Connection.WriteEntity<T>(key, entity);
         }
 
-        private static void WriteToList<T>(string key, T entity) where T : class
-        {
-            CheckConnection();
-
-            Connection.WriteToList<T>(key, entity);
-        }
-
         private static T ReadEntity<T>(string key) where T : class
         {
             CheckConnection();
 
             return Connection.ReadEntity<T>(key);
-        }
-
-        private static T ReadFromList<T>(string key) where T : class
-        {
-            CheckConnection();
-
-            return Connection.ReadFromList<T>(key);
-        }
-
-        private static double GetNumberOfItemsOnList(string key)
-        {
-            CheckConnection();
-
-            return Connection.GetNumberOfItemsOnList(key);
         }
 
         private static void DeleteKey(string key)
@@ -321,13 +180,6 @@ namespace VNDBUpdater.Communication.Database
             CheckConnection();
 
             return Connection.GetKeys(pattern);
-        }
-
-        private static bool KeyExists(string Key)
-        {
-            CheckConnection();
-
-            return Connection.KeyExists(Key);
         }
 
         private static void SaveCurrentDB()

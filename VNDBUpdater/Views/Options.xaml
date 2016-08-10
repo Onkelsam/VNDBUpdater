@@ -6,13 +6,14 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:VNDBUpdater.ViewModels"
         mc:Ignorable="d"
-        Title="VNDBUpdater - Options" Height="300" Width="425.333" ResizeMode="NoResize" WindowStartupLocation="CenterScreen"
+        Title="VNDBUpdater - Options" Height="485.333" Width="425.333" ResizeMode="NoResize" WindowStartupLocation="CenterScreen" Topmost="True"
         Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
 
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="10*" />
             <RowDefinition Height="10*" />
+            <RowDefinition Height="13*" />
         </Grid.RowDefinitions>
         <GroupBox BorderBrush="AliceBlue" BorderThickness="2" Margin="5" Header="User Credentials">
             <Grid Grid.ColumnSpan="2" Grid.RowSpan="2">
@@ -25,11 +26,11 @@
                     <RowDefinition Height="30"/>
                     <RowDefinition Height="30"/>
                 </Grid.RowDefinitions>
-                <TextBlock Text="Username:" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="3"/>
-                <TextBox Text="{Binding Path=Username}" Grid.Column="1" VerticalAlignment="Center"/>
-                <TextBlock Text="Password:" Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="3"/>
-                <PasswordBox Name="txtPassword" Grid.Row="1" Grid.Column="2" VerticalAlignment="Center"/>
-                <Button Command="{Binding Commands.Save}" CommandParameter="{Binding ElementName=txtPassword}" Content="Save" Grid.Row="2" Grid.Column="3" VerticalAlignment="Center"/>
+                <TextBlock Text="Username:" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="5"/>
+                <TextBox Text="{Binding Path=Username}" Grid.Column="1" VerticalAlignment="Center" Margin="0,1,0,1"/>
+                <TextBlock Text="Password:" Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="5"/>
+                <PasswordBox Name="txtPassword" Grid.Row="1" Grid.Column="2" Margin="0,1,0,1" VerticalAlignment="Center"/>
+                <Button Margin="0,1,0,1" Command="{Binding Commands.Login}" CommandParameter="{Binding ElementName=txtPassword}" Content="Login" Grid.Row="2" Grid.Column="3" VerticalAlignment="Center"/>
             </Grid>
         </GroupBox>
         <GroupBox Header="File Indexer" Margin="5" BorderThickness="2" BorderBrush="AliceBlue" Grid.Row="1">
@@ -44,9 +45,28 @@
                     <RowDefinition Height="30"/>
                 </Grid.RowDefinitions>
                 <TextBlock Text="Current Path:" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="3"/>
-                <TextBox Text="{Binding Path=InstallFolderPath, Mode=OneWay}" Grid.Column="1" VerticalAlignment="Center" IsReadOnly="True"/>
-                <Button Command="{Binding Commands.SetInstallFolderPath}" Content="Change VNs root folder" Grid.Row="1" Grid.Column="3" VerticalAlignment="Center"/>
-                <Button Command="{Binding Commands.StartIndexing}" Content="Start Indexing" Grid.Row="2" Grid.Column="3" VerticalAlignment="Center"/>
+                <TextBox Text="{Binding Path=InstallFolderPath, Mode=OneWay}" Grid.Column="1" VerticalAlignment="Center" IsReadOnly="True" Margin="0,1,0,1"/>
+                <Button Margin="0,1,0,1" Command="{Binding Commands.SetInstallFolderPath}" Content="Change VNs root folder" Grid.Row="1" Grid.Column="3" VerticalAlignment="Center"/>
+                <Button Margin="0,1,0,1" Command="{Binding Commands.StartIndexing}" Content="Start Indexing" Grid.Row="2" Grid.Column="3" VerticalAlignment="Center"/>
+            </Grid>
+        </GroupBox>
+        <GroupBox Header="Settings" Margin="5" BorderThickness="2" BorderBrush="AliceBlue" Grid.Row="2">
+            <Grid Grid.ColumnSpan="2" Grid.RowSpan="2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="100"/>
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="30"/>
+                    <RowDefinition Height="30"/>
+                    <RowDefinition Height="30"/>
+                    <RowDefinition Height="30"/>
+                </Grid.RowDefinitions>
+                <TextBlock Text="Spoiler Level:" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="3"/>
+                <ComboBox ItemsSource="{Binding SpoilerLevels}" SelectedItem="{Binding SpoilerLevel}" Grid.Column="1" Margin="0,1,0,1" VerticalAlignment="Center"/>
+                <CheckBox Content="Show NSFW Images" Grid.Row="1" Margin="95,4,5,28" Grid.RowSpan="2" Grid.ColumnSpan="2" IsChecked="{Binding Path=ShowNSFWImages}"/>
+                <CheckBox Content="Minimize to System Tray" Grid.Row="2" Margin="95,5,15,-4" Grid.ColumnSpan="2" IsChecked="{Binding Path=MinimizeToTray}"/>
+                <Button Content="Save" Command="{Binding Commands.Save}" Grid.Row="3" Grid.Column="1" Margin="0,1,0,1" VerticalAlignment="Center"/>
             </Grid>
         </GroupBox>
     </Grid>

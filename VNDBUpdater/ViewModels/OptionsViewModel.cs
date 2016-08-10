@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,46 +11,91 @@ using VNDBUpdater.Communication.Database;
 using VNDBUpdater.Communication.VNDB;
 using VNDBUpdater.Data;
 using VNDBUpdater.Helper;
+using VNDBUpdater.Models;
 
 namespace VNDBUpdater.ViewModels
 {
     class OptionsViewModel : ViewModelBase
     {
-        private string _Username;
-
-        private MainViewModel MainScreen;
+        private User _User;
+        private MainViewModel _MainScreen;
 
         public OptionsViewModel(MainViewModel ViewModel)
             : base()
         {
-            MainScreen = ViewModel;
+            _MainScreen = ViewModel;
 
-            _Username = RedisCommunication.GetUsername();
+            _User = UserHelper.CurrentUser;
 
-            _Commands.AddCommand("Save", ExecuteSaveCommand, CanExecuteSaveCommand);
+            _Commands.AddCommand("Login", ExecuteLoginCommand, CanExecuteSaveCommand);
             _Commands.AddCommand("SetInstallFolderPath", ExecuteSetInstallFolderPath, CanExecuteSetInstallFolderPath);
             _Commands.AddCommand("StartIndexing", ExecuteStartIndexing, CanExecuteStartIndexing);
+            _Commands.AddCommand("Save", ExecuteSaveSettings);
         }
 
         public string Username
         {
-            get { return _Username; }
+            get { return _User.Username; }
             set
             {
-                _Username = value;
+                _User.Username = value;
 
                 OnPropertyChanged(nameof(Username));
             }
         }
 
-        public string InstallFolderPath
+        public List<string> SpoilerLevels
         {
-            get { return RedisCommunication.GetInstallFolder(); }
+            get { return Enum.GetNames(typeof(SpoilerSetting)).ToList(); }
         }
 
-        public void ExecuteSaveCommand(object parameter)
+        public string SpoilerLevel
         {
-            if (RedisCommunication.GetUserPassword() != null)
+            get { return _User.Settings.SpoilerSetting.ToString(); }
+            set
+            {
+                _User.Settings.SpoilerSetting = ExtensionMethods.ParseEnum<SpoilerSetting>(value);
+
+                OnPropertyChanged(nameof(SpoilerLevel));
+            }
+        }
+
+        public bool ShowNSFWImages
+        {
+            get { return _User.Settings.ShowNSFWImages; }
+            set
+            {
+                _User.Settings.ShowNSFWImages = value;
+
+                OnPropertyChanged(nameof(ShowNSFWImages));
+            }
+        }
+
+        public bool MinimizeToTray
+        {
+            get { return _User.Settings.MinimizeToTray; }
+            set
+            {
+                _User.Settings.MinimizeToTray = value;
+
+                OnPropertyChanged(nameof(MinimizeToTray));
+            }
+        }
+
+        public string InstallFolderPath
+        {
+            get { return _User.Settings.InstallFolderPath; }
+            set
+            {
+                _User.Settings.InstallFolderPath = value;
+
+                OnPropertyChanged(nameof(InstallFolderPath));
+            }
+        }
+
+        public void ExecuteLoginCommand(object parameter)
+        {
+            if (UserHelper.CurrentUser.EncryptedPassword != null)
             {
                 var dialogResult = MessageBox.Show("This will delete all local data! Are you sure you want to procede?", "WARNING", MessageBoxButton.YesNo);
 
@@ -59,12 +106,16 @@ namespace VNDBUpdater.ViewModels
             if ((parameter as PasswordBox).SecurePassword.Length == 0)
                 return;
 
-            Login(ProtectedData.Protect(Encoding.UTF8.GetBytes((parameter as PasswordBox).Password), null, DataProtectionScope.CurrentUser));
+            _User.EncryptedPassword = ProtectedData.Protect(Encoding.UTF8.GetBytes((parameter as PasswordBox).Password), null, DataProtectionScope.CurrentUser);
+
+            Login();
         }
 
         public void ExecuteSetInstallFolderPath(object parameter)
         {
-            RedisCommunication.SetInstallFolder(FileHelper.GetFolderPath());
+            _User.Settings.InstallFolderPath = FileHelper.GetFolderPath();
+            _User.SaveUser();
+
             FileHelper.ResetFolders();
 
             OnPropertyChanged(nameof(InstallFolderPath));
@@ -80,8 +131,8 @@ namespace VNDBUpdater.ViewModels
 
         public bool CanExecuteSaveCommand(object parameter)
         {
-            if (_Username != null)
-                if (!string.IsNullOrEmpty(_Username) && Synchronizer.Status != TaskStatus.Running && FileIndexer.Status != TaskStatus.Running && Refresher.Status != TaskStatus.Running)
+            if (_User.Username != null)
+                if (!string.IsNullOrEmpty(_User.Username) && Synchronizer.Status != TaskStatus.Running && FileIndexer.Status != TaskStatus.Running && Refresher.Status != TaskStatus.Running)
                     return true;
 
             return false;
@@ -90,7 +141,7 @@ namespace VNDBUpdater.ViewModels
         public void ExecuteStartIndexing(object parameter)
         {
             var indexer = new FileIndexer();
-            indexer.Start(MainScreen);
+            indexer.Start(_MainScreen);
         }
 
         public bool CanExecuteStartIndexing(object parameter)
@@ -101,14 +152,18 @@ namespace VNDBUpdater.ViewModels
                 return false;
         }
 
-        private void Login(byte[] encryptedPassword)
+        public void ExecuteSaveSettings(object parameter)
+        {
+            _User.SaveUser();
+        }
+
+        private void Login()
         {
             RedisCommunication.Reconnect();
-            RedisCommunication.SetUserCredentials(_Username, Convert.ToBase64String(encryptedPassword));
+            _User.SaveUser();
 
-            LocalVisualNovelHelper.ResetVisualNovels();
-            MainScreen.AllVisualNovels = LocalVisualNovelHelper.LocalVisualNovels;
-            MainScreen.UpdateVisualNovelGrid();
+            LocalVisualNovelHelper.RefreshVisualNovels();
+            _MainScreen.UpdateVisualNovelGrid();
             
             VNDBCommunication.Reconnect();
 
@@ -116,10 +171,10 @@ namespace VNDBUpdater.ViewModels
             {
                 Synchronizer.Cancel();
                 var BackgroundSynchronizer = new Synchronizer();
-                BackgroundSynchronizer.Start(MainScreen);
+                BackgroundSynchronizer.Start(_MainScreen);
             }
 
-            MainScreen.UpdateStatusText();
+            _MainScreen.UpdateStatusText();
         }
     }
 }

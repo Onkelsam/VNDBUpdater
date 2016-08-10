@@ -10,10 +10,11 @@ namespace VNDBUpdater.Models
 {
     public class Trait
     {
-        public int ID { get; set; }
-        public string Name { get; set; }
-        public string Description { get; set; }
-        public List<Trait> ParentTraits { get; set; }
+        public int ID { get; private set; }
+        public string Name { get; private set; }
+        public string Description { get; private set; }
+        public List<Trait> ParentTraits { get; private set; }
+        public SpoilerLevel Spoiler { get; private set; }
 
         public Trait()
         {
@@ -34,6 +35,11 @@ namespace VNDBUpdater.Models
                 return LastParentTrait(trait.ParentTraits.Last());
             else
                 return trait;
+        }
+
+        public bool ShowTrait()
+        {
+            return (int)UserHelper.CurrentUser.Settings.SpoilerSetting >= (int)Spoiler;
         }
 
         public void SetParentTraits(List<object> Parents)
@@ -65,8 +71,21 @@ namespace VNDBUpdater.Models
                     Trait foundTrait = TraitsHelper.LocalTraits.FirstOrDefault(x => x.ID == trait[0]);
 
                     if (foundTrait != null)
-                        TraitList.Add(foundTrait);
-                }
+                    {
+                        foundTrait.Spoiler = ExtensionMethods.ParseEnum<SpoilerLevel>(trait[1].ToString());
+
+                        var newTrait = new Trait()
+                        {
+                            Description = foundTrait.Description,
+                            ID = foundTrait.ID,
+                            Name = foundTrait.Name,
+                            ParentTraits = foundTrait.ParentTraits,
+                            Spoiler = foundTrait.Spoiler
+                        };
+
+                        TraitList.Add(newTrait);
+                    }
+                }                
             }
 
             return TraitList;

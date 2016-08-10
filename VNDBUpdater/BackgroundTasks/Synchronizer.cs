@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using VNDBUpdater.Communication.Database;
 using VNDBUpdater.Communication.VNDB;
 using VNDBUpdater.Data;
 using VNDBUpdater.Helper;
@@ -89,9 +88,9 @@ namespace VNDBUpdater.BackgroundTasks
                 SynchronizeWishes(WishList);
                 SynchronizeVotes(VoteList);
 
-                Cancel();
                 _Status = TaskStatus.RanToCompletion;
                 _MainScreen.UpdateStatusText();
+                _MainScreen.UpdateVisualNovelGrid();
 
                 EventLogger.LogInformation(nameof(Synchronizer), "finished successfully.");
             }
@@ -118,7 +117,7 @@ namespace VNDBUpdater.BackgroundTasks
                     if (LocalVN.Category != (VisualNovelCatergory)vn.status)
                     {
                         LocalVN.Category = (VisualNovelCatergory)vn.status;
-                        RedisCommunication.AddVisualNovelToDB(LocalVN);
+                        LocalVisualNovelHelper.AddVisualNovel(LocalVN);
                     }
                 }
                 else
@@ -145,7 +144,7 @@ namespace VNDBUpdater.BackgroundTasks
                     if (LocalVN.Category != VisualNovelCatergory.Wish)
                     {
                         LocalVN.Category = VisualNovelCatergory.Wish;
-                        RedisCommunication.AddVisualNovelToDB(LocalVN);
+                        LocalVisualNovelHelper.AddVisualNovel(LocalVN);
                     }
                 }
                 else
@@ -170,7 +169,7 @@ namespace VNDBUpdater.BackgroundTasks
                     if (LocalVN.Score != vote.vote)
                     {
                         LocalVN.Score = vote.vote;
-                        RedisCommunication.AddVisualNovelToDB(LocalVN);
+                        LocalVisualNovelHelper.AddVisualNovel(LocalVN);
                     }
                 }
             }
@@ -192,8 +191,6 @@ namespace VNDBUpdater.BackgroundTasks
             }
             else
                 AddVNs(idSplitter.IDs, VNs);
-
-            _MainScreen.GetVisualNovelsFromDatabase();
         }
 
         private void AddVNs(int[] ids, List<VN> VNs)
@@ -202,12 +199,13 @@ namespace VNDBUpdater.BackgroundTasks
 
             foreach (var vn in VNDBCommunication.FetchVisualNovels(ids.ToList()))
             {
-                var VNFromVNDB = VNs.Where(x => x.vn == vn.Basics.id).First();
+                var VNFromVNDB = VNs.Where(x => x.vn == vn.Basics.VNDBInformation.id).First();
 
                 vn.Category = (VisualNovelCatergory)VNFromVNDB.status;
-                vn.Score = 0;
-                RedisCommunication.AddVisualNovelToDB(vn);
+                vn.Score = 0;                
                 vn.CrawlExePath();
+
+                LocalVisualNovelHelper.AddVisualNovel(vn);
 
                 _MainScreen.CompletedPendingTasks++;
                 _MainScreen.UpdateStatusText();               

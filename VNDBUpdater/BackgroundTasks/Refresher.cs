@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using VNDBUpdater.Communication.Database;
 using VNDBUpdater.Communication.VNDB;
 using VNDBUpdater.Data;
 using VNDBUpdater.Helper;
@@ -46,7 +45,7 @@ namespace VNDBUpdater.BackgroundTasks
 
                 EventLogger.LogInformation(nameof(Refresher), "started.");                
 
-                _MainScreen.CurrentPendingTasks = _MainScreen.AllVisualNovels.Count;
+                _MainScreen.CurrentPendingTasks = LocalVisualNovelHelper.LocalVisualNovels.Count;
                 _MainScreen.CompletedPendingTasks = 0;
                 _Status = TaskStatus.Running;
 
@@ -71,7 +70,7 @@ namespace VNDBUpdater.BackgroundTasks
 
                 var updatedVNs = new List<VisualNovel>();
 
-                var idSplitter = new VNIDsSplitter(_MainScreen.AllVisualNovels.Select(x => x.Basics.id).ToArray());
+                var idSplitter = new VNIDsSplitter(LocalVisualNovelHelper.LocalVisualNovels.Select(x => x.Basics.VNDBInformation.id).ToArray());
 
                 idSplitter.Split();
 
@@ -96,11 +95,11 @@ namespace VNDBUpdater.BackgroundTasks
                     updatedVNs.AddRange(VNDBCommunication.FetchVisualNovels(idSplitter.IDs.ToList()));
                     _MainScreen.CompletedPendingTasks += idSplitter.IDs.Length;
                     EventLogger.LogInformation(nameof(Refresher), "completed Tasks: " + _MainScreen.CompletedPendingTasks.ToString());
-                }                    
+                }
 
                 foreach (var vn in updatedVNs)
                 {
-                    var vnToUpdate = _MainScreen.AllVisualNovels.Where(x => x.Basics.id == vn.Basics.id).FirstOrDefault();
+                    var vnToUpdate = LocalVisualNovelHelper.LocalVisualNovels.Where(x => x.Basics.VNDBInformation.id == vn.Basics.VNDBInformation.id).FirstOrDefault();
 
                     if (vnToUpdate != null)
                     {
@@ -108,12 +107,12 @@ namespace VNDBUpdater.BackgroundTasks
                         vnToUpdate.Characters = vn.Characters;
                     }
 
-                    RedisCommunication.AddVisualNovelToDB(vnToUpdate);
+                    LocalVisualNovelHelper.AddVisualNovel(vnToUpdate);
                 }
 
-                Cancel();
                 _Status = TaskStatus.RanToCompletion;
                 _MainScreen.UpdateStatusText();
+                _MainScreen.UpdateVisualNovelGrid();
 
                 EventLogger.LogInformation(nameof(Refresher), "finished successfully.");                 
             }
