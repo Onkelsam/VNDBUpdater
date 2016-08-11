@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:VNDBUpdater.ViewModels"
         mc:Ignorable="d"
-        Title="VNDBUpdater" Height="150" Width="300" ResizeMode="NoResize" WindowStartupLocation="CenterScreen" Topmost="True">
+        Title="VNDBUpdater" Height="150" Width="300" ResizeMode="NoResize" WindowStartupLocation="CenterScreen">
 
     <Window.DataContext>
         <local:AboutViewModel/>

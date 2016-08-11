@@ -27,6 +27,7 @@ namespace VNDBUpdater.Models.Internal
             SetTaskbarVisibility(windowToOpen);
 
             windowToOpen.Show();
+            windowToOpen.Activate();
 
             WindowCollection.Add(windowToOpen);
         }
@@ -38,6 +39,7 @@ namespace VNDBUpdater.Models.Internal
             window.ShowInTaskbar = true;
 
             window.Show();
+            window.Activate();
             window.WindowState = WindowState.Normal;
         }
 

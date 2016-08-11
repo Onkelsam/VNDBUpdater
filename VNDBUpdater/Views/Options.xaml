@@ -6,7 +6,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:VNDBUpdater.ViewModels"
         mc:Ignorable="d"
-        Title="VNDBUpdater - Options" Height="485.333" Width="425.333" ResizeMode="NoResize" WindowStartupLocation="CenterScreen" Topmost="True"
+        Title="VNDBUpdater - Options" Height="485.333" Width="425.333" ResizeMode="NoResize" WindowStartupLocation="CenterScreen"
         Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
 
     <Grid>

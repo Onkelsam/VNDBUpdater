@@ -10,7 +10,7 @@ namespace VNDBUpdater.Models.Internal
         public VNInformation VNDBInformation { get; set; }
 
         [JsonIgnore]
-        public List<Tag> ConvertedTags { get; set; }
+        public List<Tag> ConvertedTags { get; private set; }
 
         public string Length
         {

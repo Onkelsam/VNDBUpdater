@@ -382,9 +382,9 @@ namespace VNDBUpdater.ViewModels
                 FileIndexer.Cancel();
                 RedisCommunication.SaveRedis();
                 RedisCommunication.Dispose();
-                VNDBCommunication.Dispose();
+                VNDBCommunication.Dispose();                
+                EventLogger.LogInformation(nameof(MainViewModel), "Shutdown successfull.");
                 _WindowHandler.CloseAllWindows();
-                EventLogger.LogInformation(nameof(MainViewModel), "Shutdown successfull.");                
                 Application.Current.Shutdown();
             }
             catch (Exception ex)

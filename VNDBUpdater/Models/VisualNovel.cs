@@ -24,6 +24,7 @@ namespace VNDBUpdater.Models
         public List<CharacterInformation> Characters { get; set; }
         public string FolderPath { get; private set; }
         public bool IsFilteredOut { get; set; }
+        public TimeSpan RunTime { get; set; }
 
         public VisualNovel()
         {
@@ -94,7 +95,22 @@ namespace VNDBUpdater.Models
         public void StartGame()
         {
             if (InstallationPathExists)
-                Process.Start(_ExePath);
+            {
+                var proc = new Process();
+
+                proc.EnableRaisingEvents = true;
+                proc.Exited += new EventHandler(ProcessExited);
+                proc.StartInfo.FileName = _ExePath;
+
+                proc.Start();
+            }           
+        }
+
+        private void ProcessExited(object sender, EventArgs e)
+        {
+            RunTime += DateTime.Now - (sender as Process).StartTime;
+            LocalVisualNovelHelper.AddVisualNovel(this);
+            OnPropertyChanged(nameof(RunTime));
         }
 
         public void OpenGameFolder()

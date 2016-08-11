@@ -5,7 +5,7 @@
         xmlns:local="clr-namespace:VNDBUpdater.ViewModels"
         xmlns:helper="clr-namespace:VNDBUpdater.Helper"
         Title="VNDBUpdater - Add Visual Novels" Height="516.675" Width="667"
-        Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" Topmost="True">
+        Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
 
     <Window.DataContext>
         <local:AddVisualNovelsViewModel />

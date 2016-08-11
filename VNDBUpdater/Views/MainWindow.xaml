@@ -7,7 +7,7 @@
         xmlns:tb="http://www.hardcodet.net/taskbar"
         x:Name="MainView"
         Title="{Binding Path=Title}" Height="665" Width="1213.775" 
-        Background="{DynamicResource {x:Static SystemColors.MenuBarBrushKey}}" Topmost="True">
+        Background="{DynamicResource {x:Static SystemColors.MenuBarBrushKey}}">
 
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="Closing">
@@ -57,6 +57,7 @@
         </Style>
         <converters:TraitsListConverter x:Key="TraitsListToStringConvert" />
         <converters:AliasesConverter x:Key="AliasesConverter" />
+        <converters:RunTimeConverter x:Key="RunTimeConverter" />
     </Window.Resources>
 
     <Grid>
@@ -89,7 +90,7 @@
         <Menu Background="{DynamicResource {x:Static SystemColors.MenuBarBrushKey}}" Grid.ColumnSpan="3">
             <MenuItem Header="File">
                 <MenuItem Header="Add Visual Novels" Command="{Binding Commands.AddVisualNovels}" />
-                <MenuItem Header="Refresh Visual Novels" Command="{Binding Commands.RefreshVisualNovels}" />
+                <MenuItem Header="Update Visual Novels" Command="{Binding Commands.RefreshVisualNovels}" />
                 <MenuItem Header="Synchronize with VNDB" Command="{Binding Commands.SynchronizeWithVNDB}" />
             </MenuItem>
             <MenuItem Header="Filter">
@@ -116,7 +117,7 @@
             <MenuItem Header="About" Command="{Binding Commands.About}" />
         </Menu>
 
-        <TabControl Grid.Row="1" Grid.Column="0" Grid.RowSpan="3" SelectedIndex="{Binding Path=SelectedVisualNovelTab}" Background="{DynamicResource {x:Static SystemColors.GradientInactiveCaptionBrushKey}}" BorderBrush="{DynamicResource {x:Static SystemColors.MenuBarBrushKey}}" Foreground="{DynamicResource ButtonHoverBorderBrush}" HorizontalAlignment="Left" VerticalAlignment="Top">
+        <TabControl Grid.Row="1" Grid.Column="0" Grid.RowSpan="3" SelectedIndex="{Binding Path=SelectedVisualNovelTab}" HorizontalAlignment="Left" VerticalAlignment="Top">
             <TabItem Header="Unknown" x:Name="Unsorted"/>
             <TabItem Header="Playing" x:Name="Reading"/>
             <TabItem Header="Finished" x:Name="OnHold"/>
@@ -145,10 +146,11 @@
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" MaxWidth="500">
                                     <TextBlock.Text>
-                                        <MultiBinding StringFormat="{}Aliases: {0}&#x0a;Length: {1}&#x0a;Released: {2}">
+                                        <MultiBinding StringFormat="{}Aliases: {0}&#x0a;Length: {1}&#x0a;Released: {2}&#x0a;Runtime: {3}">
                                             <Binding Path="Basics.VNDBInformation.aliases" Converter="{StaticResource AliasesConverter }" />
                                             <Binding Path="Basics.Length" Mode="OneWay"/>
                                             <Binding Path="Basics.VNDBInformation.released" />
+                                            <Binding Path="RunTime" Converter="{StaticResource RunTimeConverter}"/>
                                         </MultiBinding>
                                     </TextBlock.Text>
                                 </TextBlock>

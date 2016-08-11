@@ -9,7 +9,7 @@ namespace VNDBUpdater.Models.Internal
         public VNCharacterInformation VNDBInformation { get; set; }
 
         [JsonIgnore]
-        public List<Trait> ConvertedTraits { get; set; }
+        public List<Trait> ConvertedTraits { get; private set; }
 
         public CharacterInformation()
         {
