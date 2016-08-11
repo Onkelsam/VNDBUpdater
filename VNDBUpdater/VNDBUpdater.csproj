@@ -124,6 +124,7 @@
     <Compile Include="Models\Internal\CharacterInformation.cs" />
     <Compile Include="Models\Internal\WindowHandler.cs" />
     <Compile Include="Models\Internal\UserOptions.cs" />
+    <Compile Include="Models\MenuItem.cs" />
     <Compile Include="Models\Trait.cs" />
     <Compile Include="Models\User.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
@@ -132,7 +133,8 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="ValueConverters\AliasesConverter.cs" />
-    <Compile Include="ValueConverters\RunTimeConverter.cs" />
+    <Compile Include="ValueConverters\PlayTimeConverter.cs" />
+    <Compile Include="ValueConverters\RelationsConverter.cs" />
     <Compile Include="ViewModels\AboutViewModel.cs" />
     <Compile Include="ViewModels\OptionsViewModel.cs" />
     <Compile Include="ViewModels\ThreadSafeObservableCollection.cs" />

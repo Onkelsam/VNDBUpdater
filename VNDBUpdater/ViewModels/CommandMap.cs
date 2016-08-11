@@ -47,7 +47,7 @@ namespace VNDBUpdater.ViewModels
         /// <summary>
         /// Implements ICommand in a delegate friendly way
         /// </summary>
-        private class DelegateCommand : ICommand
+        public class DelegateCommand : ICommand
         {
             private Predicate<object> _canExecuteMethod;
             private Action<object> _executeMethod;

@@ -25,6 +25,14 @@ namespace VNDBUpdater.Communication.VNDB
         public int width { get; set; }
     }
 
+    public class Relation
+    {
+        public int id { get; set; }
+        public string relation { get; set; }
+        public string title { get; set; }
+        public string original { get; set; }
+    }
+
     public class VNInformation
     {
         public List<string> platforms { get; set; }
@@ -45,6 +53,7 @@ namespace VNDBUpdater.Communication.VNDB
         public object original { get; set; }
         public List<VNScreenshot> screens { get; set; }
         public bool image_nsfw { get; set; }
+        public List<Relation> relations { get; set; }
     }
     
     public class VNCharacterInformationRoot

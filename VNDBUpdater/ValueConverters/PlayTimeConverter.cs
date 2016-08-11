@@ -4,7 +4,7 @@ using System.Windows.Data;
 
 namespace VNDBUpdater.ValueConverters
 {
-    public class RunTimeConverter : IValueConverter
+    public class PlayTimeConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {

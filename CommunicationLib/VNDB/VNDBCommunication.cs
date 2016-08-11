@@ -78,7 +78,7 @@ namespace CommunicationLib.VNDB
 
             SetOptionsToDefault();
 
-            return Query("get vn basic,details,stats,tags,screens (id = [" + string.Join(",", IDs) + "] )");
+            return Query("get vn basic,details,stats,relations,tags,screens (id = [" + string.Join(",", IDs) + "] )");
         }
 
         public VndbResponse QueryCharacterInformation(int[] IDs, int page)
@@ -101,7 +101,7 @@ namespace CommunicationLib.VNDB
 
             SetOptionsToDefault();
 
-            return Query("get vn basic,details,stats,tags,screens (id = " + ID + ")");
+            return Query("get vn basic,details,stats,relations,tags,screens (id = " + ID + ")");
         }
 
         public VndbResponse QueryCharacterInformation(int ID)

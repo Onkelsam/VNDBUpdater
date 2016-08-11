@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
@@ -24,7 +25,7 @@ namespace VNDBUpdater.ViewModels
         private VisualNovel _SelectedVisualNovel;
         private List<Filter> _AvailableFilters;
         private Filter _AppliedFilter;
-        private WindowHandler _WindowHandler;
+        private WindowHandler _WindowHandler;        
 
         private int _SelectedVisualNovelTab;
         private int _SelectedTagTab;
@@ -98,6 +99,34 @@ namespace VNDBUpdater.ViewModels
             get { return Constants.PossibleScores; }
         }
 
+        public List<MenuItem> RelatedVisualNovels
+        {
+            get
+            {
+                var menuItems = new List<MenuItem>();
+
+                if (VisualNovelSelected(null))
+                {                    
+                    foreach (var relation in _SelectedVisualNovel.Basics.VNDBInformation.relations)
+                    {
+                        var submenu = new MenuItem(relation.title);
+                        var viewOnVNDB = new MenuItem("View on VNDB", new CommandMap.DelegateCommand(ExecuteViewRelationOnVNDB), relation.id);
+
+                        submenu.Children.Add(viewOnVNDB);
+
+                        if (!LocalVisualNovelHelper.VisualNovelExists(relation.id))
+                            submenu.Children.Add(new MenuItem("Add to Category 'Unknown'", new CommandMap.DelegateCommand(ExecuteAddRelation), relation.id));
+                        else
+                            submenu.Children.Add(new MenuItem("Select", new CommandMap.DelegateCommand(ExecuteSelectVisualNovel), relation.id));
+
+                        menuItems.Add(submenu);
+                    }                    
+                }
+
+                return menuItems;
+            }
+        }
+
         public List<string> Categories
         {
             get { return Enum.GetNames(typeof(VisualNovelCatergory)).ToList(); }
@@ -119,7 +148,8 @@ namespace VNDBUpdater.ViewModels
                     ExecuteNextCharacter(null);
                     ExecuteNextScreenshot(null);
                 }
-                
+
+                OnPropertyChanged(nameof(RelatedVisualNovels));
                 OnPropertyChanged(nameof(SelectedVisualNovel));
             }
         }
@@ -307,6 +337,28 @@ namespace VNDBUpdater.ViewModels
         public void ExecuteViewVisualNovelOnVNDB(object paramter)
         {
             _SelectedVisualNovel.ViewOnVNDB();
+        }
+
+        public void ExecuteViewRelationOnVNDB(object parameter)
+        {
+            Process.Start("https://vndb.org/v" + (int)parameter);
+        }
+
+        public void ExecuteSelectVisualNovel(object parameter)
+        {
+            SelectedVisualNovel = LocalVisualNovelHelper.GetVisualNovel((int)parameter);
+        }
+
+        public void ExecuteAddRelation(object parameter)
+        {
+            var newVisualNovel = VNDBCommunication.FetchVisualNovel((int)parameter);
+
+            newVisualNovel.Category = VisualNovelCatergory.Unknown;
+
+            VNDBCommunication.SetVNList(newVisualNovel);
+            LocalVisualNovelHelper.AddVisualNovel(newVisualNovel);
+
+            UpdateVisualNovelGrid();
         }
 
         public bool CanExecuteOpenWalkthrough(object paramter)

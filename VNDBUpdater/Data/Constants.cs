@@ -40,6 +40,19 @@ namespace VNDBUpdater.Data
             { 5, "Very long (> 50 hours)" }
         };
 
+        public static readonly Dictionary<string, string> RelationsMapper = new Dictionary<string, string>()
+        {
+            { "seq", "Sequel" },
+            { "set", "Same Setting" },
+            { "preq", "Prequel" },
+            { "fan", "Fandisc" },
+            { "ser", "Same Series" },
+            { "orig", "Original Game" },
+            { "alt", "Alternative Version" },
+            { "char", "Shares Characters" },
+            { "side", "Side Story" }
+        };
+
         public static readonly List<int> PossibleScores = new List<int>() { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
 
         public static readonly List<string> ExcludedExeFileNames = new List<string>() { "unins", "エンジン設定" };

@@ -19,6 +19,12 @@
     </i:Interaction.Triggers>
 
     <Window.Resources>
+        <Style x:Key="ContextMenuItemStyle">
+            <Setter Property="MenuItem.Header" Value="{Binding Header}" />
+            <Setter Property="MenuItem.ItemsSource" Value="{Binding Children}" />
+            <Setter Property="MenuItem.Command" Value="{Binding Command}" />
+            <Setter Property="MenuItem.CommandParameter" Value="{Binding CommandParameter}"/>
+        </Style>
         <Style x:Key="NoChromeButton" TargetType="{x:Type Button}">
             <Setter Property="Background" Value="Transparent"/>
             <Setter Property="BorderThickness" Value="1"/>
@@ -57,7 +63,8 @@
         </Style>
         <converters:TraitsListConverter x:Key="TraitsListToStringConvert" />
         <converters:AliasesConverter x:Key="AliasesConverter" />
-        <converters:RunTimeConverter x:Key="RunTimeConverter" />
+        <converters:PlayTimeConverter x:Key="PlayTimeConverter" />
+        <converters:RelationsConverter x:Key="RelationsConverter" />
     </Window.Resources>
 
     <Grid>
@@ -146,11 +153,12 @@
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" MaxWidth="500">
                                     <TextBlock.Text>
-                                        <MultiBinding StringFormat="{}Aliases: {0}&#x0a;Length: {1}&#x0a;Released: {2}&#x0a;Runtime: {3}">
+                                        <MultiBinding StringFormat="{}Aliases: {0}&#x0a;Length: {1}&#x0a;Released: {2}&#x0a;Related VNs: {3}&#x0a;Playtime: {4}">
                                             <Binding Path="Basics.VNDBInformation.aliases" Converter="{StaticResource AliasesConverter }" />
                                             <Binding Path="Basics.Length" Mode="OneWay"/>
                                             <Binding Path="Basics.VNDBInformation.released" />
-                                            <Binding Path="RunTime" Converter="{StaticResource RunTimeConverter}"/>
+                                            <Binding Path="Basics.VNDBInformation.relations" Converter="{StaticResource RelationsConverter}" />
+                                            <Binding Path="Playtime" Converter="{StaticResource PlayTimeConverter}"/>
                                         </MultiBinding>
                                     </TextBlock.Text>
                                 </TextBlock>
@@ -171,6 +179,8 @@
                     <MenuItem Header="View on 'VNDB'" Command="{Binding Commands.ViewVisualNovelOnVNDB}" />
                     <MenuItem Header="Update" Command="{Binding Commands.UpdateVisualNovel}" />
                     <MenuItem Header="Delete Visual Novel" Command="{Binding Commands.DeleteVisualNovel}" />
+                    <Separator HorizontalAlignment="Stretch" />
+                    <MenuItem ItemContainerStyle="{StaticResource ContextMenuItemStyle}" Header="Related Visual Novels" ItemsSource="{Binding RelatedVisualNovels}" />
                     <Separator HorizontalAlignment="Stretch" />
                     <MenuItem Header="Set as" ItemsSource="{Binding Path=Categories}">
                         <MenuItem.ItemContainerStyle>
