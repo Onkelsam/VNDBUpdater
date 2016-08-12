@@ -2,15 +2,12 @@ Implementation planned:
   
   Minor tasks:
     - Change file indexer so multiple paths to VN directories can be added (e.g. Steam).
-    - Remember user tabs so they will be the same when starting the program again.
-    - Add scroll bar to vn description window.
     - Make it clear if no character information is found.
-   
+    
   Medium tasks:
     - Wishlist implementation. Propably in a new window.
     - Display related visual novels as link, so you can click on them to get to the VNDB page 
       or select the vn if it is already on your list.
-    - Remember user column reordering and resizing.
     - Parse description text etc. correctly (implement a parser for the VNDB markdown text).
     
   Major tasks:
@@ -25,6 +22,22 @@ Current tasks:
   Minor tasks:
     - Constant improvements to the codebase through refactoring.
     - Finding bugs and fixing them.
-    - Improving the GUI.
-    - Resize covers correctly.
+    
+    - Improving the GUI:
+      - Remember user column reordering and resizing. -> Pretty difficult.
+
+
+Done:
+
+  Minor:
+    - Add scrollbar to vn description window.
+    - Remember user tabs so they will be the same when starting the program again.
+    - Fixed bug that could crash the program if you had a vn selected and a property was null and you changed the category tab.
+    - Fixed problem with the indexer.
+  
+      
+OnHold:
+
+    - Resize covers correctly. -> Major problems here as the DPI data is used by WPF to scale the image and often different for each image.
+      Currently hoping yorhel will extend the API a little bit, so I can use the (then) given height/width to manually scale the image.
     
