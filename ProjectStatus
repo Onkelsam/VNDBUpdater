@@ -2,12 +2,22 @@ Implementation planned:
   
   Minor tasks:
     - Change file indexer so multiple paths to VN directories can be added (e.g. Steam).
+    - Remember user tabs so they will be the same when starting the program again.
+    - Add scroll bar to vn description window.
+    - Make it clear if no character information is found.
    
   Medium tasks:
-    - None.
+    - Wishlist implementation. Propably in a new window.
+    - Display related visual novels as link, so you can click on them to get to the VNDB page 
+      or select the vn if it is already on your list.
+    - Remember user column reordering and resizing.
+    - Parse description text etc. correctly (implement a parser for the VNDB markdown text).
     
   Major tasks:
     - Change file indexer so it can find VNs by directory name and fetch the info from VNDB.org.
+    - Emulate VNDB style to characters, on the left side the character image on the right the description.
+    - Add navigation buttons to screenshots and a number (current picture is X of Y available pictures).
+    - Add vns with vn name. Propably in conjunction with the changes to the file indexer. Will be a pain...
   
   
 Current tasks:
@@ -16,3 +26,5 @@ Current tasks:
     - Constant improvements to the codebase through refactoring.
     - Finding bugs and fixing them.
     - Improving the GUI.
+    - Resize covers correctly.
+    
