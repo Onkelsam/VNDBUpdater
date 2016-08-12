@@ -21,6 +21,7 @@ namespace VNDBUpdater.Data
     public enum ErrorResponse : byte
     {
         Throttled = 0,
+        AuthenticationFailed,
         Unknown
     };
 
@@ -44,6 +45,12 @@ namespace VNDBUpdater.Data
         none = 0,
         minor,
         major
+    };
+
+    public enum ImageFormat : byte
+    {
+        Fill = 0,
+        Uniform
     };
 
     public enum ColumnVisibility : byte

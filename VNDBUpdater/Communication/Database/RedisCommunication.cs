@@ -40,28 +40,29 @@ namespace VNDBUpdater.Communication.Database
                         Connection = new CommunicationLib.Communication().GetRedisCommunication();
                         Connection.Connect(Constants.RedisIP, Constants.RedisPort, ExeAndStringPath + Constants.RedisExe, ExeAndStringPath + Constants.RedisConfig);
                         _IsConnected = true;
-                        EventLogger.LogInformation(nameof(RedisCommunication), "Connection to RedisDB established successfully.");
+                        _ConnectionTries = 0;
+                        EventLogger.LogInformation(nameof(RedisCommunication) + ":" + nameof(Connect), Constants.ConnectionEstablished);
                     }
                     catch (ConnectionException ex)
                     {
-                        EventLogger.LogError(nameof(RedisCommunication), ex);
+                        EventLogger.LogError(nameof(RedisCommunication) + ":" + nameof(Connect), ex);
                         _IsConnected = false;
                         _ConnectionTries++;
 
                         if (_ConnectionTries != Constants.MaxConnectionTries)
                         {
-                            EventLogger.LogInformation(nameof(RedisCommunication), "Error was handled. Trying reconnect. Current tries: " + _ConnectionTries.ToString());
+                            EventLogger.LogInformation(nameof(RedisCommunication) + ":" + nameof(Connect), Constants.ConnectionErrorHandled + _ConnectionTries.ToString());
                             Connect();
                         }
                         else
                         {
                             _ConnectionTries = 0;
-                            EventLogger.LogInformation(nameof(RedisCommunication), "Error could not be handled. Maximal tries (" + Constants.MaxConnectionTries + ") reached.");
+                            EventLogger.LogInformation(nameof(RedisCommunication) + ":" + nameof(Connect), Constants.ConnectionErrorNotHandled + "(" + Constants.MaxConnectionTries + ")");
                         }
                     }
                     catch (Exception ex)
                     {
-                        EventLogger.LogError(nameof(RedisCommunication), ex);
+                        EventLogger.LogError(nameof(RedisCommunication) + ":" + nameof(Connect), ex);
                         _IsConnected = false;
                     }
                 }
@@ -77,14 +78,14 @@ namespace VNDBUpdater.Communication.Database
 
         public static void AddVisualNovelToDB(VisualNovel visualNovel)
         {
-            WriteEntity<VisualNovel>("VisualNovel_" + visualNovel.Basics.VNDBInformation.id, visualNovel);
+            WriteEntity<VisualNovel>(Constants.VisualNovelKey + visualNovel.Basics.VNDBInformation.id, visualNovel);
         }
 
         public static List<VisualNovel> GetVisualNovelsFromDB()
         {
             var existingVNs = new List<VisualNovel>();
 
-            foreach (string key in GetAllKeys("VisualNovel_*"))
+            foreach (string key in GetAllKeys(Constants.VisualNovelKey + "*"))
             {
                 var entity = ReadEntity<VisualNovel>(key);
 
@@ -102,7 +103,7 @@ namespace VNDBUpdater.Communication.Database
 
         public static void DeleteVisualNovel(int id)
         {
-            DeleteKey("VisualNovel_" + id);
+            DeleteKey(Constants.VisualNovelKey + id);
         }
 
         public static void ResetDatabase()
@@ -115,43 +116,43 @@ namespace VNDBUpdater.Communication.Database
 
         public static void SaveFilter(Filter filter)
         {
-            WriteEntity<Filter>("Filter_" + filter.Name, filter);
+            WriteEntity<Filter>(Constants.FilterKey + filter.Name, filter);
         }
 
         public static void DeleteFilter(Filter filter)
         {
-            DeleteKey("Filter_" + filter.Name);
+            DeleteKey(Constants.FilterKey + filter.Name);
         }
 
         public static Filter GetFilter(string name)
         {
-            return ReadEntity<Filter>("Filter_" + name);
+            return ReadEntity<Filter>(Constants.FilterKey + name);
         }
 
         public static List<Filter> GetFiltersFromDatabase()
         {
             var filters = new List<Filter>();
 
-            foreach (string key in GetAllKeys("Filter_*"))
-                filters.Add(GetFilter(key.Replace("Filter_", "")));
+            foreach (string key in GetAllKeys(Constants.FilterKey + "*"))
+                filters.Add(GetFilter(key.Replace(Constants.FilterKey, "")));
 
             return filters;
         }
 
         public static User GetUser()
         {
-            return ReadEntity<User>("User");
+            return ReadEntity<User>(Constants.UserKey);
         }
 
         public static void SetUser(User user)
         {
-            WriteEntity<User>("User", user);
+            WriteEntity<User>(Constants.UserKey, user);
         }
 
         public static void SaveRedis()
         {
             SaveCurrentDB();
-            EventLogger.LogInformation(nameof(RedisCommunication), "Database saved successfully.");
+            EventLogger.LogInformation(nameof(RedisCommunication) + ":" + nameof(SaveRedis), "Database saved successfully.");
         }
 
         private static void WriteEntity<T>(string key, T entity) where T : class
@@ -201,7 +202,7 @@ namespace VNDBUpdater.Communication.Database
             {
                 Connection.Disconnect();
                 _IsConnected = false;
-                EventLogger.LogInformation(nameof(RedisCommunication), "Disconnected successfully.");
+                EventLogger.LogInformation(nameof(RedisCommunication) + ":" + nameof(Disconnect), Constants.ConnectionAborted);
             }
         }
 
@@ -212,7 +213,7 @@ namespace VNDBUpdater.Communication.Database
                 Disconnect();
                 Connection.Dispose();
                 _IsConnected = false;
-                EventLogger.LogInformation(nameof(RedisCommunication), "Was disposed successfully.");
+                EventLogger.LogInformation(nameof(RedisCommunication) + ":" + nameof(Dispose), Constants.ObjectDisposed);
             }
         }
     }

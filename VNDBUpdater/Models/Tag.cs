@@ -64,6 +64,24 @@ namespace VNDBUpdater.Models
             return (int)UserHelper.CurrentUser.Settings.SpoilerSetting >= (int)Spoiler;
         }
 
+        public static List<Tag> GetTagsForVN(VisualNovel vn, TagCategory currentCategory)
+        {
+            var tags = new List<Tag>();
+
+            if (vn != null)
+            {
+                if (vn.Basics.ConvertedTags != null)
+                {
+                    foreach (var tag in vn.Basics.ConvertedTags)
+                        if (tag.Category == currentCategory || currentCategory == TagCategory.All)
+                            if (tag.ShowTag())
+                                tags.Add(tag);
+                }
+            }
+            
+            return tags;
+        }
+
         public override string ToString()
         {
             return Name;

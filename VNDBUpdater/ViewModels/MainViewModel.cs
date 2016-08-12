@@ -250,7 +250,7 @@ namespace VNDBUpdater.ViewModels
 
         public string StretchImages
         {
-            get { return UserHelper.CurrentUser.Settings.StretchFormat; }
+            get { return UserHelper.CurrentUser.Settings.StretchFormat.ToString(); }
         }
 
         public string OriginalNameVisible
@@ -273,7 +273,7 @@ namespace VNDBUpdater.ViewModels
             get
             {
                 if (VersionHelper.NewVersionAvailable())
-                    return "VNDBUpdater " + VersionHelper.CurrentVersion + "  New Version available! Check the 'About'-window.";
+                    return "VNDBUpdater " + VersionHelper.CurrentVersion + "  New Version available! Check the 'About'-window for GitHub link.";
                 else
                     return "VNDBUpdater " + VersionHelper.CurrentVersion;
             }
@@ -460,14 +460,14 @@ namespace VNDBUpdater.ViewModels
                 RedisCommunication.SaveRedis();
                 RedisCommunication.Dispose();
                 VNDBCommunication.Dispose();                
-                EventLogger.LogInformation(nameof(MainViewModel), "Shutdown successfull.");
+                EventLogger.LogInformation(nameof(MainViewModel) + ":" + nameof(ExecuteCloseWindow), "Shutdown successfull.");
                 _WindowHandler.CloseAllWindows();
                 Application.Current.Shutdown();
             }
             catch (Exception ex)
             {
                 EventLogger.LogError(nameof(MainViewModel), ex);
-                EventLogger.LogInformation(nameof(MainViewModel), "Shutdown failed.");
+                EventLogger.LogInformation(nameof(MainViewModel) + ":" + nameof(ExecuteCloseWindow), "Shutdown failed.");
             }            
         }
 
@@ -547,16 +547,8 @@ namespace VNDBUpdater.ViewModels
         {
             TagsInGrid.Clear();
 
-            if (_SelectedVisualNovel != null)
-            {
-                if (_SelectedVisualNovel.Basics.ConvertedTags != null)
-                {
-                    foreach (var tag in _SelectedVisualNovel.Basics.ConvertedTags)
-                        if (tag.Category == (TagCategory)SelectedTagTab || (TagCategory)SelectedTagTab == TagCategory.All)
-                            if (tag.ShowTag())
-                                TagsInGrid.Add(tag);
-                }
-            }
+            foreach (var tag in Tag.GetTagsForVN(_SelectedVisualNovel, (TagCategory)SelectedTagTab))
+                TagsInGrid.Add(tag);
         }
 
         public void UpdateVisualNovelGrid()

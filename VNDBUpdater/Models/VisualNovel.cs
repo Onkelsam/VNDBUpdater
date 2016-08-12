@@ -121,14 +121,14 @@ namespace VNDBUpdater.Models
 
         public void ViewOnVNDB()
         {
-            Process.Start("https://vndb.org/v" + Basics.VNDBInformation.id);
+            Process.Start(Constants.VNDBVNLink + Basics.VNDBInformation.id);
         }
         public void SearchOnGoolge(string parameter)
         {
             if (Basics.VNDBInformation.original != null)
-                Process.Start("https://www.google.de/#q=" + Basics.VNDBInformation.original.ToString() + "+" + parameter);
+                Process.Start(Constants.GoogleLink + Basics.VNDBInformation.original.ToString() + "+" + parameter);
             else
-                Process.Start("https://www.google.de/#q=" + Basics.VNDBInformation.title + "+" + parameter);         
+                Process.Start(Constants.GoogleLink + Basics.VNDBInformation.title + "+" + parameter);         
         }
 
         public void OpenWalkthrough()
@@ -249,7 +249,8 @@ namespace VNDBUpdater.Models
         {
             if (InstallationPathExists && !WalkthroughAvailable)
             {
-                File.Create(FolderPath + Constants.WalkthroughFileName);
+                FileHelper.CreateFile(FolderPath + Constants.WalkthroughFileName);
+                OpenWalkthrough();
                 LocalVisualNovelHelper.AddVisualNovel(this);
             }                
         }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Reflection;
+using VNDBUpdater.Data;
 using VNDBUpdater.Helper;
 
 namespace VNDBUpdater.ViewModels
@@ -29,7 +30,7 @@ namespace VNDBUpdater.ViewModels
 
         public void ExecuteOpenGitHubLink(object parameter)
         {
-            Process.Start("https://github.com/Onkelsam/VNDBUpdater/releases");
+            Process.Start(Constants.GitHubReleaseLink);
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows.Controls;
+using VNDBUpdater.Data;
 
 namespace VNDBUpdater.Helper
 {
@@ -22,7 +23,7 @@ namespace VNDBUpdater.Helper
             if (string.IsNullOrEmpty(val))
             {
                 _IsValid = false;
-                return new ValidationResult(false, "The field cannot be empty");
+                return new ValidationResult(false, Constants.InputValidationStringEmpty);
             }
 
             if (val.Contains(','))
@@ -34,7 +35,7 @@ namespace VNDBUpdater.Helper
                     if (!regex.IsMatch(input))
                     {
                         _IsValid = false;
-                        return new ValidationResult(false, "Only numbers from 0 to 9 allowed! Split IDs by ','.");
+                        return new ValidationResult(false, Constants.InputValidationFalseInput);
                     }
                 }
 
@@ -51,7 +52,7 @@ namespace VNDBUpdater.Helper
                 else
                 {
                     _IsValid = false;
-                    return new ValidationResult(false, "Only numbers from 0 to 9 allowed! Split IDs by ','.");
+                    return new ValidationResult(false, Constants.InputValidationFalseInput);
                 }
             }          
         }

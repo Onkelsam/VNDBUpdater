@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using VNDBUpdater.Data;
 using VNDBUpdater.Helper;
 using VNDBUpdater.Models;
 using VNDBUpdater.ViewModels;
@@ -24,11 +25,11 @@ namespace VNDBUpdater.BackgroundTasks
                 switch(_Status)
                 {
                     case (TaskStatus.Running):
-                        return "Fileindexer is currently running. " + _MainScreen.CompletedPendingTasks + " of " + _MainScreen.CurrentPendingTasks + " Visual Novels indexed.";
+                        return nameof(FileIndexer) +  Constants.TaskRunning + _MainScreen.CompletedPendingTasks + " of " + _MainScreen.CurrentPendingTasks + " Visual Novels indexed.";
                     case (TaskStatus.RanToCompletion):
-                        return "Fileindexer is finished. " + LocalVisualNovelHelper.LocalVisualNovels.Count(x => x.ExePath == null || x.ExePath == "") + " could not be indexed.";
+                        return nameof(FileIndexer) + Constants.TaskFinished + LocalVisualNovelHelper.LocalVisualNovels.Count(x => x.ExePath == null || x.ExePath == "") + " could not be indexed.";
                     case (TaskStatus.Faulted):
-                        return "Error occured while running Fileindexer. Please check the eventlog.";
+                        return nameof(FileIndexer) + Constants.TaskFaulted;
                     default:
                         return string.Empty;
                 }
@@ -41,7 +42,7 @@ namespace VNDBUpdater.BackgroundTasks
             {
                 base.Start(MainScreen);
 
-                EventLogger.LogInformation(nameof(FileIndexer), "started.");
+                EventLogger.LogInformation(nameof(FileIndexer) + ":" + nameof(Start), Constants.TaskStarted);
 
                 _MainScreen.CurrentPendingTasks = LocalVisualNovelHelper.LocalVisualNovels.Count(x => x.ExePath == null || x.ExePath == "");
                 _MainScreen.CompletedPendingTasks = 0;
@@ -64,7 +65,7 @@ namespace VNDBUpdater.BackgroundTasks
         {
             try
             {
-                EventLogger.LogInformation(nameof(FileIndexer), "pending Tasks: " + _MainScreen.CurrentPendingTasks.ToString());
+                EventLogger.LogInformation(nameof(FileIndexer) + ":" + nameof(Indexing), Constants.TasksPending + _MainScreen.CurrentPendingTasks.ToString());
 
                 var crawledVNs = new List<VisualNovel>();
 
@@ -73,7 +74,7 @@ namespace VNDBUpdater.BackgroundTasks
                     vn.CrawlExePath();
                     crawledVNs.Add(vn);                 
                     _MainScreen.CompletedPendingTasks++;
-                    EventLogger.LogInformation(nameof(FileIndexer), "completed Tasks: " + _MainScreen.CompletedPendingTasks.ToString());
+                    EventLogger.LogInformation(nameof(FileIndexer) + ":" + nameof(Indexing), Constants.TasksCompleted + _MainScreen.CompletedPendingTasks.ToString());
                 }
 
                 LocalVisualNovelHelper.AddVisualNovels(crawledVNs);
@@ -81,12 +82,12 @@ namespace VNDBUpdater.BackgroundTasks
                 _Status = TaskStatus.RanToCompletion;
                 _MainScreen.UpdateStatusText();
 
-                EventLogger.LogInformation(nameof(FileIndexer), "finished successfully.");
+                EventLogger.LogInformation(nameof(FileIndexer) + ":" + nameof(Indexing), Constants.TaskFinished);
             }
             catch (Exception ex)
             {
                 _Status = TaskStatus.Faulted;
-                EventLogger.LogError(nameof(FileIndexer), ex);
+                EventLogger.LogError(nameof(FileIndexer) + ":" + nameof(Indexing), ex);
             }
         }
     }

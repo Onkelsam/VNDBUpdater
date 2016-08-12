@@ -64,8 +64,6 @@ namespace VNDBUpdater.Helper
                 Description = "Select main folder where your Visual Novels are stored."
             };
 
-            DialogResult result = fileDialog.ShowDialog();
-
             if (!string.IsNullOrWhiteSpace(fileDialog.SelectedPath))
                 return fileDialog.SelectedPath;
             else
@@ -106,6 +104,14 @@ namespace VNDBUpdater.Helper
         {
             if (File.Exists(Constants.PathToDatabase + Constants.DatabaseName))
                 File.Copy(Constants.PathToDatabase + Constants.DatabaseName, Constants.PathToDatabase + Constants.BackupDatabaseName, true);
+        }
+
+        public static void CreateFile(string path)
+        {
+            if (!File.Exists(path))
+            {
+                using (var fs = File.Create(path)) { } ;
+            }
         }
 
         public static string SearchForVisualNovelExe(VisualNovel VN)

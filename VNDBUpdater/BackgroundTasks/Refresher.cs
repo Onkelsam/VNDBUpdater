@@ -26,11 +26,11 @@ namespace VNDBUpdater.BackgroundTasks
                 switch(_Status)
                 {
                     case (TaskStatus.Running):
-                        return "Refresher is currently running. " + _MainScreen.CompletedPendingTasks + " of " + _MainScreen.CurrentPendingTasks + " Visual Novels updated.";
+                        return nameof(Refresher) + Constants.TaskRunning + _MainScreen.CompletedPendingTasks + " of " + _MainScreen.CurrentPendingTasks + " Visual Novels updated.";
                     case (TaskStatus.RanToCompletion):
-                        return "Refresher is finished.";
+                        return nameof(Refresher) + Constants.TaskFinished;
                     case (TaskStatus.Faulted):
-                        return "Error occured while running Refresher. Please check the eventlog.";
+                        return nameof(Refresher) + Constants.TaskFaulted;
                     default:
                         return string.Empty;
                 }
@@ -43,7 +43,7 @@ namespace VNDBUpdater.BackgroundTasks
             {
                 base.Start(MainScreen);
 
-                EventLogger.LogInformation(nameof(Refresher), "started.");                
+                EventLogger.LogInformation(nameof(Refresher) + ":" + nameof(Start), Constants.TaskStarted);   
 
                 _MainScreen.CurrentPendingTasks = LocalVisualNovelHelper.LocalVisualNovels.Count;
                 _MainScreen.CompletedPendingTasks = 0;
@@ -66,7 +66,7 @@ namespace VNDBUpdater.BackgroundTasks
         {
             try
             {
-                EventLogger.LogInformation(nameof(Refresher), "pending Tasks: " + _MainScreen.CurrentPendingTasks.ToString());
+                EventLogger.LogInformation(nameof(Refresher) + ":" + nameof(Refresh), Constants.TasksPending + _MainScreen.CurrentPendingTasks.ToString());
 
                 var updatedVNs = new List<VisualNovel>();
 
@@ -80,26 +80,26 @@ namespace VNDBUpdater.BackgroundTasks
                     {                        
                         updatedVNs.AddRange(VNDBCommunication.FetchVisualNovels(idSplitter.IDs.Take(round * Constants.MaxVNsPerRequest, Constants.MaxVNsPerRequest).ToList()));
                         _MainScreen.CompletedPendingTasks += Constants.MaxVNsPerRequest;
-                        EventLogger.LogInformation(nameof(Refresher), "completed Tasks: " + _MainScreen.CompletedPendingTasks.ToString());                        
+                        EventLogger.LogInformation(nameof(Refresher) + ":" + nameof(Refresh), Constants.TasksCompleted + _MainScreen.CompletedPendingTasks.ToString());                        
                     }
                         
                     if (idSplitter.Remainder > 0)
                     {                        
                         updatedVNs.AddRange(VNDBCommunication.FetchVisualNovels(idSplitter.IDs.Take(idSplitter.IDs.Length - idSplitter.Remainder, idSplitter.Remainder).ToList()));
                         _MainScreen.CompletedPendingTasks += idSplitter.Remainder;
-                        EventLogger.LogInformation(nameof(Refresher), "completed Tasks: " + _MainScreen.CompletedPendingTasks.ToString());
+                        EventLogger.LogInformation(nameof(Refresher) + ":" + nameof(Refresh), Constants.TasksCompleted + _MainScreen.CompletedPendingTasks.ToString());
                     }                        
                 }
                 else
                 {
                     updatedVNs.AddRange(VNDBCommunication.FetchVisualNovels(idSplitter.IDs.ToList()));
                     _MainScreen.CompletedPendingTasks += idSplitter.IDs.Length;
-                    EventLogger.LogInformation(nameof(Refresher), "completed Tasks: " + _MainScreen.CompletedPendingTasks.ToString());
+                    EventLogger.LogInformation(nameof(Refresher) + ":" + nameof(Refresh), Constants.TasksCompleted + _MainScreen.CompletedPendingTasks.ToString());
                 }
 
                 foreach (var vn in updatedVNs)
                 {
-                    var vnToUpdate = LocalVisualNovelHelper.LocalVisualNovels.Where(x => x.Basics.VNDBInformation.id == vn.Basics.VNDBInformation.id).FirstOrDefault();
+                    VisualNovel vnToUpdate = LocalVisualNovelHelper.LocalVisualNovels.Where(x => x.Basics.VNDBInformation.id == vn.Basics.VNDBInformation.id).FirstOrDefault();
 
                     if (vnToUpdate != null)
                     {
@@ -114,12 +114,12 @@ namespace VNDBUpdater.BackgroundTasks
                 _MainScreen.UpdateStatusText();
                 _MainScreen.UpdateVisualNovelGrid();
 
-                EventLogger.LogInformation(nameof(Refresher), "finished successfully.");                 
+                EventLogger.LogInformation(nameof(Refresher) + ":" + nameof(Refresh), Constants.TaskFinished);
             }
             catch (Exception ex)
             {
                 _Status = TaskStatus.Faulted;
-                EventLogger.LogError(nameof(Refresher), ex);
+                EventLogger.LogError(nameof(Refresher) + ":" + nameof(Refresh), ex);
             }
         }
     }

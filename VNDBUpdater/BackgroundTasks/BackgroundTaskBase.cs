@@ -18,7 +18,7 @@ namespace VNDBUpdater.BackgroundTasks
             _MainScreen = MainScreen;
 
             _CancelTokenSource = new CancellationTokenSource();
-            _CancelToken = _CancelTokenSource.Token;         
+            _CancelToken = _CancelTokenSource.Token;            
         }
     }
 }

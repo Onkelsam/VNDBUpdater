@@ -6,14 +6,17 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:VNDBUpdater.ViewModels"
         mc:Ignorable="d"
-        Title="VNDBUpdater - Options" Height="546.666" Width="570" ResizeMode="NoResize" WindowStartupLocation="CenterScreen"
+        Title="VNDBUpdater - Options" Height="399.333" Width="578.667" ResizeMode="NoResize" WindowStartupLocation="CenterScreen"
         Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
 
     <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="10*" />
+            <ColumnDefinition Width="10*" />
+        </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition Height="11*" />
-            <RowDefinition Height="9*" />
-            <RowDefinition Height="13*" />
+            <RowDefinition Height="8.5*" />
+            <RowDefinition Height="10*" />
         </Grid.RowDefinitions>
         <GroupBox BorderBrush="AliceBlue" BorderThickness="2" Margin="5" Header="User Credentials">
             <Grid Grid.ColumnSpan="2" Grid.RowSpan="2">
@@ -31,10 +34,10 @@
                 <TextBlock Text="Password:" Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="5"/>
                 <PasswordBox Name="txtPassword" Grid.Row="1" Grid.Column="2" Margin="0,1,0,1" VerticalAlignment="Center"/>
                 <Button Margin="0,1,0,1" Command="{Binding Commands.Login}" CommandParameter="{Binding ElementName=txtPassword}" Content="Login" Grid.Row="2" Grid.Column="3" VerticalAlignment="Center"/>
-                <TextBlock Grid.Column="1" Grid.Row="2" Text="{Binding Path=LoginState}" VerticalAlignment="Center" Margin="0,42,0,-31" />
+                <TextBlock Grid.Column="0" Grid.Row="2" Text="{Binding Path=LoginState}" VerticalAlignment="Center" Grid.ColumnSpan="2" Margin="0,42,0,-31"  TextAlignment="Center"/>
             </Grid>
         </GroupBox>
-        <GroupBox Header="File Indexer" Margin="5" BorderThickness="2" BorderBrush="AliceBlue" Grid.Row="1">
+        <GroupBox Header="File Indexer" Margin="5" BorderThickness="2" BorderBrush="AliceBlue" Grid.Row="0" Grid.Column="1">
             <Grid Grid.ColumnSpan="2" Grid.RowSpan="2">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="100"/>
@@ -47,11 +50,11 @@
                 </Grid.RowDefinitions>
                 <TextBlock Text="Current Path:" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="3"/>
                 <TextBox Text="{Binding Path=InstallFolderPath, Mode=OneWay}" Grid.Column="1" VerticalAlignment="Center" IsReadOnly="True" Margin="0,1,0,1"/>
-                <Button Margin="0,1,0,1" Command="{Binding Commands.SetInstallFolderPath}" Content="Change VNs root folder" Grid.Row="1" Grid.Column="3" VerticalAlignment="Center"/>
+                <Button Margin="0,1,0,1" Command="{Binding Commands.SetInstallFolderPath}" Content="Change VNs root" Grid.Row="1" Grid.Column="3" VerticalAlignment="Center"/>
                 <Button Margin="0,1,0,1" Command="{Binding Commands.StartIndexing}" Content="Start Indexing" Grid.Row="2" Grid.Column="3" VerticalAlignment="Center"/>
             </Grid>
         </GroupBox>
-        <GroupBox Header="Settings" Margin="5" BorderThickness="2" BorderBrush="AliceBlue" Grid.Row="2">
+        <GroupBox Header="Settings" Margin="5" BorderThickness="2" BorderBrush="AliceBlue" Grid.Row="1" Grid.ColumnSpan="2">
             <Grid Grid.ColumnSpan="2" Grid.RowSpan="2">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="100"/>

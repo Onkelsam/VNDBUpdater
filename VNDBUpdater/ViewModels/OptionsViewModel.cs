@@ -100,13 +100,13 @@ namespace VNDBUpdater.ViewModels
 
         public bool Fill
         {
-            get { return _User.Settings.StretchFormat == "Fill" ? true : false; }
+            get { return _User.Settings.StretchFormat == ImageFormat.Fill ? true : false; }
             set
             {
                 if (value)
-                    _User.Settings.StretchFormat = "Fill";
+                    _User.Settings.StretchFormat = ImageFormat.Fill;
                 else
-                    _User.Settings.StretchFormat = "Uniform";
+                    _User.Settings.StretchFormat = ImageFormat.Uniform;
             }
         }       
 

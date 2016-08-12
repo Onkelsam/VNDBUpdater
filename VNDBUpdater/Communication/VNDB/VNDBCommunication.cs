@@ -33,11 +33,11 @@ namespace VNDBUpdater.Communication.VNDB
                 switch (_Status)
                 {
                     case (VNDBCommunicationStatus.LoggedIn):
-                        return "Currently logged in as '" + UserHelper.CurrentUser.Username + "'.";
+                        return Constants.LoggedIn + UserHelper.CurrentUser.Username + "'.";
                     case (VNDBCommunicationStatus.NotLoggedIn):
-                        return "Currently not logged in. Please specify your Login-Credentials in the Options-Menu.";
+                        return Constants.NotLoggedIn;
                     case (VNDBCommunicationStatus.Throttled):
-                        return "Currently logged in as '" + UserHelper.CurrentUser.Username + "'. Throttled by VNDB. Please be patient.";
+                        return Constants.LoggedIn + UserHelper.CurrentUser.Username + "'.Throttled by VNDB.";
                     default:
                         return ErrorMessage;
                 }
@@ -60,21 +60,29 @@ namespace VNDBUpdater.Communication.VNDB
 
                     if (response.ResponseType == VndbResponseType.Error)
                     {
-                        if (HandleError(response) == ErrorResponse.Throttled)
+                        ErrorResponse result = HandleError(response);
+
+                        if (result == ErrorResponse.Throttled)
                         {
-                            EventLogger.LogInformation(nameof(VNDBCommunication), "Connecting faild because of throttling error. Trying reconnect.");                            
+                            EventLogger.LogInformation(nameof(VNDBCommunication) + ":" + nameof(Connect), Constants.VNDBConnectionFailedThrottling);                            
                             Connect(); // If the connection was throttled try again (after waiting 'minwait').
                         }                                                    
+                        else if (result == ErrorResponse.AuthenticationFailed)
+                        {
+                            EventLogger.LogInformation(nameof(VNDBCommunication) + ":" + nameof(Connect), Constants.VNDBConnectionFailedAuthentication);                           
+                            _Status = VNDBCommunicationStatus.Error;
+                        }            
                         else
                         {
-                            EventLogger.LogInformation(nameof(VNDBCommunication), "Connecting failed because of unknown error. Abort connecting procedure.");                           
+                            EventLogger.LogInformation(nameof(VNDBCommunication) + ":" + nameof(Connect), Constants.VNDBConnectionFailedUnknownError);
                             _Status = VNDBCommunicationStatus.Error;
-                        }                            
+                        }                
                     }
                     else
                     {
-                        EventLogger.LogInformation(nameof(VNDBCommunication), "Connection established successfully.");
+                        EventLogger.LogInformation(nameof(VNDBCommunication) + ":" + nameof(Connect), Constants.ConnectionEstablished);
                         _Status = VNDBCommunicationStatus.LoggedIn;
+                        _ConnectionTries = 0;
                     }
                         
                 }
@@ -82,27 +90,27 @@ namespace VNDBUpdater.Communication.VNDB
                 {
                     // IOExceptins occurs if VNDB closed the stream.
                     // Just try to connect again using recursion.
-                    EventLogger.LogError(nameof(VNDBCommunication), ex);                    
+                    EventLogger.LogError(nameof(VNDBCommunication) + ":" + nameof(Connect), ex);                    
                     _Status = VNDBCommunicationStatus.NotLoggedIn;
                     _ConnectionTries++;
 
                     if (_ConnectionTries != Constants.MaxConnectionTries)
                     {
-                        EventLogger.LogInformation(nameof(VNDBCommunication), "Error was handled. Trying reconnect. Current tries: " + _ConnectionTries.ToString());                        
+                        EventLogger.LogInformation(nameof(VNDBCommunication) + ":" + nameof(Connect), Constants.ConnectionErrorHandled + _ConnectionTries.ToString());                        
                         Connect();
                     }                        
                     else
                     {
                         _ConnectionTries = 0;
-                        EventLogger.LogInformation(nameof(VNDBCommunication), "Error could not be handled. Maximal tries (" + Constants.MaxConnectionTries + ") reached.");                        
+                        EventLogger.LogInformation(nameof(VNDBCommunication) + ":" + nameof(Connect), Constants.ConnectionErrorNotHandled + "(" + Constants.MaxConnectionTries + ")");                        
                         _Status = VNDBCommunicationStatus.Error;
                         _ErrorMessage = "Login failed. Error message: " + ex.Message + ex.GetType().ToString() + ex.GetBaseException().GetType().ToString();
                     }
                 }
                 catch (Exception ex)
                 {
-                    EventLogger.LogError(nameof(VNDBCommunication), ex);
-                    EventLogger.LogInformation(nameof(VNDBCommunication), "Error could not be handled. Abort connecting procedure.");                    
+                    EventLogger.LogError(nameof(VNDBCommunication) + ":" + nameof(Connect), ex);
+                    EventLogger.LogInformation(nameof(VNDBCommunication) + ":" + nameof(Connect), Constants.ConnectionErrorNotHandled);                    
                     _Status = VNDBCommunicationStatus.Error;
                     _ErrorMessage = "Login failed. Error message: " + ex.Message + ex.GetType().ToString() + ex.GetBaseException().GetType().ToString();
                 }
@@ -367,21 +375,21 @@ namespace VNDBUpdater.Communication.VNDB
             if (error.id == "throttled")
             {
                 // In case of 'throttled' error wait 'minwait'.
-                EventLogger.LogInformation(nameof(VNDBCommunication), "Throttled error by VNDB received. Waiting: " + TimeSpan.FromSeconds(error.minwait).ToString() + " before proceeding with queries.");                
+                EventLogger.LogInformation(nameof(VNDBCommunication) + ":" + nameof(HandleError), Constants.VNDBConnectionFailedThrottling + TimeSpan.FromSeconds(error.minwait).ToString());                
                 Thread.Sleep(TimeSpan.FromSeconds(error.minwait));
                 _Status = VNDBCommunicationStatus.Throttled;
                 return ErrorResponse.Throttled;
             }
             else if (error.id == "auth")
             {
-                EventLogger.LogInformation(nameof(HandleError), "VNDB Authentication failed.");
+                EventLogger.LogInformation(nameof(HandleError) + ":" + nameof(HandleError), Constants.VNDBConnectionAuthenticationError);
                 _Status = VNDBCommunicationStatus.Error;
-                _ErrorMessage = "Wrong Username/Password combination.";
-                return ErrorResponse.Unknown;
+                _ErrorMessage = "Wrong Username/Password";
+                return ErrorResponse.AuthenticationFailed;
             }
             else
             {
-                EventLogger.LogInformation(nameof(VNDBCommunication), "Unknown error by VNDB received. Aborting connection.");                
+                EventLogger.LogInformation(nameof(VNDBCommunication) + nameof(HandleError), Constants.VNDBConnectionUnknownErrorReceived);                
                 _Status = VNDBCommunicationStatus.Error;
                 _ErrorMessage = "Error while communicating with VNDB: Error ID: '" + error.id + "' Error message: '" + error.msg + "'";
                 return ErrorResponse.Unknown;
@@ -400,7 +408,7 @@ namespace VNDBUpdater.Communication.VNDB
             {
                 Connection.Disconnect();
                 _Status = VNDBCommunicationStatus.NotLoggedIn;
-                EventLogger.LogInformation(nameof(VNDBCommunication), "Disconnected successfully.");                
+                EventLogger.LogInformation(nameof(VNDBCommunication) + ":" + nameof(Disconnect), Constants.ConnectionAborted);                
             }
         }
 
@@ -410,7 +418,7 @@ namespace VNDBUpdater.Communication.VNDB
             {
                 Disconnect();
                 Connection.Dispose();
-                EventLogger.LogInformation(nameof(VNDBCommunication), "Was disposed successfully.");                
+                EventLogger.LogInformation(nameof(VNDBCommunication) + ":" + nameof(Dispose), Constants.ObjectDisposed);                
             }
         }
     }

@@ -10,7 +10,11 @@ namespace VNDBUpdater.Data
         public const string RedisConfig = "redis.windows.conf";
         public const string DatabaseName = "LocalVNStorage.rdb";
         public const string PathToDatabase = @"Resources\";
-        public const string BackupDatabaseName = "LocalVNStorage_Backup.rdb";        
+        public const string BackupDatabaseName = "LocalVNStorage_Backup.rdb";
+
+        public const string VisualNovelKey = "VisualNovel_";
+        public const string FilterKey = "Filter_";
+        public const string UserKey = "User";
 
         public const int MaxVNsPerRequest = 25;
 
@@ -29,6 +33,39 @@ namespace VNDBUpdater.Data
         public const int MaxDistanceBetweenStringsForIndexer = 5;
 
         public const string EventlogFileName = "Eventlog.txt";
+
+        public const string TaskRunning = " currently running. ";
+        public const string TaskFinished = " finished successfully.";
+        public const string TaskFaulted = " faulted. Please check the " + Constants.EventlogFileName + " found in the program directory.";
+        public const string TaskStarted = " started.";
+        public const string TasksPending = " pending Tasks: ";
+        public const string TasksCompleted = " completed Tasks: ";
+
+        public const string ConnectionEstablished = "Connection established successfully.";
+        public const string ConnectionErrorHandled = "Error was handled. Trying reconnect. Current tries: ";
+        public const string ConnectionErrorNotHandled = "Error could not be handled. Maximal connection tries reached. ";
+        public const string ConnectionAborted = "Disconnected successfully";
+        public const string ObjectDisposed = "Disposed successfully";
+
+        public const string LoggedIn = "Currently logged in as '";
+        public const string NotLoggedIn = "Currently not logged in.";
+        public const string VNDBConnectionFailedThrottling = "Connecting to VNDB failed because of throttling error. Trying reconnect.";
+        public const string VNDBConnectionFailedAuthentication = "Connecting to VNDB failed because of authentication error. Abort connection procedure.";
+        public const string VNDBConnectionFailedUnknownError = "Connecting to VNDB failed because of unknown error. Abort connection procedure.";
+
+        public const string VNDBConnectionThrottlingError = "Throttled error by VNDB received. Waiting: ";
+        public const string VNDBConnectionAuthenticationError = "Authentication error by VNDB received.";
+        public const string VNDBConnectionUnknownErrorReceived = "Unknown error by VNDB received.";
+
+        public const string InputValidationStringEmpty = "The input cannot be empty!";
+        public const string InputValidationFalseInput = "Only numbers allowed! Split IDs by ','.";
+
+        public const string VNDBVNLink = "https://vndb.org/v";
+        public const string GoogleLink = "https://www.google.de/#q=";
+        public const string GitHubReleaseLink = "https://github.com/Onkelsam/VNDBUpdater/releases";
+
+
+
 
         public static readonly Dictionary<int?, string> VNLengthMapper = new Dictionary<int?, string>()
         {

@@ -22,7 +22,7 @@ namespace VNDBUpdater.Helper
                 }
                 catch (Exception ex)
                 {
-                    EventLogger.LogError(nameof(VersionHelper), ex);
+                    EventLogger.LogError(nameof(VersionHelper) + ":" + nameof(NewestVersion), ex);
                     return string.Empty;
                 }                
             }

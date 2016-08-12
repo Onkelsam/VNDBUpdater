@@ -74,6 +74,7 @@ namespace VNDBUpdater.ViewModels
             }
 
             IDs = string.Empty;
+            InputValidation.IsValid = false;
         }
 
         public bool CanExecuteAddVisualNovelsToDB(object paramter)

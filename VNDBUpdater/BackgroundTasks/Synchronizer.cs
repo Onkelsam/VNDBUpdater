@@ -26,11 +26,11 @@ namespace VNDBUpdater.BackgroundTasks
                 switch (_Status)
                 {
                     case (TaskStatus.Running):
-                        return "Synchronizer is currently running. " + _MainScreen.CompletedPendingTasks + " of " + _MainScreen.CurrentPendingTasks + " Visual Novels synced.";
+                        return nameof(Synchronizer) + Constants.TaskRunning + _MainScreen.CompletedPendingTasks + " of " + _MainScreen.CurrentPendingTasks + " Visual Novels synced.";
                     case (TaskStatus.RanToCompletion):
-                        return "Synchronizer is finished.";
+                        return nameof(Synchronizer) + Constants.TaskFinished;
                     case (TaskStatus.Faulted):
-                        return "Error occured while running Synchronizer. Please check the eventlog.";
+                        return nameof(Synchronizer) + Constants.TaskFaulted;
                     default:
                         return string.Empty;
                 }
@@ -43,7 +43,7 @@ namespace VNDBUpdater.BackgroundTasks
             {
                 base.Start(MainScreen);
 
-                EventLogger.LogInformation(nameof(Synchronizer), "started.");                
+                EventLogger.LogInformation(nameof(Synchronizer) + ":" + nameof(Start), Constants.TaskStarted);
 
                 VNDBCommunication.Connect();
 
@@ -78,7 +78,7 @@ namespace VNDBUpdater.BackgroundTasks
 
                 int count = VNList.Count + VoteList.Count;
 
-                EventLogger.LogInformation(nameof(Synchronizer), "pending Tasks: " + count.ToString());
+                EventLogger.LogInformation(nameof(Synchronizer) + ":" + nameof(Synchronize), Constants.TasksPending + count.ToString());
 
                 _MainScreen.CompletedPendingTasks = 0;
                 _MainScreen.CurrentPendingTasks = count;
@@ -90,7 +90,7 @@ namespace VNDBUpdater.BackgroundTasks
                 _MainScreen.UpdateStatusText();
                 _MainScreen.UpdateVisualNovelGrid();
 
-                EventLogger.LogInformation(nameof(Synchronizer), "finished successfully.");
+                EventLogger.LogInformation(nameof(Synchronizer) + ":" + nameof(Synchronize), Constants.TaskFinished);
             }
             catch (Exception ex)
             {
@@ -108,7 +108,7 @@ namespace VNDBUpdater.BackgroundTasks
                 if (LocalVisualNovelHelper.VisualNovelExists(vn.vn))
                 {
                     _MainScreen.CompletedPendingTasks++;
-                    EventLogger.LogInformation(nameof(Synchronizer), "completed Tasks: " + _MainScreen.CompletedPendingTasks.ToString());
+                    EventLogger.LogInformation(nameof(Synchronizer) + ":" + nameof(SynchronizeVNs), Constants.TasksCompleted + _MainScreen.CompletedPendingTasks.ToString());
 
                     VisualNovel LocalVN = LocalVisualNovelHelper.GetVisualNovel(vn.vn);
 
@@ -160,7 +160,7 @@ namespace VNDBUpdater.BackgroundTasks
                 if (LocalVisualNovelHelper.VisualNovelExists(vote.vn))
                 {
                     _MainScreen.CompletedPendingTasks++;
-                    EventLogger.LogInformation(nameof(Synchronizer), "completed Tasks: " + _MainScreen.CompletedPendingTasks.ToString());
+                    EventLogger.LogInformation(nameof(Synchronizer) + ":" + nameof(SynchronizeVotes), Constants.TasksCompleted + _MainScreen.CompletedPendingTasks.ToString());
 
                     VisualNovel LocalVN = LocalVisualNovelHelper.GetVisualNovel(vote.vn);
 
@@ -192,9 +192,7 @@ namespace VNDBUpdater.BackgroundTasks
         }
 
         private void AddVNs(int[] ids, List<VN> VNs)
-        {
-            EventLogger.LogInformation(nameof(Synchronizer), "completed Tasks: " + _MainScreen.CompletedPendingTasks.ToString());
-
+        {           
             foreach (var vn in VNDBCommunication.FetchVisualNovels(ids.ToList()))
             {
                 var VNFromVNDB = VNs.Where(x => x.vn == vn.Basics.VNDBInformation.id).First();
@@ -207,7 +205,9 @@ namespace VNDBUpdater.BackgroundTasks
 
                 _MainScreen.CompletedPendingTasks++;
                 _MainScreen.UpdateStatusText();               
-            }            
+            }
+
+            EventLogger.LogInformation(nameof(Synchronizer) + ":" + nameof(AddVNs), Constants.TasksCompleted + _MainScreen.CompletedPendingTasks.ToString());
         }
     }
 }

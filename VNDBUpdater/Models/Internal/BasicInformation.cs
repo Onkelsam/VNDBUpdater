@@ -14,13 +14,7 @@ namespace VNDBUpdater.Models.Internal
 
         public string Length
         {
-            get
-            {
-                if (VNDBInformation.length == null)
-                    return Constants.VNLengthMapper[0];
-                else
-                    return Constants.VNLengthMapper[VNDBInformation.length];
-            }
+            get { return VNDBInformation.length == null ? Constants.VNLengthMapper[0] : Constants.VNLengthMapper[VNDBInformation.length]; }
         }
 
         public BasicInformation()

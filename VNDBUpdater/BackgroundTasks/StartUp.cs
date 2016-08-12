@@ -24,9 +24,9 @@ namespace VNDBUpdater.BackgroundTasks
                 switch(_Status)
                 {
                     case (TaskStatus.Running):
-                        return "Currently loading database.";
+                        return nameof(StartUp) + Constants.TaskRunning;
                     case (TaskStatus.Faulted):
-                        return "Error occured while loading database. Please check the eventlog.";
+                        return nameof(StartUp) + Constants.TaskFaulted;
                     default:
                         return string.Empty;
                 }
@@ -41,7 +41,7 @@ namespace VNDBUpdater.BackgroundTasks
 
                 FileHelper.DeleteTooLargeFile(Constants.EventlogFileName, 1000000);
 
-                EventLogger.LogInformation(nameof(StartUp), "Started. Version: " + VersionHelper.CurrentVersion + " New Version available: " + VersionHelper.NewVersionAvailable().ToString());                
+                EventLogger.LogInformation(nameof(StartUp) + ":" + nameof(Start), Constants.TaskStarted + "Version: " + VersionHelper.CurrentVersion + " New Version available: " + VersionHelper.NewVersionAvailable().ToString());                
 
                 _Status = TaskStatus.Running;
 
@@ -77,14 +77,14 @@ namespace VNDBUpdater.BackgroundTasks
                 }
 
                 _Status = TaskStatus.RanToCompletion;
-                _MainScreen.UpdateStatusText();                
+                _MainScreen.UpdateStatusText();
 
-                EventLogger.LogInformation(nameof(StartUp), "finished successfully.");                
+                EventLogger.LogInformation(nameof(StartUp) + ":" + nameof(StartUpProgram), Constants.TaskFinished);
             }
             catch (Exception ex)
             {
                 _Status = TaskStatus.Faulted;
-                EventLogger.LogError(nameof(StartUp), ex);
+                EventLogger.LogError(nameof(StartUp) + ":" + nameof(StartUpProgram), ex);
             }
         }
     }
