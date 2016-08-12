@@ -64,6 +64,8 @@ namespace VNDBUpdater.Helper
                 Description = "Select main folder where your Visual Novels are stored."
             };
 
+            fileDialog.ShowDialog();
+
             if (!string.IsNullOrWhiteSpace(fileDialog.SelectedPath))
                 return fileDialog.SelectedPath;
             else

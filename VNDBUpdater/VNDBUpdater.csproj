@@ -122,6 +122,7 @@
     <Compile Include="Helper\VNIDsSplitter.cs" />
     <Compile Include="Models\Internal\BasicInformation.cs" />
     <Compile Include="Models\Internal\CharacterInformation.cs" />
+    <Compile Include="Models\Internal\GUISettings.cs" />
     <Compile Include="Models\Internal\WindowHandler.cs" />
     <Compile Include="Models\Internal\UserOptions.cs" />
     <Compile Include="Models\MenuItem.cs" />

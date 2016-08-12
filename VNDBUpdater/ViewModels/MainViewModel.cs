@@ -27,8 +27,8 @@ namespace VNDBUpdater.ViewModels
         private Filter _AppliedFilter;
         private WindowHandler _WindowHandler;        
 
-        private int _SelectedVisualNovelTab;
-        private int _SelectedTagTab;
+        private int _SelectedVisualNovelTab = UserHelper.CurrentUser.GUI != null ? (int)UserHelper.CurrentUser.GUI.SelectedVNCategory : 0;
+        private int _SelectedTagTab = UserHelper.CurrentUser.GUI != null ? (int)UserHelper.CurrentUser.GUI.SelectedTagCategory : 0;
 
         private VNScreenshot _SelectedScreenshot;
         private CharacterInformation _SelectedCharacter;
@@ -160,6 +160,7 @@ namespace VNDBUpdater.ViewModels
             set
             {
                 _SelectedVisualNovelTab = value;
+                UserHelper.CurrentUser.GUI.SelectedVNCategory = (VisualNovelCatergory)value;
 
                 UpdateVisualNovelGrid();
 
@@ -173,6 +174,7 @@ namespace VNDBUpdater.ViewModels
             set
             {
                 _SelectedTagTab = value;
+                UserHelper.CurrentUser.GUI.SelectedTagCategory = (TagCategory)value;
 
                 UpdateTagGrid();
 
@@ -457,6 +459,7 @@ namespace VNDBUpdater.ViewModels
                 Refresher.Cancel();
                 Synchronizer.Cancel();
                 FileIndexer.Cancel();
+                UserHelper.CurrentUser.SaveUser();
                 RedisCommunication.SaveRedis();
                 RedisCommunication.Dispose();
                 VNDBCommunication.Dispose();                

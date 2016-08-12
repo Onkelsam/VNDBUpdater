@@ -9,6 +9,7 @@ namespace VNDBUpdater.Models
         public byte[] EncryptedPassword { get; set; }
 
         public UserOptions Settings { get; set; }
+        public GUISettings GUI { get; set; }
 
         public User()
         {
@@ -25,13 +26,16 @@ namespace VNDBUpdater.Models
 
             if (existingUser != null)
             {
-                Settings = existingUser.Settings;
+                Settings = existingUser.Settings ?? new UserOptions();
+                GUI = existingUser.GUI ?? new GUISettings();
+
                 Username = existingUser.Username;
                 EncryptedPassword = existingUser.EncryptedPassword;
             }
             else
             {
                 Settings = new UserOptions();
+                GUI = new GUISettings();
                 Username = null;
                 EncryptedPassword = null;
             }

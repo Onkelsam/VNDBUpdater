@@ -70,13 +70,16 @@ namespace VNDBUpdater.Models
 
             if (vn != null)
             {
-                if (vn.Basics.ConvertedTags != null)
+                if (vn.Basics != null)
                 {
-                    foreach (var tag in vn.Basics.ConvertedTags)
-                        if (tag.Category == currentCategory || currentCategory == TagCategory.All)
-                            if (tag.ShowTag())
-                                tags.Add(tag);
-                }
+                    if (vn.Basics.ConvertedTags != null)
+                    {
+                        foreach (var tag in vn.Basics.ConvertedTags)
+                            if (tag.Category == currentCategory || currentCategory == TagCategory.All)
+                                if (tag.ShowTag())
+                                    tags.Add(tag);
+                    }
+                }                
             }
             
             return tags;

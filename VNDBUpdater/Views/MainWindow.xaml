@@ -125,13 +125,7 @@
             <MenuItem Header="About" Command="{Binding Commands.About}" />
         </Menu>
 
-        <TabControl Grid.Row="1" Grid.Column="0" Grid.RowSpan="3" SelectedIndex="{Binding Path=SelectedVisualNovelTab}" HorizontalAlignment="Left" VerticalAlignment="Top">
-            <TabItem Header="Unknown" x:Name="Unsorted"/>
-            <TabItem Header="Playing" x:Name="Reading"/>
-            <TabItem Header="Finished" x:Name="OnHold"/>
-            <TabItem Header="Stalled" x:Name="PlanToRead"/>
-            <TabItem Header="Dropped" x:Name="Completed"/>
-        </TabControl>
+        <TabControl Grid.Row="1" Grid.Column="0" Grid.RowSpan="3" SelectedIndex="{Binding Path=SelectedVisualNovelTab}" HorizontalAlignment="Left" VerticalAlignment="Top" ItemsSource="{Binding Path=Categories}"/>
         <DataGrid ItemsSource="{Binding Path=VisualNovelsInGrid, UpdateSourceTrigger=PropertyChanged}" SelectedItem="{Binding Path=SelectedVisualNovel}" 
                   Grid.Row="2" Grid.RowSpan="2" Grid.Column="0"  AutoGenerateColumns="False" CanUserAddRows="False" GridLinesVisibility="None" 
                   BorderThickness="0" CanUserResizeRows="False" CanUserDeleteRows="False" RowHeaderWidth="0" SelectionMode="Single" Background="{DynamicResource {x:Static SystemColors.ControlLightLightBrushKey}}" AlternationCount="1">
@@ -263,7 +257,7 @@
         </DataGrid>
 
         <GroupBox Grid.Column="1" Grid.Row="3" Header="Description" BorderBrush="AliceBlue" BorderThickness="2">
-            <RichTextBox Grid.Column="1" Grid.Row="3" Grid.ColumnSpan="1" IsReadOnly="True" BorderThickness="0" Background="{DynamicResource {x:Static SystemColors.MenuBarBrushKey}}">
+            <RichTextBox Grid.Column="1" Grid.Row="3" Grid.ColumnSpan="1" IsReadOnly="True" BorderThickness="0" Background="{DynamicResource {x:Static SystemColors.MenuBarBrushKey}}" VerticalScrollBarVisibility="Auto">
                 <FlowDocument>
                     <Paragraph>
                         <Run Text="{Binding Path=SelectedVisualNovel.Basics.VNDBInformation.description}" />
