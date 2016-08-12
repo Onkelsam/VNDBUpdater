@@ -33,6 +33,7 @@ Done:
     - Add scrollbar to vn description window.
     - Remember user tabs so they will be the same when starting the program again.
     - Fixed bug that could crash the program if you had a vn selected and a property was null and you changed the category tab.
+    - Fixed problem with the indexer.
   
       
 OnHold:
