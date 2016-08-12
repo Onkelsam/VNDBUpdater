@@ -16,6 +16,7 @@ Implementation planned:
     - Add navigation buttons to screenshots and a number (current picture is X of Y available pictures).
     - Add vns with vn name. Propably in conjunction with the changes to the file indexer. Will be a pain...
   
+  
 Current tasks:
   
   Minor tasks:
@@ -23,9 +24,16 @@ Current tasks:
     - Finding bugs and fixing them.
     
     - Improving the GUI:
-      - Add scroll bar to vn description window.
-      - Remember user tabs so they will be the same when starting the program again.
-      - Remember user column reordering and resizing.
+      - Remember user column reordering and resizing. -> Pretty difficult.
+
+
+Done:
+
+  Minor:
+    - Add scrollbar to vn description window.
+    - Remember user tabs so they will be the same when starting the program again.
+    - Fixed bug that could crash the program if you had a vn selected and a property was null and you changed the category tab.
+  
       
 OnHold:
 
