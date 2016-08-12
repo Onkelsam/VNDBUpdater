@@ -26,7 +26,7 @@ namespace VNDBUpdater.BackgroundTasks
                 switch (_Status)
                 {
                     case (TaskStatus.Running):
-                        return "Synchronizer is currently running. " + _MainScreen.CompletedPendingTasks + " from " + _MainScreen.CurrentPendingTasks + " Visual Novels synced.";
+                        return "Synchronizer is currently running. " + _MainScreen.CompletedPendingTasks + " of " + _MainScreen.CurrentPendingTasks + " Visual Novels synced.";
                     case (TaskStatus.RanToCompletion):
                         return "Synchronizer is finished.";
                     case (TaskStatus.Faulted):
@@ -54,7 +54,6 @@ namespace VNDBUpdater.BackgroundTasks
                     return;
                 }
 
-                _MainScreen.CompletedPendingTasks = 0;
                 _Status = TaskStatus.Running;
 
                 _BackgroundTask = new Task(Synchronize, _CancelToken);
@@ -75,17 +74,16 @@ namespace VNDBUpdater.BackgroundTasks
             try
             {
                 List<VN> VNList = VNDBCommunication.GetVisualNovelListFromVNDB();
-                List<Wish> WishList = VNDBCommunication.GetWishListFromVNDB();
                 List<Vote> VoteList = VNDBCommunication.GetVoteListFromVNDB();
 
-                int count = VNList.Count + WishList.Count + VoteList.Count;
+                int count = VNList.Count + VoteList.Count;
 
-                EventLogger.LogInformation(nameof(Synchronizer), "pending Tasks: " + count.ToString());                
+                EventLogger.LogInformation(nameof(Synchronizer), "pending Tasks: " + count.ToString());
 
+                _MainScreen.CompletedPendingTasks = 0;
                 _MainScreen.CurrentPendingTasks = count;
 
                 SynchronizeVNs(VNList);
-                SynchronizeWishes(WishList);
                 SynchronizeVotes(VoteList);
 
                 _Status = TaskStatus.RanToCompletion;
@@ -128,7 +126,7 @@ namespace VNDBUpdater.BackgroundTasks
                 GetVNs(VNsToAdd);
         }
 
-        private void SynchronizeWishes(List<Wish> WishesToSynchronize)
+        /*private void SynchronizeWishes(List<Wish> WishesToSynchronize)
         {
             var VNsToAdd = new List<VN>();
 
@@ -153,7 +151,7 @@ namespace VNDBUpdater.BackgroundTasks
 
             if (VNsToAdd.Any())
                 GetVNs(VNsToAdd);
-        }
+        }*/
 
         private void SynchronizeVotes(List<Vote> VotesToSynchronize)
         {

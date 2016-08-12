@@ -65,6 +65,7 @@
         <converters:AliasesConverter x:Key="AliasesConverter" />
         <converters:PlayTimeConverter x:Key="PlayTimeConverter" />
         <converters:RelationsConverter x:Key="RelationsConverter" />
+        <local:MainViewModel x:Key="MainViewM" />
     </Window.Resources>
 
     <Grid>
@@ -130,16 +131,15 @@
             <TabItem Header="Finished" x:Name="OnHold"/>
             <TabItem Header="Stalled" x:Name="PlanToRead"/>
             <TabItem Header="Dropped" x:Name="Completed"/>
-            <TabItem Header="Wishlist" x:Name="Wishlist"/>
         </TabControl>
         <DataGrid ItemsSource="{Binding Path=VisualNovelsInGrid, UpdateSourceTrigger=PropertyChanged}" SelectedItem="{Binding Path=SelectedVisualNovel}" 
                   Grid.Row="2" Grid.RowSpan="2" Grid.Column="0"  AutoGenerateColumns="False" CanUserAddRows="False" GridLinesVisibility="None" 
                   BorderThickness="0" CanUserResizeRows="False" CanUserDeleteRows="False" RowHeaderWidth="0" SelectionMode="Single" Background="{DynamicResource {x:Static SystemColors.ControlLightLightBrushKey}}" AlternationCount="1">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Name" Binding="{Binding Path=Basics.VNDBInformation.title}" IsReadOnly="True" Width="5*" />
-                <DataGridTextColumn Header="Original Name" Binding="{Binding Path=Basics.VNDBInformation.original}" IsReadOnly="True" Width="1*"  />
-                <DataGridTextColumn Header="VNDB Score" Binding="{Binding Path=Basics.VNDBInformation.rating}" IsReadOnly="True" Width="2*" />
-                <DataGridTextColumn Header="VNDB Popularity" Binding="{Binding Path=Basics.VNDBInformation.popularity}" IsReadOnly="True" Width="2*" />
+                <DataGridTextColumn Header="Original Name" Binding="{Binding Path=Basics.VNDBInformation.original}" IsReadOnly="True" Width="1*" Visibility="{Binding Source={StaticResource MainViewM}, Path=OriginalNameVisible, Mode=OneWay, BindsDirectlyToSource=True}" />
+                <DataGridTextColumn Header="VNDB Score" Binding="{Binding Path=Basics.VNDBInformation.rating}" IsReadOnly="True" Width="2*" Visibility="{Binding Source={StaticResource MainViewM}, Path=VNDBScoreVisible, Mode=OneWay}" />
+                <DataGridTextColumn Header="VNDB Popularity" Binding="{Binding Path=Basics.VNDBInformation.popularity}" IsReadOnly="True" Width="2*" Visibility="{Binding Source={StaticResource MainViewM}, Path=VNDBPopularityVisible, Mode=OneWay}"/>
                 <DataGridTextColumn Header="Own Score" Binding="{Binding Path=ScoreInDouble}" IsReadOnly="True" Width="2*"/>
             </DataGrid.Columns>
             <DataGrid.Resources>
@@ -148,7 +148,7 @@
             </DataGrid.Resources>
             <DataGrid.RowDetailsTemplate>
                 <DataTemplate>
-                    <Border Padding="4">
+                    <Border Padding="20,5,0,5">
                         <StackPanel Orientation="Vertical">
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" MaxWidth="500">
@@ -209,7 +209,7 @@
 
         <GroupBox Grid.Column="2" Grid.Row="3" Header="Characters" BorderBrush="AliceBlue" BorderThickness="2">
             <Button Style="{DynamicResource NoChromeButton}" Command="{Binding Commands.NextCharacter}">
-                <Image Source="{Binding Path=SelectedCharacter.VNDBInformation.image, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, IsAsync=True}" Stretch="Fill" ToolTipService.ShowDuration="60000">
+                <Image Source="{Binding Path=SelectedCharacter.VNDBInformation.image, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, IsAsync=True}" Stretch="{Binding Path=StretchImages}" ToolTipService.ShowDuration="60000">
                     <Image.ToolTip>
                         <TextBlock TextWrapping="WrapWithOverflow" MaxWidth="600">
                             <TextBlock.Text>
@@ -227,7 +227,7 @@
 
         <GroupBox Grid.Column="2" Grid.Row="1" Grid.RowSpan="2" Header="Screenshots" BorderBrush="AliceBlue" BorderThickness="2">
             <Button Style="{DynamicResource NoChromeButton}" Command="{Binding Commands.NextScreenshot}">
-                <Image Source="{Binding Path=SelectedScreenshot.image, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, IsAsync=True}" Stretch="Fill" />
+                <Image Source="{Binding Path=SelectedScreenshot.image, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, IsAsync=True}" StretchDirection="DownOnly" Stretch="{Binding Path=StretchImages}" />
             </Button>
         </GroupBox>
 

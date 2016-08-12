@@ -93,6 +93,59 @@ namespace VNDBUpdater.ViewModels
             }
         }
 
+        public string LoginState
+        {
+            get { return VNDBCommunication.StatusString; }
+        }
+
+        public bool Fill
+        {
+            get { return _User.Settings.StretchFormat == "Fill" ? true : false; }
+            set
+            {
+                if (value)
+                    _User.Settings.StretchFormat = "Fill";
+                else
+                    _User.Settings.StretchFormat = "Uniform";
+            }
+        }       
+
+        public bool OriginalNameVisible
+        {
+            get { return _User.Settings.OriginalNameTab == ColumnVisibility.Visible ? true : false; }
+            set
+            {
+                if (value)
+                    _User.Settings.OriginalNameTab = ColumnVisibility.Visible;
+                else
+                    _User.Settings.OriginalNameTab = ColumnVisibility.Collapsed;
+            }
+        }
+
+        public bool VNDBVoteVisible
+        {
+            get { return _User.Settings.VNDBVoteTab == ColumnVisibility.Visible ? true : false; }
+            set
+            {
+                if (value)
+                    _User.Settings.VNDBVoteTab = ColumnVisibility.Visible;
+                else
+                    _User.Settings.VNDBVoteTab = ColumnVisibility.Collapsed;
+            }
+        }
+
+        public bool VNDBPopularityVisible
+        {
+            get { return _User.Settings.VNDBPopularityTab == ColumnVisibility.Visible ? true : false; }
+            set
+            {
+                if (value)
+                    _User.Settings.VNDBPopularityTab = ColumnVisibility.Visible;
+                else
+                    _User.Settings.VNDBPopularityTab = ColumnVisibility.Collapsed;
+            }
+        }
+
         public void ExecuteLoginCommand(object parameter)
         {
             if (UserHelper.CurrentUser.EncryptedPassword != null)
@@ -155,6 +208,7 @@ namespace VNDBUpdater.ViewModels
         public void ExecuteSaveSettings(object parameter)
         {
             _User.SaveUser();
+            (parameter as Window).Close();
         }
 
         private void Login()
@@ -175,6 +229,7 @@ namespace VNDBUpdater.ViewModels
             }
 
             _MainScreen.UpdateStatusText();
+            OnPropertyChanged(nameof(LoginState));
         }
     }
 }

@@ -248,6 +248,26 @@ namespace VNDBUpdater.ViewModels
             }
         }
 
+        public string StretchImages
+        {
+            get { return UserHelper.CurrentUser.Settings.StretchFormat; }
+        }
+
+        public string OriginalNameVisible
+        {
+            get { return UserHelper.CurrentUser.Settings.OriginalNameTab.ToString(); }
+        }
+
+        public string VNDBScoreVisible
+        {
+            get { return UserHelper.CurrentUser.Settings.VNDBVoteTab.ToString(); }
+        }
+
+        public string VNDBPopularityVisible
+        {
+            get { return UserHelper.CurrentUser.Settings.VNDBPopularityTab.ToString(); }
+        }
+
         public string Title
         {
             get
@@ -290,11 +310,13 @@ namespace VNDBUpdater.ViewModels
 
         public void ExecuteNextScreenshot(object parameter)
         {
+            OnPropertyChanged(nameof(StretchImages));
             SelectedScreenshot = _SelectedVisualNovel.GetNextScreenshot(SelectedScreenshot);
         }
 
         public void ExecuteNextCharacter(object paramter)
         {
+            OnPropertyChanged(nameof(StretchImages));
             SelectedCharacter = _SelectedVisualNovel.NextCharacter(SelectedCharacter);
         }
 
@@ -346,7 +368,10 @@ namespace VNDBUpdater.ViewModels
 
         public void ExecuteSelectVisualNovel(object parameter)
         {
-            SelectedVisualNovel = LocalVisualNovelHelper.GetVisualNovel((int)parameter);
+            var visualNovel = LocalVisualNovelHelper.GetVisualNovel((int)parameter);
+
+            SelectedVisualNovelTab = (int)visualNovel.Category;
+            SelectedVisualNovel = visualNovel;
         }
 
         public void ExecuteAddRelation(object parameter)
@@ -517,7 +542,7 @@ namespace VNDBUpdater.ViewModels
         {
             _WindowHandler.Open(new Options(this));
         }
-        
+
         private void UpdateTagGrid()
         {
             TagsInGrid.Clear();

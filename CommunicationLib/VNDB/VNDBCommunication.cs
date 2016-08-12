@@ -12,7 +12,7 @@ namespace CommunicationLib.VNDB
 
         public bool IsConnected
         {
-            get { return _IsConnected; }
+            get { return Client == null ? false : Client.IsConnected; }
         }
 
         public Options VNDBOptions

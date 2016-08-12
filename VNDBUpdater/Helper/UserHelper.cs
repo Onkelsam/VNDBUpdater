@@ -7,18 +7,22 @@ namespace VNDBUpdater.Helper
     {
         private static User _CurrentUser;
 
+        private static object Lock = new object();
+
         public static User CurrentUser
         {
-            private set { _CurrentUser = value; }
             get
             {
-                if (_CurrentUser == null)
+                lock (Lock)
                 {
-                    _CurrentUser = new User();
-                    _CurrentUser.GetUser();
-                }
+                    if (_CurrentUser == null)
+                    {
+                        _CurrentUser = new User();
+                        _CurrentUser.GetUser();
+                    }
 
-                return _CurrentUser;
+                    return _CurrentUser;
+                }                
             }
         }
     }

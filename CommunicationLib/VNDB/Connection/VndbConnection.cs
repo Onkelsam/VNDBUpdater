@@ -17,13 +17,7 @@ namespace CommunicationLib.VNDB.Connection
 
         public bool IsConnected
         {
-            get
-            {
-                if (TcpClient != null)
-                    return TcpClient.Connected;
-                else
-                    return false;
-            }
+            get { return TcpClient == null ? false : TcpClient.Connected; }
         }
 
         public VndbConnection()

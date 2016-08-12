@@ -51,7 +51,7 @@ namespace VNDBUpdater.Communication.VNDB
 
         public static void Connect()
         {
-            if (_Status != VNDBCommunicationStatus.LoggedIn)
+            if (_Status != VNDBCommunicationStatus.LoggedIn || !Connection.IsConnected)
             {                
                 try
                 {
@@ -64,7 +64,7 @@ namespace VNDBUpdater.Communication.VNDB
                         {
                             EventLogger.LogInformation(nameof(VNDBCommunication), "Connecting faild because of throttling error. Trying reconnect.");                            
                             Connect(); // If the connection was throttled try again (after waiting 'minwait').
-                        }                            
+                        }                                                    
                         else
                         {
                             EventLogger.LogInformation(nameof(VNDBCommunication), "Connecting failed because of unknown error. Abort connecting procedure.");                           
@@ -117,6 +117,8 @@ namespace VNDBUpdater.Communication.VNDB
 
         public static List<VisualNovel> FetchVisualNovels(List<int> IDs)
         {
+            CheckConnection();
+
             var visualNovels = new List<VisualNovel>();
 
             var idSplitter = new VNIDsSplitter(IDs.ToArray());
@@ -139,6 +141,8 @@ namespace VNDBUpdater.Communication.VNDB
 
         public static VisualNovel FetchVisualNovel(int ID)
         {
+            CheckConnection();
+
             var visualNovel = new VisualNovel();
 
             visualNovel.Basics = new BasicInformation(GetBasicInformation(ID).items[0]);
@@ -180,46 +184,43 @@ namespace VNDBUpdater.Communication.VNDB
 
         public static List<VN> GetVisualNovelListFromVNDB()
         {
-            return GetList<VN, VNListRoot>(Connection.QueryVNList);
-        }
+            CheckConnection();
 
-        public static List<Wish> GetWishListFromVNDB()
-        {
-            return GetList<Wish, WishListRoot>(Connection.QueryWishList);
+            return GetList<VN, VNListRoot>(Connection.QueryVNList);
         }
 
         public static List<Vote> GetVoteListFromVNDB()
         {
+            CheckConnection();
+
             return GetList<Vote, VoteListRoot>(Connection.QueryVoteList);
         }
 
         public static void SetVNList(VisualNovel VN)
         {
-            SetList<SetJSONObjects.State>(VN, new SetJSONObjects.State { status = (int)VN.Category }, Connection.SetVNList);
-        }
+            CheckConnection();
 
-        public static void SetWishList(VisualNovel VN)
-        {
-            SetList<SetJSONObjects.Priority>(VN, new SetJSONObjects.Priority { priority = 1 }, Connection.SetWishList);
+            SetList<SetJSONObjects.State>(VN, new SetJSONObjects.State { status = (int)VN.Category }, Connection.SetVNList);
         }
 
         public static void SetVoteList(VisualNovel VN)
         {
+            CheckConnection();
+
             SetList<SetJSONObjects.Vote>(VN, new SetJSONObjects.Vote { vote = VN.Score }, Connection.SetVote);
         }
 
         public static void RemoveFromVNList(VisualNovel VN)
         {
-            RemoveFromList(VN, Connection.DeleteVNFromVNList);
-        }
+            CheckConnection();
 
-        public static void RemoveFromWishList(VisualNovel VN)
-        {
-            RemoveFromList(VN, Connection.DeleteVNFromWishList);
+            RemoveFromList(VN, Connection.DeleteVNFromVNList);
         }
 
         public static void RemoveFromScoreList(VisualNovel VN)
         {
+            CheckConnection();
+
             RemoveFromList(VN, Connection.DeleteVote);
         }
 
@@ -371,6 +372,13 @@ namespace VNDBUpdater.Communication.VNDB
                 _Status = VNDBCommunicationStatus.Throttled;
                 return ErrorResponse.Throttled;
             }
+            else if (error.id == "auth")
+            {
+                EventLogger.LogInformation(nameof(HandleError), "VNDB Authentication failed.");
+                _Status = VNDBCommunicationStatus.Error;
+                _ErrorMessage = "Wrong Username/Password combination.";
+                return ErrorResponse.Unknown;
+            }
             else
             {
                 EventLogger.LogInformation(nameof(VNDBCommunication), "Unknown error by VNDB received. Aborting connection.");                
@@ -378,6 +386,12 @@ namespace VNDBUpdater.Communication.VNDB
                 _ErrorMessage = "Error while communicating with VNDB: Error ID: '" + error.id + "' Error message: '" + error.msg + "'";
                 return ErrorResponse.Unknown;
             }
+        }
+
+        private static void CheckConnection()
+        {
+            if (_Status != VNDBCommunicationStatus.LoggedIn || !Connection.IsConnected)
+                Connect();
         }
 
         public static void Disconnect()

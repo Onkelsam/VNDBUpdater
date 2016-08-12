@@ -16,7 +16,6 @@ namespace VNDBUpdater.Data
         Finished,
         Stalled,
         Dropped,
-        Wish
     };
 
     public enum ErrorResponse : byte
@@ -45,5 +44,12 @@ namespace VNDBUpdater.Data
         none = 0,
         minor,
         major
+    };
+
+    public enum ColumnVisibility : byte
+    {
+        Collapsed = 0,
+        Hidden,
+        Visible
     };
 }

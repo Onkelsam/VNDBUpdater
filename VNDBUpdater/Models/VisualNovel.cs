@@ -149,10 +149,7 @@ namespace VNDBUpdater.Models
         {
             Category = category;
 
-            if (Category == VisualNovelCatergory.Wish)
-                VNDBCommunication.SetWishList(this);
-            else
-                VNDBCommunication.SetVNList(this);
+            VNDBCommunication.SetVNList(this);
 
             LocalVisualNovelHelper.AddVisualNovel(this);
         }
@@ -231,7 +228,6 @@ namespace VNDBUpdater.Models
             {
                 LocalVisualNovelHelper.RemoveVisualNovel(this);
                 VNDBCommunication.RemoveFromScoreList(this);
-                VNDBCommunication.RemoveFromWishList(this);
                 VNDBCommunication.RemoveFromVNList(this);
                 return true;
             }
