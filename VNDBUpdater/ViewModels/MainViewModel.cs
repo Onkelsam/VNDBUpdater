@@ -250,7 +250,7 @@ namespace VNDBUpdater.ViewModels
 
         public string StretchImages
         {
-            get { return UserHelper.CurrentUser.Settings.StretchFormat.ToString(); }
+            get { return UserHelper.CurrentUser.Settings.StretchFormat; }
         }
 
         public string OriginalNameVisible
@@ -461,7 +461,7 @@ namespace VNDBUpdater.ViewModels
                 RedisCommunication.Dispose();
                 VNDBCommunication.Dispose();                
                 EventLogger.LogInformation(nameof(MainViewModel) + ":" + nameof(ExecuteCloseWindow), "Shutdown successfull.");
-                _WindowHandler.CloseAllWindows();
+                _WindowHandler.CloseAllWindows();                
                 Application.Current.Shutdown();
             }
             catch (Exception ex)

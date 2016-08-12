@@ -37,9 +37,7 @@ namespace VNDBUpdater.BackgroundTasks
         {
             if (_Status != TaskStatus.Running)
             {
-                base.Start(MainScreen);
-
-                FileHelper.DeleteTooLargeFile(Constants.EventlogFileName, 1000000);
+                base.Start(MainScreen);                
 
                 EventLogger.LogInformation(nameof(StartUp) + ":" + nameof(Start), Constants.TaskStarted + "Version: " + VersionHelper.CurrentVersion + " New Version available: " + VersionHelper.NewVersionAvailable().ToString());                
 

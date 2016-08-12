@@ -8,7 +8,7 @@ namespace VNDBUpdater.Models.Internal
         public bool ShowNSFWImages { get; set; }
         public bool MinimizeToTray { get; set; }
         public string InstallFolderPath { get; set; }
-        public ImageFormat StretchFormat { get; set; }
+        public string StretchFormat { get; set; }
         public ColumnVisibility OriginalNameTab { get; set; }
         public ColumnVisibility VNDBVoteTab { get; set; }
         public ColumnVisibility VNDBPopularityTab { get; set; }
@@ -19,7 +19,7 @@ namespace VNDBUpdater.Models.Internal
             ShowNSFWImages = false;
             MinimizeToTray = false;
             InstallFolderPath = null;
-            StretchFormat = ImageFormat.Fill;
+            StretchFormat = "Fill";
             OriginalNameTab = ColumnVisibility.Collapsed;
             VNDBVoteTab =  ColumnVisibility.Visible;
             VNDBPopularityTab = ColumnVisibility.Visible;

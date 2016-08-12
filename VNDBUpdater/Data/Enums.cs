@@ -47,12 +47,6 @@ namespace VNDBUpdater.Data
         major
     };
 
-    public enum ImageFormat : byte
-    {
-        Fill = 0,
-        Uniform
-    };
-
     public enum ColumnVisibility : byte
     {
         Collapsed = 0,

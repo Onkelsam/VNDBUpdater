@@ -1,5 +1,7 @@
 ﻿using System.Windows;
 using VNDBUpdater.BackgroundTasks;
+using VNDBUpdater.Data;
+using VNDBUpdater.Helper;
 using VNDBUpdater.ViewModels;
 
 namespace VNDBUpdater.Views
@@ -11,10 +13,12 @@ namespace VNDBUpdater.Views
     {
         public MainWindow()
         {
+            FileHelper.DeleteTooLargeFile(Constants.EventlogFileName, 1000000);
+
             InitializeComponent();
 
             DataContext = new MainViewModel();
-            
+
             var Startup = new StartUp();
             Startup.Start((DataContext as MainViewModel));    
         }
