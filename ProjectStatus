@@ -1,14 +1,12 @@
 Implementation planned:
   
   Minor tasks:
-    - Change file indexer so multiple paths to VN directories can be added (e.g. Steam).
+    
     
     
   Medium tasks:
     - Wishlist implementation. Propably in a new window.
-    - Display related visual novels as link, so you can click on them to get to the VNDB page 
-      or select the vn if it is already on your list.
-    
+
     
   Major tasks:
     - Change file indexer so it can find VNs by directory name and fetch the info from VNDB.org.
@@ -23,7 +21,13 @@ Current tasks:
     
     - Improving the GUI:
       - Remember user column reordering and resizing. -> Pretty difficult.
-
+      
+    - Change file indexer so multiple paths to VN directories can be added (e.g. Steam).
+      
+  Medium tasks:  
+      - Display related visual novels as link, so you can click on them to get to the VNDB page 
+      or select the vn if it is already on your list.
+      
 
 Done:
 
