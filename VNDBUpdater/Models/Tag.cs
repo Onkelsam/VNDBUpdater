@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using CodeKicker.BBCode;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -45,7 +46,7 @@ namespace VNDBUpdater.Models
                     var newTag = new Tag()
                     {
                         Category = foundTag.Category,
-                        Description = foundTag.Description,
+                        Description = BBCode.ToHtml(foundTag.Description),
                         ID = foundTag.ID,
                         Name = foundTag.Name,
                         Score = foundTag.Score,

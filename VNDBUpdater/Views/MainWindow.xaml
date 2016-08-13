@@ -6,7 +6,7 @@
         xmlns:converters="clr-namespace:VNDBUpdater.ValueConverters"
         xmlns:tb="http://www.hardcodet.net/taskbar"
         x:Name="MainView"
-        Title="{Binding Path=Title}" Height="665" Width="1213.775" 
+        Title="{Binding Path=Title}" Height="{Binding Height, Mode=TwoWay}" Width="{Binding Width, Mode=TwoWay}" WindowStartupLocation="CenterScreen"
         Background="{DynamicResource {x:Static SystemColors.MenuBarBrushKey}}">
 
     <i:Interaction.Triggers>
@@ -15,6 +15,9 @@
         </i:EventTrigger>
         <i:EventTrigger EventName="StateChanged">
             <i:InvokeCommandAction Command="{Binding Commands.StateChanged}" CommandParameter="{Binding ElementName=MainView}"/>
+        </i:EventTrigger>
+        <i:EventTrigger EventName="SizeChanged">
+            <i:InvokeCommandAction Command="{Binding Commands.Resized}" CommandParameter="{Binding ElementName=MainView}" />
         </i:EventTrigger>
     </i:Interaction.Triggers>
 
@@ -71,13 +74,14 @@
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="250*" />
-            <ColumnDefinition Width="125*" />
+            <ColumnDefinition Width="150*" />
             <ColumnDefinition Width="200*" />
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="20*" MaxHeight="20" MinHeight="20"/>
             <RowDefinition Height="20*" MaxHeight="20" MinHeight="20"/>
             <RowDefinition Height="125*" />
+            <RowDefinition Height="20*" MaxHeight="20" MinHeight="20"/>
             <RowDefinition Height="125*" />
             <RowDefinition Height="10*" />
         </Grid.RowDefinitions>
@@ -125,9 +129,9 @@
             <MenuItem Header="About" Command="{Binding Commands.About}" />
         </Menu>
 
-        <TabControl Grid.Row="1" Grid.Column="0" Grid.RowSpan="3" SelectedIndex="{Binding Path=SelectedVisualNovelTab}" HorizontalAlignment="Left" VerticalAlignment="Top" ItemsSource="{Binding Path=Categories}"/>
+        <TabControl Grid.Row="1" Grid.Column="0" Grid.RowSpan="1" SelectedIndex="{Binding Path=SelectedVisualNovelTab}" HorizontalAlignment="Left" VerticalAlignment="Top" ItemsSource="{Binding Path=Categories}"/>
         <DataGrid ItemsSource="{Binding Path=VisualNovelsInGrid, UpdateSourceTrigger=PropertyChanged}" SelectedItem="{Binding Path=SelectedVisualNovel}" 
-                  Grid.Row="2" Grid.RowSpan="2" Grid.Column="0"  AutoGenerateColumns="False" CanUserAddRows="False" GridLinesVisibility="None" 
+                  Grid.Row="2" Grid.RowSpan="3" Grid.Column="0"  AutoGenerateColumns="False" CanUserAddRows="False" GridLinesVisibility="None" 
                   BorderThickness="0" CanUserResizeRows="False" CanUserDeleteRows="False" RowHeaderWidth="0" SelectionMode="Single" Background="{DynamicResource {x:Static SystemColors.ControlLightLightBrushKey}}" AlternationCount="1">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Name" Binding="{Binding Path=Basics.VNDBInformation.title}" IsReadOnly="True" Width="5*" />
@@ -140,27 +144,6 @@
                 <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="LightBlue"/>
                 <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="LightBlue"/>
             </DataGrid.Resources>
-            <DataGrid.RowDetailsTemplate>
-                <DataTemplate>
-                    <Border Padding="20,5,0,5">
-                        <StackPanel Orientation="Vertical">
-                            <StackPanel Orientation="Horizontal">
-                                <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" MaxWidth="500">
-                                    <TextBlock.Text>
-                                        <MultiBinding StringFormat="{}Aliases: {0}&#x0a;Length: {1}&#x0a;Released: {2}&#x0a;Related VNs: {3}&#x0a;Playtime: {4}">
-                                            <Binding Path="Basics.VNDBInformation.aliases" Converter="{StaticResource AliasesConverter }" />
-                                            <Binding Path="Basics.Length" Mode="OneWay"/>
-                                            <Binding Path="Basics.VNDBInformation.released" />
-                                            <Binding Path="Basics.VNDBInformation.relations" Converter="{StaticResource RelationsConverter}" />
-                                            <Binding Path="Playtime" Converter="{StaticResource PlayTimeConverter}"/>
-                                        </MultiBinding>
-                                    </TextBlock.Text>
-                                </TextBlock>
-                            </StackPanel>
-                        </StackPanel>
-                    </Border>
-                </DataTemplate>
-            </DataGrid.RowDetailsTemplate>
             <DataGrid.ContextMenu>
                 <ContextMenu Name="MainMenu">
                     <MenuItem Header="Start Game" Command="{Binding Commands.StartVisualNovel}" />
@@ -201,72 +184,107 @@
             </DataGrid.ContextMenu>
         </DataGrid>
 
-        <GroupBox Grid.Column="2" Grid.Row="3" Header="Characters" BorderBrush="AliceBlue" BorderThickness="2">
-            <Button Style="{DynamicResource NoChromeButton}" Command="{Binding Commands.NextCharacter}">
-                <Image Source="{Binding Path=SelectedCharacter.VNDBInformation.image, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, IsAsync=True}" Stretch="{Binding Path=StretchImages}" ToolTipService.ShowDuration="60000">
-                    <Image.ToolTip>
-                        <TextBlock TextWrapping="WrapWithOverflow" MaxWidth="600">
-                            <TextBlock.Text>
-                                <MultiBinding StringFormat="{}{0}&#x0a;&#x0a;{1}&#x0a;&#x0a;{2}">
-                                    <Binding Path="SelectedCharacter.VNDBInformation.name" />
-                                    <Binding Path="SelectedCharacter.VNDBInformation.description" />
-                                    <Binding Path="SelectedCharacter.ConvertedTraits" Converter="{StaticResource TraitsListToStringConvert}" />
-                                </MultiBinding>
-                            </TextBlock.Text>
-                        </TextBlock>
-                    </Image.ToolTip>
-                </Image>
-            </Button>
-        </GroupBox>
+        <Image Source="{Binding Path=SelectedVisualNovel.Basics.MainThumb}" Stretch="{Binding Path=StretchImages}" Grid.Column="1" Grid.Row="2" Margin="2" />
 
-        <GroupBox Grid.Column="2" Grid.Row="1" Grid.RowSpan="2" Header="Screenshots" BorderBrush="AliceBlue" BorderThickness="2">
-            <Button Style="{DynamicResource NoChromeButton}" Command="{Binding Commands.NextScreenshot}">
-                <Image Source="{Binding Path=SelectedScreenshot.image, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, IsAsync=True}" StretchDirection="DownOnly" Stretch="{Binding Path=StretchImages}" />
-            </Button>
-        </GroupBox>
+        <ScrollViewer Grid.Column="2" Grid.Row="2" Margin="2">
+            <StackPanel>
+                <TextBlock>
+                    <TextBlock.Text>
+                        <MultiBinding StringFormat="{}Aliases:&#x09;&#x09;{0}&#x0a;&#x0a;Length:&#x09;&#x09;{1}&#x0a;&#x0a;Released:&#x09;{2}&#x0a;&#x0a;Related VNs:&#x09;{3}&#x0a;&#x0a;Playtime: &#x09;{4}&#x0a;&#x0a;">
+                            <Binding Path="SelectedVisualNovel.Basics.VNDBInformation.aliases" Converter="{StaticResource AliasesConverter }" />
+                            <Binding Path="SelectedVisualNovel.Basics.Length" Mode="OneWay"/>
+                            <Binding Path="SelectedVisualNovel.Basics.VNDBInformation.released" />
+                            <Binding Path="SelectedVisualNovel.Basics.VNDBInformation.relations" Converter="{StaticResource RelationsConverter}" />
+                            <Binding Path="SelectedVisualNovel.Playtime" Converter="{StaticResource PlayTimeConverter}"/>
+                        </MultiBinding>
+                    </TextBlock.Text>
+                </TextBlock>
+                <RichTextBox Background="{DynamicResource {x:Static SystemColors.MenuBarBrushKey}}" BorderThickness="0" converters:HtmlRichTextBoxBehavior.Text="{Binding Path=SelectedVisualNovel.Basics.Description}"/>
+            </StackPanel>
+        </ScrollViewer>
 
-        <TabControl Grid.Row="1" Grid.Column="1" SelectedIndex="{Binding SelectedTagTab}">
-            <TabItem Header="All" x:Name="All" />
-            <TabItem Header="Content" x:Name="Content" />
-            <TabItem Header="Sexual Content" x:Name="SexualContent" />
-            <TabItem Header="Technical" x:Name="Technical" />
+        <TabControl Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2" SelectedIndex="{Binding Path=SelectedSubTab}" HorizontalAlignment="Left" VerticalAlignment="Top">
+            <TabItem Header="Tags"/>
+            <TabItem Header="Screenshots" />
+            <TabItem Header="Characters" />
         </TabControl>
-        <DataGrid ItemsSource="{Binding Path=TagsInGrid, UpdateSourceTrigger=PropertyChanged}"
-                  Grid.Row="2" Grid.Column="1" CanUserAddRows="False" GridLinesVisibility="None" BorderThickness="0" AutoGenerateColumns="False" 
-                  ScrollViewer.VerticalScrollBarVisibility="Visible" CanUserResizeRows="False" CanUserDeleteRows="False" 
-                  RowHeaderWidth="0" SelectionMode="Single" Background="{DynamicResource {x:Static SystemColors.ControlLightLightBrushKey}}">
-            <DataGrid.Resources>
-                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="LightBlue"/>
-                <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="LightBlue"/>
-            </DataGrid.Resources>
-            <DataGrid.RowDetailsTemplate>
-                <DataTemplate>
-                    <Border Padding="4">
-                        <StackPanel Orientation="Vertical">
-                            <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="{Binding Path=Description}" HorizontalAlignment="Left" TextWrapping="Wrap" MaxWidth="250"/>
-                            </StackPanel>
-                        </StackPanel>
-                    </Border>
-                </DataTemplate>
-            </DataGrid.RowDetailsTemplate>
-            <DataGrid.Columns>
-                <DataGridTextColumn Header="Tag" Binding="{Binding Path=Name}" IsReadOnly="True" Width="*" />
-                <DataGridTextColumn Header="Score" Binding="{Binding Path=Score}" IsReadOnly="True" Selector.IsSelected="True"/>
-            </DataGrid.Columns>
-        </DataGrid>
 
-        <GroupBox Grid.Column="1" Grid.Row="3" Header="Description" BorderBrush="AliceBlue" BorderThickness="2">
-            <RichTextBox Grid.Column="1" Grid.Row="3" Grid.ColumnSpan="1" IsReadOnly="True" BorderThickness="0" Background="{DynamicResource {x:Static SystemColors.MenuBarBrushKey}}" VerticalScrollBarVisibility="Auto">
-                <FlowDocument>
-                    <Paragraph>
-                        <Run Text="{Binding Path=SelectedVisualNovel.Basics.VNDBInformation.description}" />
-                    </Paragraph>
-                </FlowDocument>
-            </RichTextBox>
-        </GroupBox>
+        <Grid Grid.Column="1" Grid.Row="4" Grid.ColumnSpan="2" Visibility="{Binding Path=ScreenshotTabVisibility}" Margin="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="18*" MinWidth="30" MaxWidth="30"/>
+                <ColumnDefinition Width="30*"/>
+                <ColumnDefinition Width="18*" MinWidth="30" MaxWidth="30"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="20*"/>
+                <RowDefinition Height="10*" MinHeight="30" MaxHeight="30"/>
+                <RowDefinition Height="20*"/>
+            </Grid.RowDefinitions>
 
-        <StatusBar Grid.Row="4" Grid.ColumnSpan="3">
+            <Image Grid.Column="1" Grid.RowSpan="3" Source="{Binding Path=SelectedScreenshot.image}" Stretch="{Binding Path=StretchImages}" />
+            <Button Content="4" Grid.Column="2" Grid.Row="1" FontFamily="Marlett" Command="{Binding Commands.NextScreenshot}" Margin="0,0,0,2"/>
+            <Button Content="3" Grid.Row="1" FontFamily="Marlett" Command="{Binding Commands.PreviousScreenshot}" Margin="2,0,0,0"/>
+        </Grid>
+        
+        <Grid Grid.Column="1" Grid.Row="4" Grid.ColumnSpan="2" Visibility="{Binding Path=CharacterTabVisibility}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="18*" MinWidth="30" MaxWidth="30"/>
+                <ColumnDefinition Width="30*"/>
+                <ColumnDefinition Width="18*" MinWidth="30" MaxWidth="30"/>
+                <ColumnDefinition Width="40*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="20*"/>
+                <RowDefinition Height="10*" MinHeight="30" MaxHeight="30"/>
+                <RowDefinition Height="20*"/>
+            </Grid.RowDefinitions>
+
+            <Image Grid.Column="1" Grid.RowSpan="3" Source="{Binding Path=SelectedCharacter.VNDBInformation.image}" Stretch="{Binding Path=StretchImages}" />
+            <Button Content="4" Grid.Column="2" Grid.Row="1" FontFamily="Marlett" Command="{Binding Commands.NextCharacter}" Margin="0,0,0,2" />
+            <Button Content="3" Grid.Row="1" FontFamily="Marlett" Command="{Binding Commands.PreviousCharacter}" Margin="2,0,0,0"/>
+
+            <ScrollViewer Grid.Column="3" Grid.RowSpan="3" Margin="5,0,0,0">
+                <StackPanel>
+                    <TextBlock TextWrapping="Wrap">
+                        <TextBlock.Text>
+                            <MultiBinding StringFormat="{}{0}&#x0a;&#x0a;{1}">
+                                <Binding Path="SelectedCharacter.VNDBInformation.name" />
+                                <Binding Path="SelectedCharacter.ConvertedTraits" Converter="{StaticResource TraitsListToStringConvert}" />
+                            </MultiBinding>
+                        </TextBlock.Text>
+                    </TextBlock>
+                    <RichTextBox Grid.Column="1" Grid.Row="2" IsReadOnly="True" BorderThickness="0" Background="{DynamicResource {x:Static SystemColors.MenuBarBrushKey}}" VerticalScrollBarVisibility="Auto" converters:HtmlRichTextBoxBehavior.Text="{Binding Path=SelectedCharacter.Description}"/>
+                </StackPanel>
+            </ScrollViewer>
+        </Grid>
+
+        <Grid Grid.Column="1" Grid.Row="4" Grid.ColumnSpan="2" Visibility="{Binding Path=TagTabVisibility}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="100*"/>
+                <ColumnDefinition Width="100*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="20*" MaxHeight="20" MinHeight="20" />
+                <RowDefinition Height="20*"/>
+            </Grid.RowDefinitions>
+
+            <TabControl SelectedIndex="{Binding SelectedTagTab}" ItemsSource="{Binding Path=TagCategories}" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+            <DataGrid ItemsSource="{Binding Path=TagsInGrid, UpdateSourceTrigger=PropertyChanged}" Grid.Row="1" CanUserAddRows="False" GridLinesVisibility="None" BorderThickness="0"
+                      AutoGenerateColumns="False" ScrollViewer.VerticalScrollBarVisibility="Visible" CanUserResizeRows="False" CanUserDeleteRows="False" RowHeaderWidth="0" SelectionMode="Single"
+                      Background="{DynamicResource {x:Static SystemColors.ControlLightLightBrushKey}}" SelectedItem="{Binding Path=SelectedTag}">
+                <DataGrid.Resources>
+                    <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="LightBlue"/>
+                    <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="LightBlue"/>
+                </DataGrid.Resources>
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Tag" Binding="{Binding Path=Name}" IsReadOnly="True" Width="*" />
+                    <DataGridTextColumn Header="Score" Binding="{Binding Path=Score}" IsReadOnly="True" Selector.IsSelected="True"/>
+                </DataGrid.Columns>
+            </DataGrid>
+            <RichTextBox Grid.Column="1" Grid.Row="2" IsReadOnly="True" BorderThickness="0" Background="{DynamicResource {x:Static SystemColors.MenuBarBrushKey}}" VerticalScrollBarVisibility="Auto" converters:HtmlRichTextBoxBehavior.Text="{Binding Path=SelectedTag.Description}"/>
+        </Grid>
+
+        <StatusBar Grid.Row="5" Grid.ColumnSpan="3">
             <StatusBarItem HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch">
                 <Grid>
                     <ProgressBar Minimum="0" Maximum="{Binding Path=CurrentPendingTasks}" Value="{Binding Path=CompletedPendingTasks}" Height="20" HorizontalAlignment="Stretch" Style="{DynamicResource ProgressBarStyle}" OverridesDefaultStyle="True" Foreground="{DynamicResource ProgressBarBackgroundBrush}" Background="{x:Null}"/>

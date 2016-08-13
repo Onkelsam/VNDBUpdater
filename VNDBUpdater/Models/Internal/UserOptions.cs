@@ -9,9 +9,9 @@ namespace VNDBUpdater.Models.Internal
         public bool MinimizeToTray { get; set; }
         public string InstallFolderPath { get; set; }
         public string StretchFormat { get; set; }
-        public ColumnVisibility OriginalNameTab { get; set; }
-        public ColumnVisibility VNDBVoteTab { get; set; }
-        public ColumnVisibility VNDBPopularityTab { get; set; }
+        public ControlVisibility OriginalNameTab { get; set; }
+        public ControlVisibility VNDBVoteTab { get; set; }
+        public ControlVisibility VNDBPopularityTab { get; set; }
 
         public UserOptions()
         {
@@ -20,9 +20,9 @@ namespace VNDBUpdater.Models.Internal
             MinimizeToTray = false;
             InstallFolderPath = null;
             StretchFormat = "Fill";
-            OriginalNameTab = ColumnVisibility.Collapsed;
-            VNDBVoteTab =  ColumnVisibility.Visible;
-            VNDBPopularityTab = ColumnVisibility.Visible;
+            OriginalNameTab = ControlVisibility.Collapsed;
+            VNDBVoteTab =  ControlVisibility.Visible;
+            VNDBPopularityTab = ControlVisibility.Visible;
         }
     }
 }

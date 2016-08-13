@@ -18,6 +18,8 @@ namespace VNDBUpdater.Models
         private int _Score;
         private VisualNovelCatergory _Category;
 
+        private static readonly string NoImageLocation = Constants.DirectoryPath + Constants.NoImage;
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         public BasicInformation Basics { get; set; }
@@ -123,6 +125,7 @@ namespace VNDBUpdater.Models
         {
             Process.Start(Constants.VNDBVNLink + Basics.VNDBInformation.id);
         }
+
         public void SearchOnGoolge(string parameter)
         {
             if (Basics.VNDBInformation.original != null)
@@ -181,43 +184,44 @@ namespace VNDBUpdater.Models
 
         public VNScreenshot GetNextScreenshot(VNScreenshot currentScreenshot)
         {
-            if (UserHelper.CurrentUser.Settings.ShowNSFWImages)
+            if (Basics.VNDBInformation.screens?.Any() == true)
             {
-                if (!Basics.VNDBInformation.screens.Any() || currentScreenshot == Basics.VNDBInformation.screens.Last() || currentScreenshot == null)
-                    return new VNScreenshot() { image = Basics.VNDBInformation.image };
-                else
+                if (UserHelper.CurrentUser.Settings.ShowNSFWImages)
                     return Basics.VNDBInformation.screens.NextOf(currentScreenshot);
+                else
+                    return Basics.VNDBInformation.screens.NextOf(currentScreenshot).nsfw == true ? GetNextScreenshot(Basics.VNDBInformation.screens.NextOf(currentScreenshot)) : Basics.VNDBInformation.screens.NextOf(currentScreenshot);
             }
             else
-            {
-                if (!Basics.VNDBInformation.screens.Any() || currentScreenshot == Basics.VNDBInformation.screens.Last() && !Basics.VNDBInformation.image_nsfw || currentScreenshot == null)
-                    return new VNScreenshot() { image = Basics.VNDBInformation.image };
-                else
-                {
-                    VNScreenshot screen = Basics.VNDBInformation.screens.NextOf(currentScreenshot);
-
-                    if (screen.nsfw)
-                        return GetNextScreenshot(screen);
-                    else
-                        return screen;
-                }
-            }            
+                return new VNScreenshot() { image = NoImageLocation };   
         }
 
-        public CharacterInformation NextCharacter(CharacterInformation currentCharacter)
+        public VNScreenshot GetPreviousScreenshot(VNScreenshot currentScreenshot)
         {
-            if (Characters != null)
+            if (Basics.VNDBInformation.screens?.Any() == true)
             {
-                if (Characters.Any())
-                {
-                    if (!Characters.Any(x => x.VNDBInformation.image != null))
-                        return new CharacterInformation(new VNCharacterInformation());
-                    else
-                        return Characters.NextOf(currentCharacter);
-                }
+                if (UserHelper.CurrentUser.Settings.ShowNSFWImages)
+                    return Basics.VNDBInformation.screens.PreviousOf(currentScreenshot);
+                else
+                    return Basics.VNDBInformation.screens.PreviousOf(currentScreenshot).nsfw == true ? GetPreviousScreenshot(Basics.VNDBInformation.screens.PreviousOf(currentScreenshot)) : Basics.VNDBInformation.screens.PreviousOf(currentScreenshot);
             }
+            else
+                return new VNScreenshot() { image = NoImageLocation };
+        }
 
-            return new CharacterInformation(new VNCharacterInformation());
+        public CharacterInformation GetNextCharacter(CharacterInformation currentCharacter)
+        {
+            if (Characters?.Any() == true)
+                return Characters.NextOf(currentCharacter);
+
+            return new CharacterInformation(new VNCharacterInformation() { image = NoImageLocation });
+        }
+
+        public CharacterInformation GetPreviousCharacter(CharacterInformation currentCharacter)
+        {
+            if (Characters?.Any() == true)
+                return Characters.PreviousOf(currentCharacter);
+
+            return new CharacterInformation(new VNCharacterInformation() { image = NoImageLocation });        
         }
 
         public bool Delete()

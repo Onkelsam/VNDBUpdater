@@ -2,8 +2,6 @@
 using CommunicationLib.Redis;
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Reflection;
 using VNDBUpdater.Data;
 using VNDBUpdater.Helper;
 using VNDBUpdater.Models;
@@ -13,7 +11,7 @@ namespace VNDBUpdater.Communication.Database
 {
     public static class RedisCommunication
     {
-        private static readonly string ExeAndStringPath = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location) + @"\" + Constants.PathToDatabase;
+        private static readonly string ResourceDirectoryPath = Constants.DirectoryPath + Constants.PathToDatabase;
 
         private static IRedisCommunication Connection;
 
@@ -38,7 +36,7 @@ namespace VNDBUpdater.Communication.Database
                     try
                     {
                         Connection = new CommunicationLib.Communication().GetRedisCommunication();
-                        Connection.Connect(Constants.RedisIP, Constants.RedisPort, ExeAndStringPath + Constants.RedisExe, ExeAndStringPath + Constants.RedisConfig);
+                        Connection.Connect(Constants.RedisIP, Constants.RedisPort, ResourceDirectoryPath + Constants.RedisExe, ResourceDirectoryPath + Constants.RedisConfig);
                         _IsConnected = true;
                         _ConnectionTries = 0;
                         EventLogger.LogInformation(nameof(RedisCommunication) + ":" + nameof(Connect), Constants.ConnectionEstablished);
@@ -186,6 +184,9 @@ namespace VNDBUpdater.Communication.Database
         private static void SaveCurrentDB()
         {
             CheckConnection();
+
+            foreach (var vn in LocalVisualNovelHelper.LocalVisualNovels)
+                AddVisualNovelToDB(vn);
 
             Connection.ForceSave();
         }

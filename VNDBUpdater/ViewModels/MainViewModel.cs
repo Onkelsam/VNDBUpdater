@@ -29,9 +29,11 @@ namespace VNDBUpdater.ViewModels
 
         private int _SelectedVisualNovelTab = UserHelper.CurrentUser.GUI != null ? (int)UserHelper.CurrentUser.GUI.SelectedVNCategory : 0;
         private int _SelectedTagTab = UserHelper.CurrentUser.GUI != null ? (int)UserHelper.CurrentUser.GUI.SelectedTagCategory : 0;
+        private int _SelectedSubTab = UserHelper.CurrentUser.GUI != null ? (int)UserHelper.CurrentUser.GUI.SelectedSubTab : 0;        
 
         private VNScreenshot _SelectedScreenshot;
         private CharacterInformation _SelectedCharacter;
+        private Tag _SelectedTag;
 
         private int _CurrentPendingTasks;
         private int _CompletedPendingTasks;
@@ -49,8 +51,10 @@ namespace VNDBUpdater.ViewModels
             _WindowHandler = new WindowHandler();
 
             _Commands.AddCommand("RefreshVisualNovels", ExecuteRefreshVisualNovels, CanExecuteVNDBOperations);
+            _Commands.AddCommand("PreviousScreenshot", ExecutePreviousScreenshot, VisualNovelSelected);
             _Commands.AddCommand("NextScreenshot", ExecuteNextScreenshot, VisualNovelSelected);
             _Commands.AddCommand("NextCharacter", ExecuteNextCharacter, VisualNovelSelected);
+            _Commands.AddCommand("PreviousCharacter", ExecutePreviousCharacter, VisualNovelSelected);
             _Commands.AddCommand("StartVisualNovel", ExecuteStartVisualNovel, CanExecuteStartVisualNovel);
             _Commands.AddCommand("OpenVisualNovelFolder", ExecuteOpenVisualNovelFolder, CanExecuteOpenVisualNovelFolder);
             _Commands.AddCommand("ViewVisualNovelOnVNDB", ExecuteViewVisualNovelOnVNDB, VisualNovelSelected);
@@ -74,6 +78,7 @@ namespace VNDBUpdater.ViewModels
             _Commands.AddCommand("SetCustomScore", ExecuteSetCustomScore, CanExecuteVisualNovelChanges);
             _Commands.AddCommand("ShowMainWindow", ExecuteShowMainWindow);
             _Commands.AddCommand("StateChanged", ExecuteStateChanged);
+            _Commands.AddCommand("Resized", ExecuteResized);
 
             _VisualNovelsInGrid.CollectionChanged += OnCollectionChanged;            
             _TagsInGrid.CollectionChanged += OnCollectionChanged;
@@ -132,6 +137,11 @@ namespace VNDBUpdater.ViewModels
             get { return Enum.GetNames(typeof(VisualNovelCatergory)).ToList(); }
         }
 
+        public List<string> TagCategories
+        {
+            get { return Constants.TagCategoryMapper.Select(x => x.Value).ToList(); }
+        }
+
         public VisualNovel SelectedVisualNovel
         {
             get { return _SelectedVisualNovel; }
@@ -182,6 +192,22 @@ namespace VNDBUpdater.ViewModels
             }
         }
 
+        public int SelectedSubTab
+        {
+            get { return _SelectedSubTab; }
+            set
+            {
+                _SelectedSubTab = value;
+                UserHelper.CurrentUser.GUI.SelectedSubTab = (SubTabs)value;
+
+
+                OnPropertyChanged(nameof(CharacterTabVisibility));
+                OnPropertyChanged(nameof(ScreenshotTabVisibility));
+                OnPropertyChanged(nameof(TagTabVisibility));
+                OnPropertyChanged(nameof(SelectedSubTab));
+            }
+        }
+
         public VNScreenshot SelectedScreenshot
         {
             get { return _SelectedScreenshot; }
@@ -201,6 +227,17 @@ namespace VNDBUpdater.ViewModels
                 _SelectedCharacter = value;
 
                 OnPropertyChanged(nameof(SelectedCharacter));
+            }
+        }
+
+        public Tag SelectedTag
+        {
+            get { return _SelectedTag; }
+            set
+            {
+                _SelectedTag = value;
+
+                OnPropertyChanged(nameof(SelectedTag));
             }
         }
 
@@ -270,6 +307,33 @@ namespace VNDBUpdater.ViewModels
             get { return UserHelper.CurrentUser.Settings.VNDBPopularityTab.ToString(); }
         }
 
+        public string ScreenshotTabVisibility
+        {
+            get { return (SubTabs)_SelectedSubTab == SubTabs.Screenshots ? ControlVisibility.Visible.ToString() : ControlVisibility.Collapsed.ToString(); }
+        }
+
+        public string CharacterTabVisibility
+        {
+            get { return (SubTabs)_SelectedSubTab == SubTabs.Characters ? ControlVisibility.Visible.ToString() : ControlVisibility.Collapsed.ToString(); }
+        }
+
+        public string TagTabVisibility
+        {
+            get { return (SubTabs)_SelectedSubTab == SubTabs.Tags ? ControlVisibility.Visible.ToString() : ControlVisibility.Collapsed.ToString(); }
+        }
+
+        public double Height
+        {
+            get { return UserHelper.CurrentUser.GUI.Height; }
+            set { UserHelper.CurrentUser.GUI.Height = value; }
+        }
+
+        public double Width
+        {
+            get { return UserHelper.CurrentUser.GUI.Width; }
+            set { UserHelper.CurrentUser.GUI.Width = value; }
+        }
+
         public string Title
         {
             get
@@ -316,10 +380,22 @@ namespace VNDBUpdater.ViewModels
             SelectedScreenshot = _SelectedVisualNovel.GetNextScreenshot(SelectedScreenshot);
         }
 
+        public void ExecutePreviousScreenshot(object parameter)
+        {
+            OnPropertyChanged(nameof(StretchImages));
+            SelectedScreenshot = _SelectedVisualNovel.GetPreviousScreenshot(SelectedScreenshot);
+        }
+
         public void ExecuteNextCharacter(object paramter)
         {
             OnPropertyChanged(nameof(StretchImages));
-            SelectedCharacter = _SelectedVisualNovel.NextCharacter(SelectedCharacter);
+            SelectedCharacter = _SelectedVisualNovel.GetNextCharacter(SelectedCharacter);
+        }
+
+        public void ExecutePreviousCharacter(object parameter)
+        {
+            OnPropertyChanged(nameof(StretchImages));
+            SelectedCharacter = _SelectedVisualNovel.GetPreviousCharacter(SelectedCharacter);
         }
 
         public bool CanExecuteStartVisualNovel(object paramter)
@@ -365,7 +441,7 @@ namespace VNDBUpdater.ViewModels
 
         public void ExecuteViewRelationOnVNDB(object parameter)
         {
-            Process.Start("https://vndb.org/v" + (int)parameter);
+            Process.Start(Constants.VNDBVNLink + (int)parameter);
         }
 
         public void ExecuteSelectVisualNovel(object parameter)
@@ -592,5 +668,13 @@ namespace VNDBUpdater.ViewModels
             if (window.WindowState == WindowState.Minimized)
                 _WindowHandler.Minimize(window);
         }   
+
+        public void ExecuteResized(object parameter)
+        {
+            var window = (parameter as MainWindow);
+
+            Height = window.Height;
+            Width = window.Width;
+        }
     }
 }

@@ -21,5 +21,10 @@ namespace VNDBUpdater.Helper
         {
             return list[(list.IndexOf(item) + 1) == list.Count ? 0 : (list.IndexOf(item) + 1)];
         }
+
+        public static T PreviousOf<T>(this IList<T> list, T item)
+        {
+            return list[list.IndexOf(item) == 0 ? list.Count - 1 : (list.IndexOf(item) - 1)];
+        }
     }
 }

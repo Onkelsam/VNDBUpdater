@@ -47,10 +47,17 @@ namespace VNDBUpdater.Data
         major
     };
 
-    public enum ColumnVisibility : byte
+    public enum ControlVisibility : byte
     {
         Collapsed = 0,
         Hidden,
         Visible
     };
+
+    public enum SubTabs : byte
+    {
+        Tags = 0,
+        Screenshots,
+        Characters
+    }
 }

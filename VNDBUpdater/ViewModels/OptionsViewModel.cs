@@ -112,37 +112,37 @@ namespace VNDBUpdater.ViewModels
 
         public bool OriginalNameVisible
         {
-            get { return _User.Settings.OriginalNameTab == ColumnVisibility.Visible ? true : false; }
+            get { return _User.Settings.OriginalNameTab == Data.ControlVisibility.Visible ? true : false; }
             set
             {
                 if (value)
-                    _User.Settings.OriginalNameTab = ColumnVisibility.Visible;
+                    _User.Settings.OriginalNameTab = Data.ControlVisibility.Visible;
                 else
-                    _User.Settings.OriginalNameTab = ColumnVisibility.Collapsed;
+                    _User.Settings.OriginalNameTab = Data.ControlVisibility.Collapsed;
             }
         }
 
         public bool VNDBVoteVisible
         {
-            get { return _User.Settings.VNDBVoteTab == ColumnVisibility.Visible ? true : false; }
+            get { return _User.Settings.VNDBVoteTab == Data.ControlVisibility.Visible ? true : false; }
             set
             {
                 if (value)
-                    _User.Settings.VNDBVoteTab = ColumnVisibility.Visible;
+                    _User.Settings.VNDBVoteTab = Data.ControlVisibility.Visible;
                 else
-                    _User.Settings.VNDBVoteTab = ColumnVisibility.Collapsed;
+                    _User.Settings.VNDBVoteTab = Data.ControlVisibility.Collapsed;
             }
         }
 
         public bool VNDBPopularityVisible
         {
-            get { return _User.Settings.VNDBPopularityTab == ColumnVisibility.Visible ? true : false; }
+            get { return _User.Settings.VNDBPopularityTab == Data.ControlVisibility.Visible ? true : false; }
             set
             {
                 if (value)
-                    _User.Settings.VNDBPopularityTab = ColumnVisibility.Visible;
+                    _User.Settings.VNDBPopularityTab = Data.ControlVisibility.Visible;
                 else
-                    _User.Settings.VNDBPopularityTab = ColumnVisibility.Collapsed;
+                    _User.Settings.VNDBPopularityTab = Data.ControlVisibility.Collapsed;
             }
         }
 

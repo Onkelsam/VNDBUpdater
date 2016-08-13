@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Text;
 using System.Windows.Data;
 using VNDBUpdater.Communication.VNDB;
@@ -14,10 +15,22 @@ namespace VNDBUpdater.ValueConverters
         {
             if (value != null)
             {
+                var relations = (value as List<Relation>);
                 var sb = new StringBuilder();
 
-                foreach (var relation in (List<Relation>)value)
-                    sb.Append(relation.title + " (" + Constants.RelationsMapper[relation.relation] + ") ");
+                foreach (var relation in Constants.RelationsMapper)
+                {
+                    if (relations.Any(x => x.relation == relation.Key))
+                    {
+                        sb.Append(relation.Value + ":");
+
+                        foreach (var rel in relations.Where(x => x.relation == relation.Key))
+                            sb.Append(Environment.NewLine + "\t\t\t" + rel.title);
+
+                        sb.AppendLine();
+                        sb.Append("\t\t");
+                    }                    
+                }
 
                 return sb.ToString();
             }
