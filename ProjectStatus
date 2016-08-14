@@ -14,23 +14,20 @@ Implementation planned:
   
   
 Current tasks:
-  
-  Currently doing:
-    - Cleaning up the codebase, especially the views...
-  
+
   Minor tasks:
     - Constant improvements to the codebase through refactoring.
     - Finding bugs and fixing them.
     
-    - Improving the GUI:
-      - Remember user column reordering and resizing. -> Pretty difficult.
-      
     - Change file indexer so multiple paths to VN directories can be added (e.g. Steam).
       
   Medium tasks:  
-      - Display related visual novels as link, so you can click on them to get to the VNDB page 
-      or select the vn if it is already on your list.
+    - Display related visual novels as link, so you can click on them to get to the VNDB page 
+    or select the vn if it is already on your list.
       
+
+  On Hold:
+    - Remember user column reordering and resizing. -> Pretty difficult.
 
 Done:
 
@@ -39,7 +36,6 @@ Done:
     - Remember user tabs so they will be the same when starting the program again.
     - Fixed bug that could crash the program if you had a vn selected and a property was null and you changed the category tab.
     - Fixed problem with the indexer.
-    
     - Make it clear if no character information is found.
     - Added 'No image available' and 'Image is NSFW' images.
     - Images fixed.
