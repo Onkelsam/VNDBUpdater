@@ -25,10 +25,9 @@ namespace VNDBUpdater.ValueConverters
                         sb.Append(relation.Value + ":");
 
                         foreach (var rel in relations.Where(x => x.relation == relation.Key))
-                            sb.Append(Environment.NewLine + "\t\t\t" + rel.title);
+                            sb.Append(Environment.NewLine + "\t" + rel.title);
 
                         sb.AppendLine();
-                        sb.Append("\t\t");
                     }                    
                 }
 

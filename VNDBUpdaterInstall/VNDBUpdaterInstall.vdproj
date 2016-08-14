@@ -27,8 +27,8 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_53228724A8184C828486763A34107BE2"
-        "OwnerKey" = "8:_UNDEFINED"
+        "MsmKey" = "8:_537F2FBA45C0D7C999CF0E1A400BFE1E"
+        "OwnerKey" = "8:_0A24BA2BE22D40FCADF58F62DC4C1230"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -147,6 +147,18 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_FDBF54A925181D8534B436CCAE263708"
+        "OwnerKey" = "8:_0A24BA2BE22D40FCADF58F62DC4C1230"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_EED879AD5AE754A8F06000C800918FF0"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_UNDEFINED"
         "OwnerKey" = "8:_0A24BA2BE22D40FCADF58F62DC4C1230"
         "MsmSig" = "8:_UNDEFINED"
@@ -154,7 +166,7 @@
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_F4393E71B2F94E35EDBB0946EDEC1B04"
+        "OwnerKey" = "8:_FDBF54A925181D8534B436CCAE263708"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -184,7 +196,19 @@
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_537F2FBA45C0D7C999CF0E1A400BFE1E"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
         "OwnerKey" = "8:_A65DF7FB5D66965E0C8DE8ED4D67ABD7"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_F4393E71B2F94E35EDBB0946EDEC1B04"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -209,12 +233,6 @@
         {
         "MsmKey" = "8:_UNDEFINED"
         "OwnerKey" = "8:_6361B74A28F28C29DE58EC19FEBE9537"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_EED879AD5AE754A8F06000C800918FF0"
         "MsmSig" = "8:_UNDEFINED"
         }
     }
@@ -343,12 +361,23 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_53228724A8184C828486763A34107BE2"
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_537F2FBA45C0D7C999CF0E1A400BFE1E"
             {
-            "SourcePath" = "8:..\\VNDBUpdater\\Resources\\redis-server.pdb"
-            "TargetName" = "8:redis-server.pdb"
+            "AssemblyRegister" = "3:1"
+            "AssemblyIsInGAC" = "11:FALSE"
+            "AssemblyAsmDisplayName" = "8:HtmlToXamlConverter, Version=1.0.5727.24510, Culture=neutral, processorArchitecture=MSIL"
+                "ScatterAssemblies"
+                {
+                    "_537F2FBA45C0D7C999CF0E1A400BFE1E"
+                    {
+                    "Name" = "8:HtmlToXamlConverter.dll"
+                    "Attributes" = "3:512"
+                    }
+                }
+            "SourcePath" = "8:HtmlToXamlConverter.dll"
+            "TargetName" = "8:"
             "Tag" = "8:"
-            "Folder" = "8:_B14CA04B690F45BF994642E32D74AC3E"
+            "Folder" = "8:_A54D6D2092E74C098F4843EB575A6FE3"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -360,7 +389,7 @@
             "PackageAs" = "3:1"
             "Register" = "3:1"
             "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
+            "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
             "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_58469DEA407364F67854539942132DDC"
@@ -706,7 +735,7 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:CommunicationLib, Version=1.0.6066.41766, Culture=neutral, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:CommunicationLib, Version=1.0.6069.36486, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
                     "_F4393E71B2F94E35EDBB0946EDEC1B04"
@@ -716,6 +745,37 @@
                     }
                 }
             "SourcePath" = "8:CommunicationLib.dll"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_A54D6D2092E74C098F4843EB575A6FE3"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_FDBF54A925181D8534B436CCAE263708"
+            {
+            "AssemblyRegister" = "3:1"
+            "AssemblyIsInGAC" = "11:FALSE"
+            "AssemblyAsmDisplayName" = "8:CodeKicker.BBCode, Version=5.0.0.0, Culture=neutral, processorArchitecture=MSIL"
+                "ScatterAssemblies"
+                {
+                    "_FDBF54A925181D8534B436CCAE263708"
+                    {
+                    "Name" = "8:CodeKicker.BBCode.dll"
+                    "Attributes" = "3:512"
+                    }
+                }
+            "SourcePath" = "8:CodeKicker.BBCode.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_A54D6D2092E74C098F4843EB575A6FE3"
@@ -812,7 +872,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:VNDBUpdaterInstall"
         "ProductCode" = "8:{877BC4A8-DF19-43C2-8550-DB9B6DFD6176}"
-        "PackageCode" = "8:{A6848B37-23F6-4274-AB90-C7F883F20C7B}"
+        "PackageCode" = "8:{22EAB35D-EEF3-40C1-911A-1A5448E35993}"
         "UpgradeCode" = "8:{FCDAE49C-5B16-4876-929B-761EE174D519}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"

@@ -27,7 +27,7 @@ namespace VNDBUpdater.BackgroundTasks
                     case (TaskStatus.Running):
                         return nameof(FileIndexer) +  Constants.TaskRunning + _MainScreen.CompletedPendingTasks + " of " + _MainScreen.CurrentPendingTasks + " Visual Novels indexed.";
                     case (TaskStatus.RanToCompletion):
-                        return nameof(FileIndexer) + Constants.TaskFinished + LocalVisualNovelHelper.LocalVisualNovels.Count(x => x.ExePath == null || x.ExePath == "") + " could not be indexed.";
+                        return nameof(FileIndexer) + Constants.TaskFinished + " " + LocalVisualNovelHelper.LocalVisualNovels.Count(x => x.ExePath == null || x.ExePath == "") + " could not be indexed.";
                     case (TaskStatus.Faulted):
                         return nameof(FileIndexer) + Constants.TaskFaulted;
                     default:

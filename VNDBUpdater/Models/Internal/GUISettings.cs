@@ -14,9 +14,9 @@ namespace VNDBUpdater.Models.Internal
         {
             SelectedVNCategory = VisualNovelCatergory.Unknown;
             SelectedTagCategory = TagCategory.All;
-            SelectedSubTab = SubTabs.Tags;
-            Height = 665;
-            Width = 1213.775;
+            SelectedSubTab = SubTabs.Screenshots;
+            Height = Constants.InitialHeight;
+            Width = Constants.InitialWidth;
         }
     }
 }

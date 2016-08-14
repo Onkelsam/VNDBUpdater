@@ -15,6 +15,12 @@ namespace VNDBUpdater.Views
         {
             FileHelper.DeleteTooLargeFile(Constants.EventlogFileName, 1000000);
 
+            try
+            {
+                FileHelper.DeleteFile(Constants.DirectoryPath + @"\Resources\redis-server.pdb");
+            }
+            catch {; }
+
             InitializeComponent();
 
             DataContext = new MainViewModel();

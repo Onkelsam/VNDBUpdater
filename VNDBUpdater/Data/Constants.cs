@@ -71,6 +71,9 @@ namespace VNDBUpdater.Data
 
         public static readonly string DirectoryPath = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
 
+        public const double InitialHeight = 800;
+        public const double InitialWidth = 1200;
+
         public static readonly Dictionary<int?, string> VNLengthMapper = new Dictionary<int?, string>()
         {
             { 0, "Unknown" },

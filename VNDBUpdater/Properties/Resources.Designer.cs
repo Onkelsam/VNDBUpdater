@@ -93,16 +93,6 @@ namespace VNDBUpdater.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
-        internal static byte[] redis_server1 {
-            get {
-                object obj = ResourceManager.GetObject("redis_server1", resourceCulture);
-                return ((byte[])(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Byte[].
-        /// </summary>
         internal static byte[] redis_windows {
             get {
                 object obj = ResourceManager.GetObject("redis_windows", resourceCulture);

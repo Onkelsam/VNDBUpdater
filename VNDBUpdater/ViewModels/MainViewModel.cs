@@ -31,7 +31,6 @@ namespace VNDBUpdater.ViewModels
         private int _SelectedTagTab = UserHelper.CurrentUser.GUI != null ? (int)UserHelper.CurrentUser.GUI.SelectedTagCategory : 0;
         private int _SelectedSubTab = UserHelper.CurrentUser.GUI != null ? (int)UserHelper.CurrentUser.GUI.SelectedSubTab : 0;        
 
-        private VNScreenshot _SelectedScreenshot;
         private CharacterInformation _SelectedCharacter;
         private Tag _SelectedTag;
 
@@ -51,10 +50,6 @@ namespace VNDBUpdater.ViewModels
             _WindowHandler = new WindowHandler();
 
             _Commands.AddCommand("RefreshVisualNovels", ExecuteRefreshVisualNovels, CanExecuteVNDBOperations);
-            _Commands.AddCommand("PreviousScreenshot", ExecutePreviousScreenshot, VisualNovelSelected);
-            _Commands.AddCommand("NextScreenshot", ExecuteNextScreenshot, VisualNovelSelected);
-            _Commands.AddCommand("NextCharacter", ExecuteNextCharacter, VisualNovelSelected);
-            _Commands.AddCommand("PreviousCharacter", ExecutePreviousCharacter, VisualNovelSelected);
             _Commands.AddCommand("StartVisualNovel", ExecuteStartVisualNovel, CanExecuteStartVisualNovel);
             _Commands.AddCommand("OpenVisualNovelFolder", ExecuteOpenVisualNovelFolder, CanExecuteOpenVisualNovelFolder);
             _Commands.AddCommand("ViewVisualNovelOnVNDB", ExecuteViewVisualNovelOnVNDB, VisualNovelSelected);
@@ -147,20 +142,18 @@ namespace VNDBUpdater.ViewModels
             get { return _SelectedVisualNovel; }
             set
             {
-                _SelectedVisualNovel = value;
-                _SelectedCharacter = null;
-                _SelectedScreenshot = null;
-
-                UpdateTagGrid();
-
-                if (VisualNovelSelected(null))
+                if (value != null)
                 {
-                    ExecuteNextCharacter(null);
-                    ExecuteNextScreenshot(null);
-                }
+                    _SelectedVisualNovel = value;
+                    _SelectedCharacter = null;
 
-                OnPropertyChanged(nameof(RelatedVisualNovels));
-                OnPropertyChanged(nameof(SelectedVisualNovel));
+                    UpdateTagGrid();
+
+                    OnPropertyChanged(nameof(RelatedVisualNovels));
+                    OnPropertyChanged(nameof(SelectedVisualNovel));
+                    OnPropertyChanged(nameof(SelectedCharacter));
+                    OnPropertyChanged(nameof(DetailsVisibility));
+                }                
             }
         }
 
@@ -203,19 +196,7 @@ namespace VNDBUpdater.ViewModels
 
                 OnPropertyChanged(nameof(CharacterTabVisibility));
                 OnPropertyChanged(nameof(ScreenshotTabVisibility));
-                OnPropertyChanged(nameof(TagTabVisibility));
                 OnPropertyChanged(nameof(SelectedSubTab));
-            }
-        }
-
-        public VNScreenshot SelectedScreenshot
-        {
-            get { return _SelectedScreenshot; }
-            set
-            {
-                _SelectedScreenshot = value;
-
-                OnPropertyChanged(nameof(SelectedScreenshot));
             }
         }
 
@@ -317,9 +298,9 @@ namespace VNDBUpdater.ViewModels
             get { return (SubTabs)_SelectedSubTab == SubTabs.Characters ? ControlVisibility.Visible.ToString() : ControlVisibility.Collapsed.ToString(); }
         }
 
-        public string TagTabVisibility
+        public string DetailsVisibility
         {
-            get { return (SubTabs)_SelectedSubTab == SubTabs.Tags ? ControlVisibility.Visible.ToString() : ControlVisibility.Collapsed.ToString(); }
+            get { return _SelectedVisualNovel.Basics != null ? ControlVisibility.Visible.ToString() : ControlVisibility.Collapsed.ToString(); }
         }
 
         public double Height
@@ -372,30 +353,6 @@ namespace VNDBUpdater.ViewModels
         {
             _SelectedVisualNovel.Update();
             OnPropertyChanged(nameof(SelectedVisualNovel));
-        }
-
-        public void ExecuteNextScreenshot(object parameter)
-        {
-            OnPropertyChanged(nameof(StretchImages));
-            SelectedScreenshot = _SelectedVisualNovel.GetNextScreenshot(SelectedScreenshot);
-        }
-
-        public void ExecutePreviousScreenshot(object parameter)
-        {
-            OnPropertyChanged(nameof(StretchImages));
-            SelectedScreenshot = _SelectedVisualNovel.GetPreviousScreenshot(SelectedScreenshot);
-        }
-
-        public void ExecuteNextCharacter(object paramter)
-        {
-            OnPropertyChanged(nameof(StretchImages));
-            SelectedCharacter = _SelectedVisualNovel.GetNextCharacter(SelectedCharacter);
-        }
-
-        public void ExecutePreviousCharacter(object parameter)
-        {
-            OnPropertyChanged(nameof(StretchImages));
-            SelectedCharacter = _SelectedVisualNovel.GetPreviousCharacter(SelectedCharacter);
         }
 
         public bool CanExecuteStartVisualNovel(object paramter)

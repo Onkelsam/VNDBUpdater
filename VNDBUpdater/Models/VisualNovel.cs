@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Windows;
 using VNDBUpdater.Communication.VNDB;
 using VNDBUpdater.Data;
@@ -180,48 +179,6 @@ namespace VNDBUpdater.Models
             Characters = updatedVisualNovel.Characters;
 
             LocalVisualNovelHelper.AddVisualNovel(this);
-        }
-
-        public VNScreenshot GetNextScreenshot(VNScreenshot currentScreenshot)
-        {
-            if (Basics.VNDBInformation.screens?.Any() == true)
-            {
-                if (UserHelper.CurrentUser.Settings.ShowNSFWImages)
-                    return Basics.VNDBInformation.screens.NextOf(currentScreenshot);
-                else
-                    return Basics.VNDBInformation.screens.NextOf(currentScreenshot).nsfw == true ? GetNextScreenshot(Basics.VNDBInformation.screens.NextOf(currentScreenshot)) : Basics.VNDBInformation.screens.NextOf(currentScreenshot);
-            }
-            else
-                return new VNScreenshot() { image = NoImageLocation };   
-        }
-
-        public VNScreenshot GetPreviousScreenshot(VNScreenshot currentScreenshot)
-        {
-            if (Basics.VNDBInformation.screens?.Any() == true)
-            {
-                if (UserHelper.CurrentUser.Settings.ShowNSFWImages)
-                    return Basics.VNDBInformation.screens.PreviousOf(currentScreenshot);
-                else
-                    return Basics.VNDBInformation.screens.PreviousOf(currentScreenshot).nsfw == true ? GetPreviousScreenshot(Basics.VNDBInformation.screens.PreviousOf(currentScreenshot)) : Basics.VNDBInformation.screens.PreviousOf(currentScreenshot);
-            }
-            else
-                return new VNScreenshot() { image = NoImageLocation };
-        }
-
-        public CharacterInformation GetNextCharacter(CharacterInformation currentCharacter)
-        {
-            if (Characters?.Any() == true)
-                return Characters.NextOf(currentCharacter);
-
-            return new CharacterInformation(new VNCharacterInformation() { image = NoImageLocation });
-        }
-
-        public CharacterInformation GetPreviousCharacter(CharacterInformation currentCharacter)
-        {
-            if (Characters?.Any() == true)
-                return Characters.PreviousOf(currentCharacter);
-
-            return new CharacterInformation(new VNCharacterInformation() { image = NoImageLocation });        
         }
 
         public bool Delete()

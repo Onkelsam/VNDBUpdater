@@ -56,8 +56,7 @@ namespace VNDBUpdater.Data
 
     public enum SubTabs : byte
     {
-        Tags = 0,
-        Screenshots,
+        Screenshots = 0,
         Characters
     }
 }

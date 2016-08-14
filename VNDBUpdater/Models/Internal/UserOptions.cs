@@ -19,7 +19,7 @@ namespace VNDBUpdater.Models.Internal
             ShowNSFWImages = false;
             MinimizeToTray = false;
             InstallFolderPath = null;
-            StretchFormat = "Fill";
+            StretchFormat = "Uniform";
             OriginalNameTab = ControlVisibility.Collapsed;
             VNDBVoteTab =  ControlVisibility.Visible;
             VNDBPopularityTab = ControlVisibility.Visible;
