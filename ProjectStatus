@@ -15,6 +15,9 @@ Implementation planned:
   
 Current tasks:
   
+  Currently doing:
+    - Cleaning up the codebase, especially the views...
+  
   Minor tasks:
     - Constant improvements to the codebase through refactoring.
     - Finding bugs and fixing them.
@@ -50,7 +53,7 @@ Done:
   Major:
   
     - Emulate VNDB style to characters, on the left side the character image on the right the description.
-      ->  Implemented. Works well, but still does not look right.
+      ->  Implemented. Works well. Looks better now.
     - Add navigation buttons to screenshots and a number (current picture is X of Y available pictures).
-      ->  Mostly done, I am not sure if I should add the number or not...
+      ->  Not needed anymore.
       
