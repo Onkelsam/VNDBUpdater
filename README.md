@@ -25,8 +25,8 @@ That is, of course, not 100% accurate. In my testing 50 of 360 VNs could not be 
 
 <b> Screenshots </b>
 
-![alt tag](http://i.imgur.com/BTXpprL.png)
+![alt tag](http://i.imgur.com/kDkSX5a.png)
 
 ![alt tag](http://i.imgur.com/dNCLGVO.png)
 
-![alt tag](http://i.imgur.com/O1eOCge.png)
+![alt tag](http://i.imgur.com/9lkylao.png)
