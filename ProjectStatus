@@ -2,32 +2,29 @@ Implementation planned:
   
   Minor tasks:
     
-    
-    
   Medium tasks:
     - Wishlist implementation. Propably in a new window.
-
     
   Major tasks:
-    - Change file indexer so it can find VNs by directory name and fetch the info from VNDB.org.
     - Add vns with vn name. Propably in conjunction with the changes to the file indexer. Will be a pain...
   
   
 Current tasks:
-  
+
+  Currently doing:
+    - Change file indexer so it can find VNs by directory name and fetch the info from VNDB.org. -> Halfway done.
+    - Change file indexer so multiple paths to VN directories can be added (e.g. Steam). -> Done.
+
   Minor tasks:
     - Constant improvements to the codebase through refactoring.
     - Finding bugs and fixing them.
-    
-    - Improving the GUI:
-      - Remember user column reordering and resizing. -> Pretty difficult.
-      
-    - Change file indexer so multiple paths to VN directories can be added (e.g. Steam).
       
   Medium tasks:  
-      - Display related visual novels as link, so you can click on them to get to the VNDB page 
+
+  On Hold:
+    - Remember user column reordering and resizing. -> Pretty difficult.
+    - Display related visual novels as link, so you can click on them to get to the VNDB page 
       or select the vn if it is already on your list.
-      
 
 Done:
 
@@ -36,7 +33,6 @@ Done:
     - Remember user tabs so they will be the same when starting the program again.
     - Fixed bug that could crash the program if you had a vn selected and a property was null and you changed the category tab.
     - Fixed problem with the indexer.
-    
     - Make it clear if no character information is found.
     - Added 'No image available' and 'Image is NSFW' images.
     - Images fixed.
@@ -50,7 +46,7 @@ Done:
   Major:
   
     - Emulate VNDB style to characters, on the left side the character image on the right the description.
-      ->  Implemented. Works well, but still does not look right.
+      ->  Implemented. Works well. Looks better now.
     - Add navigation buttons to screenshots and a number (current picture is X of Y available pictures).
-      ->  Mostly done, I am not sure if I should add the number or not...
+      ->  Not needed anymore.
       
