@@ -70,6 +70,28 @@ namespace CommunicationLib.VNDB
             return Client.Query(command);
         }
 
+        public VndbResponse QueryInformationByTitle(string title)
+        {
+            CheckConnection();
+
+            InputSanitization.CheckStringArgument(title);
+
+            SetOptionsToDefault();
+
+            return Query("get vn basic,details,stats,relations,tags,screen (title=" + JsonConvert.SerializeObject(title) + ")");
+        }
+
+        public VndbResponse SearchByTitle(string title)
+        {
+            CheckConnection();
+
+            InputSanitization.CheckStringArgument(title);
+
+            SetOptionsToDefault();
+
+            return Query("get vn basic,details,stats,relations,tags,screen (search~" + JsonConvert.SerializeObject(title) + ")");
+        }
+
         public VndbResponse QueryInformation(int[] IDs)
         {
             CheckConnection();

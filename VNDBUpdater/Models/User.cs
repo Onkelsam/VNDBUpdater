@@ -10,6 +10,7 @@ namespace VNDBUpdater.Models
 
         public UserOptions Settings { get; set; }
         public GUISettings GUI { get; set; }
+        public FileIndexerSettings FileIndexerSetting { get; set; }
 
         public User()
         {
@@ -28,6 +29,7 @@ namespace VNDBUpdater.Models
             {
                 Settings = existingUser.Settings ?? new UserOptions();
                 GUI = existingUser.GUI ?? new GUISettings();
+                FileIndexerSetting = existingUser.FileIndexerSetting ?? new FileIndexerSettings().SetDefault();
 
                 Username = existingUser.Username;
                 EncryptedPassword = existingUser.EncryptedPassword;
@@ -36,6 +38,7 @@ namespace VNDBUpdater.Models
             {
                 Settings = new UserOptions();
                 GUI = new GUISettings();
+                FileIndexerSetting = new FileIndexerSettings().SetDefault();
                 Username = null;
                 EncryptedPassword = null;
             }

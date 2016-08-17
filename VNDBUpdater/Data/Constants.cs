@@ -108,6 +108,8 @@ namespace VNDBUpdater.Data
 
         public static readonly List<int> PossibleScores = new List<int>() { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
 
-        public static readonly List<string> ExcludedExeFileNames = new List<string>() { "unins", "エンジン設定" };
+        public static readonly List<string> ExcludedExeFileNames = new List<string>() { "uninstall", "エンジン設定", "unins000", "supporttools",
+            "startuptool", "filechk", "directxcheck", "setup", "uninst64", "uninst", "cmvscheck64", "cmvsconfig64", "uninst32", "cmvscheck32", "cmvsconfig32", "gameupdate64", "filechecker", "config", "uninstaller",
+            "inst", "patch", "_uninst", "setting", "authtool", "ファイル破損チェックツール", "launcher" };
     }
 }

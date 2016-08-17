@@ -199,7 +199,6 @@ namespace VNDBUpdater.BackgroundTasks
 
                 vn.Category = (VisualNovelCatergory)VNFromVNDB.status;
                 vn.Score = 0;                
-                vn.CrawlExePath();
 
                 LocalVisualNovelHelper.AddVisualNovel(vn);
 

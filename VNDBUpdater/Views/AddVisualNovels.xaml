@@ -28,7 +28,7 @@
         </ControlTemplate>        
         <SolidColorBrush x:Key="CellColor" Color="Gray" />
     </Window.Resources>
-    
+        
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="200*" MaxWidth="200"/>
@@ -43,8 +43,7 @@
         </Grid.RowDefinitions>
 
         <DataGrid ItemsSource="{Binding Path=VisualNovelsToAdd, UpdateSourceTrigger=PropertyChanged}" SelectedItem="{Binding Path=SelectedVisualNovel}"
-                  AutoGenerateColumns="False" Grid.Row ="1" Grid.ColumnSpan="4" GridLinesVisibility="None" CanUserResizeRows="False"
-                  CanUserAddRows="False" Background="White" BorderThickness="0" CanUserDeleteRows="False" RowHeaderWidth="0" SelectionMode="Single">
+                  Grid.Row ="1" Grid.ColumnSpan="4" Style="{StaticResource StandardDataGrid}">
             <DataGrid.InputBindings>
                 <MouseBinding Gesture="LeftDoubleClick" Command="{Binding Commands.SetExePath}" CommandParameter="{Binding Path=SelectedVisualNovel}"/>
             </DataGrid.InputBindings>
@@ -74,7 +73,7 @@
         <Button Content="Fetch"  Grid.Column="1" Command="{Binding Commands.FetchVisualNovels}" Margin="0,19,0,0"/>
         <Button Content="Add VNs"  Grid.Column="3" Command="{Binding Commands.AddVisualNovelsToDB}" Margin="0,19,0,0"/>
         <Image Grid.Row="2" Source="{Binding Path=SelectedVisualNovel.Basics.VNDBInformation.image}"/>
-        <RichTextBox Grid.Column="1" Grid.Row="2" Grid.ColumnSpan="3" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" BorderThickness="0" >
+        <RichTextBox Grid.Column="1" Grid.Row="2" Grid.ColumnSpan="3" Style="{StaticResource StandardRichTextBox}" >
             <FlowDocument>
                 <Paragraph>
                     <Run Text="{Binding Path=SelectedVisualNovel.Basics.VNDBInformation.description}"/>

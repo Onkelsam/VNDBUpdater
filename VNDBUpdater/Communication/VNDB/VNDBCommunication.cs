@@ -161,6 +161,20 @@ namespace VNDBUpdater.Communication.VNDB
             return visualNovel;
         }
 
+        public static VisualNovel FetchVisualNovel(string title)
+        {
+            CheckConnection();
+
+            var visualNovel = new VisualNovel();
+
+            visualNovel.Basics = new BasicInformation(GetBasicInformation(title).items[0]);
+
+            foreach (var character in GetCharInfo(visualNovel.Basics.VNDBInformation.id))
+                visualNovel.Characters.Add(new CharacterInformation(character));
+
+            return visualNovel;
+        }
+
         private static List<VisualNovel> AddToVisualNovelsList(List<int> IDs)
         {
             var vns = new List<VisualNovel>();
@@ -240,6 +254,21 @@ namespace VNDBUpdater.Communication.VNDB
             {
                 if (HandleError(result) == ErrorResponse.Throttled)
                     return GetBasicInformation(IDs);
+                else
+                    return null;
+            }
+            else
+                return JsonConvert.DeserializeObject<VNInformationRoot>(result.Payload);
+        }
+
+        private static VNInformationRoot GetBasicInformation(string title)
+        {
+            VndbResponse result = Connection.QueryInformationByTitle(title);
+
+            if (result.ResponseType == VndbResponseType.Error)
+            {
+                if (HandleError(result) == ErrorResponse.Throttled)
+                    return GetBasicInformation(title);
                 else
                     return null;
             }

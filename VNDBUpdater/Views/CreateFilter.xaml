@@ -8,6 +8,12 @@
         <local:CreateFilterViewModel/>
     </Window.DataContext>
 
+    <Window.Resources>
+        <Style TargetType="{x:Type Button}" x:Key="DefaultButton" BasedOn="{StaticResource DefaultFontsize}">
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+    </Window.Resources>
+
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="125*" />
@@ -26,9 +32,9 @@
         </GroupBox>
                     
         <StackPanel Grid.Row="1" Grid.ColumnSpan="3">
-            <Button Content="AND" Command="{Binding Commands.AddAndOperation}" VerticalAlignment="Center" Margin="12,3" />
-            <Button Content="OR" Command="{Binding Commands.AddOrOperation}" VerticalAlignment="Center" Margin="12,2"/>
-            <Button Content="NOT" Command="{Binding Commands.AddNotOperation}" VerticalAlignment="Center" Margin="12,2"/>
+            <Button Content="AND" Command="{Binding Commands.AddAndOperation}" Style="{StaticResource ButtonStyle}" Margin="12,3" />
+            <Button Content="OR" Command="{Binding Commands.AddOrOperation}" Style="{StaticResource ButtonStyle}" Margin="12,2"/>
+            <Button Content="NOT" Command="{Binding Commands.AddNotOperation}" Style="{StaticResource ButtonStyle}" Margin="12,2"/>
         </StackPanel>
 
         <GroupBox Grid.Row="2" Grid.ColumnSpan="3" Header="Filter Description" BorderBrush="AliceBlue" BorderThickness="2">

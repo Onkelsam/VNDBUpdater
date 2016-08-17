@@ -28,29 +28,6 @@
             <Setter Property="MenuItem.Command" Value="{Binding Command}" />
             <Setter Property="MenuItem.CommandParameter" Value="{Binding CommandParameter}"/>
         </Style>
-        <Style x:Key="NoChromeButton" TargetType="{x:Type Button}">
-            <Setter Property="Background" Value="Transparent"/>
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>
-            <Setter Property="HorizontalContentAlignment" Value="Center"/>
-            <Setter Property="VerticalContentAlignment" Value="Center"/>
-            <Setter Property="Padding" Value="1"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="{x:Type Button}">
-                        <Grid x:Name="Chrome" Background="{TemplateBinding Background}" SnapsToDevicePixels="true">
-                            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="{TemplateBinding Padding}" RecognizesAccessKey="True" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
-                        </Grid>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsEnabled" Value="false">
-                                <Setter Property="Foreground" Value="#ADADAD"/>
-                                <Setter Property="Opacity" TargetName="Chrome" Value="0.5"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
         <Style x:Key="{x:Type DataGridColumnHeadersPresenter}" TargetType="{x:Type DataGridColumnHeadersPresenter}">
             <Setter Property="Grid.ColumnSpan" Value="2"/>
             <Setter Property="Template">
@@ -64,16 +41,37 @@
                 </Setter.Value>
             </Setter>
         </Style>
-        <converters:AliasesConverter x:Key="AliasesConverter" />
-        <converters:PlayTimeConverter x:Key="PlayTimeConverter" />
-        <converters:RelationsConverter x:Key="RelationsConverter" />
+        <Style TargetType="{x:Type Label}" x:Key="DetailsLabel" BasedOn="{StaticResource DefaultFontsize}">
+            <Setter Property="VerticalAlignment" Value="Top"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+        <Style TargetType="{x:Type TextBlock}" x:Key="CharacterTextBlock">
+            <Setter Property="TextWrapping" Value="Wrap"/>
+            <Setter Property="FontSize" Value="13"/>
+        </Style>
+        <Style TargetType="{x:Type ListBox}" x:Key="StandardListBox" BasedOn="{StaticResource DefaultFontsize}">
+            <Setter Property="SelectionMode" Value="Single"/>
+            <Setter Property="IsSynchronizedWithCurrentItem" Value="True"/>
+            <Setter Property="ScrollViewer.CanContentScroll" Value="False"/>
+            <Setter Property="ItemsPanel">
+                <Setter.Value>
+                    <ItemsPanelTemplate>
+                        <VirtualizingStackPanel Orientation="Vertical" IsItemsHost="True"/>
+                    </ItemsPanelTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style TargetType="{x:Type TabControl}" x:Key="StandardTabControl" BasedOn="{StaticResource DefaultFontsize}">
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+            <Setter Property="VerticalAlignment" Value="Top"/>
+        </Style>
         <local:MainViewModel x:Key="MainViewM" />
     </Window.Resources>
 
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="250*" />
-            <ColumnDefinition Width="150*" />
+            <ColumnDefinition Width="200*" />
             <ColumnDefinition Width="200*" />
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
@@ -126,13 +124,13 @@
                 <MenuItem Header="Reset Filters" Command="{Binding Commands.ResetFilters}" />
             </MenuItem>
             <MenuItem Header="Options" Command="{Binding Commands.OpenOptions}" />
+            <MenuItem Header="File Indexer" Command="{Binding Commands.OpenFileIndexer}"/>
             <MenuItem Header="About" Command="{Binding Commands.About}" />
         </Menu>
 
-        <TabControl Grid.Row="1" Grid.Column="0" Grid.RowSpan="1" SelectedIndex="{Binding Path=SelectedVisualNovelTab}" HorizontalAlignment="Left" VerticalAlignment="Top" ItemsSource="{Binding Path=Categories}"/>
+        <TabControl Grid.Row="1" Grid.Column="0" Grid.RowSpan="1" SelectedIndex="{Binding Path=SelectedVisualNovelTab}" ItemsSource="{Binding Path=Categories}" Style="{StaticResource StandardTabControl}"/>
         <DataGrid ItemsSource="{Binding Path=VisualNovelsInGrid, UpdateSourceTrigger=PropertyChanged}" SelectedItem="{Binding Path=SelectedVisualNovel}" 
-                  Grid.Row="2" Grid.RowSpan="4" Grid.Column="0"  AutoGenerateColumns="False" CanUserAddRows="False" GridLinesVisibility="None" 
-                  BorderThickness="0" CanUserResizeRows="False" CanUserDeleteRows="False" RowHeaderWidth="0" SelectionMode="Single" Background="{DynamicResource {x:Static SystemColors.ControlLightLightBrushKey}}" AlternationCount="1">
+                  Grid.Row="2" Grid.RowSpan="4" Grid.Column="0" Style="{StaticResource StandardDataGrid}">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Name" Binding="{Binding Path=Basics.VNDBInformation.title}" IsReadOnly="True" Width="5*" />
                 <DataGridTextColumn Header="Original Name" Binding="{Binding Path=Basics.VNDBInformation.original}" IsReadOnly="True" Width="1*" Visibility="{Binding Source={StaticResource MainViewM}, Path=OriginalNameVisible, Mode=OneWay, BindsDirectlyToSource=True}" />
@@ -184,54 +182,54 @@
             </DataGrid.ContextMenu>
         </DataGrid>
 
-        <Image Source="{Binding Path=SelectedVisualNovel.Basics.MainThumb}" Stretch="{Binding Path=StretchImages}" Grid.Column="1" Grid.Row="2" Margin="2"/>
+        <Image Source="{Binding Path=SelectedVisualNovel.Basics.MainThumb, IsAsync=True}" Stretch="{Binding Path=StretchImages}" Grid.Column="1" Grid.Row="2" Margin="2" />
 
-        <ScrollViewer VerticalScrollBarVisibility="Visible" Grid.Column="2" Grid.Row="2" x:Name="scroll" Visibility="{Binding Path=DetailsVisibility}">
+        <ScrollViewer VerticalScrollBarVisibility="Visible" Grid.Column="2" Grid.Row="2" Visibility="{Binding Path=DetailsVisibility}">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="10*"/>
-                    <RowDefinition Height="10*"/>
-                    <RowDefinition Height="10*"/>
-                    <RowDefinition Height="10*"/>
-                    <RowDefinition Height="10*"/>
-                    <RowDefinition Height="10*"/>
+                    <RowDefinition Height="10*" MaxHeight="10" MinHeight="10"/>
                     <RowDefinition Height="10*"/>
                 </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="10*" MaxWidth="93" MinWidth="93"/>
-                    <ColumnDefinition Width="10*"/>
-                </Grid.ColumnDefinitions>
-                <Label Grid.Row="0" Content="Aliases:" VerticalAlignment="Top" VerticalContentAlignment="Center"  FontSize="14"/>
-                <Label Grid.Row="1" Content="Length:" VerticalAlignment="Top" VerticalContentAlignment="Center" FontSize="14"/>
-                <Label Grid.Row="2" Content="Release Date:" VerticalAlignment="Top" VerticalContentAlignment="Center" FontSize="14"/>
-                <Label Grid.Row="3" Content="Relations:" VerticalAlignment="Top" VerticalContentAlignment="Center" FontSize="14"/>
-                <Label Grid.Row="4" Content="Playtime:" VerticalAlignment="Top" VerticalContentAlignment="Center" FontSize="14"/>
-                <TextBlock Grid.Row="0" Grid.Column="1" TextWrapping="Wrap" Text="{Binding Path=SelectedVisualNovel.Basics.VNDBInformation.aliases, Converter={StaticResource AliasesConverter}}" Margin="5,0,0,0" VerticalAlignment="Center"  FontSize="14"/>
-                <TextBlock Grid.Row="1" Grid.Column="1" TextWrapping="Wrap" Text="{Binding Path=SelectedVisualNovel.Basics.Length, Mode=OneWay}" Margin="5,0,0,0" VerticalAlignment="Center"  FontSize="14"/>
-                <TextBlock Grid.Row="2" Grid.Column="1" TextWrapping="Wrap" Text="{Binding Path=SelectedVisualNovel.Basics.VNDBInformation.released}" Margin="5,0,0,0" VerticalAlignment="Center"  FontSize="14"/>
-                <TextBlock Grid.Row="3" Grid.Column="1" TextWrapping="Wrap" Text="{Binding Path=SelectedVisualNovel.Basics.VNDBInformation.relations, Converter={StaticResource RelationsConverter}}" Margin="5,6,0,0" VerticalAlignment="Center"  FontSize="14"/>
-                <TextBlock Grid.Row="4" Grid.Column="1" TextWrapping="Wrap" Text="{Binding Path=SelectedVisualNovel.Playtime, Converter={StaticResource PlayTimeConverter}}" Margin="5,0,0,0" VerticalAlignment="Center"  FontSize="14"/>
-                <Separator Grid.Row="5" Grid.ColumnSpan="2"/>
-                <RichTextBox Grid.Row="6" Grid.ColumnSpan="2"  Background="{DynamicResource {x:Static SystemColors.MenuBarBrushKey}}" BorderThickness="0" converters:HtmlRichTextBoxBehavior.Text="{Binding Path=SelectedVisualNovel.Basics.Description}" FontSize="14"/>
+                <ItemsControl ItemsSource="{Binding Path=SelectedVisualNovel.Basics.DetailedInformation}" AlternationCount="2">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Grid x:Name="ItemGrid">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="10*" MaxWidth="117" MinWidth="117"/>
+                                    <ColumnDefinition Width="10*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="{Binding Path=Key}" Style="{StaticResource CharacterTextBlock}" VerticalAlignment="Top"/>
+                                <TextBlock Text="{Binding Path=Value}" Style="{StaticResource CharacterTextBlock}" Grid.Column="1"/>
+                            </Grid>
+                            <DataTemplate.Triggers>
+                                <Trigger Property="ItemsControl.AlternationIndex" Value="0">
+                                    <Setter Property="Background" Value="{DynamicResource DisabledVisualElement}" TargetName="ItemGrid"/>
+                                </Trigger>
+                                <Trigger Property="ItemsControl.AlternationIndex" Value="1">
+                                    <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.MenuBarBrushKey}}" TargetName="ItemGrid"/>
+                                </Trigger>
+                            </DataTemplate.Triggers>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+                <Separator Grid.Row="1"/>
+                <RichTextBox Grid.Row="2"  converters:HtmlRichTextBoxBehavior.Text="{Binding Path=SelectedVisualNovel.Basics.Description}" Style="{StaticResource StandardRichTextBox}"/>
             </Grid>
         </ScrollViewer>
 
-        <TabControl Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2" SelectedIndex="{Binding Path=SelectedSubTab}" HorizontalAlignment="Left" VerticalAlignment="Top">
+
+        <TabControl Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2" SelectedIndex="{Binding Path=SelectedSubTab}" Style="{StaticResource StandardTabControl}">
             <TabItem Header="Screenshots" />
             <TabItem Header="Characters" />
         </TabControl>
 
         <Grid Grid.Column="1" Grid.Row="4" Grid.ColumnSpan="2" Visibility="{Binding Path=ScreenshotTabVisibility}" Margin="2">
-            <ListBox SelectionMode="Single" ItemsSource="{Binding Path=SelectedVisualNovel.Basics.Screenshots}"  IsSynchronizedWithCurrentItem="True" x:Name="List" ScrollViewer.CanContentScroll="False">
-                <ListBox.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <VirtualizingStackPanel Orientation="Vertical" IsItemsHost="True" />
-                    </ItemsPanelTemplate>
-                </ListBox.ItemsPanel>
+            <ListBox ItemsSource="{Binding Path=SelectedVisualNovel.Basics.Screenshots}" x:Name="ScreenshotList" Style="{StaticResource StandardListBox}">
                 <ListBox.ItemContainerStyle>
                     <Style TargetType="ListBoxItem">
-                        <Setter Property="MaxWidth" Value="{Binding ElementName=List, Path=ActualWidth}"/>
-                        <Setter Property="MaxHeight" Value="{Binding ElementName=List, Path=ActualHeight}"/>
+                        <Setter Property="MaxWidth" Value="{Binding ElementName=ScreenshotList, Path=ActualWidth}"/>
+                        <Setter Property="MaxHeight" Value="{Binding ElementName=ScreenshotList, Path=ActualHeight}"/>
                         <Setter Property="HorizontalContentAlignment" Value="Center" />
                     </Style>
                 </ListBox.ItemContainerStyle>
@@ -239,14 +237,14 @@
                     <DataTemplate>
                         <Grid>
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="{Binding ElementName=List, Path=ActualWidth}"/>
+                                <ColumnDefinition Width="{Binding ElementName=ScreenshotList, Path=ActualWidth}"/>
                             </Grid.ColumnDefinitions>
                             <Grid.RowDefinitions>
-                                <RowDefinition Height="{Binding ElementName=List, Path=ActualHeight}"/>
+                                <RowDefinition Height="{Binding ElementName=ScreenshotList, Path=ActualHeight}"/>
                             </Grid.RowDefinitions>
-                            <Image Source="{Binding Path=image}" Stretch="{Binding Path=StretchImages}">
+                            <Image Source="{Binding Path=image, IsAsync=True}" Stretch="{Binding Path=StretchImages}">
                                 <Image.ToolTip>
-                                    <Image Source="{Binding Path=image}" Stretch="Uniform" MaxHeight="1000" MaxWidth="1000"/>
+                                    <Image Source="{Binding Path=image, IsAsync=True}" Stretch="Uniform" MaxHeight="1000" MaxWidth="1000"/>
                                 </Image.ToolTip>
                             </Image>
                         </Grid>
@@ -256,16 +254,11 @@
         </Grid>
 
         <Grid Grid.Column="1" Grid.Row="4" Visibility="{Binding Path=CharacterTabVisibility}">
-            <ListBox SelectionMode="Single" ItemsSource="{Binding Path=SelectedVisualNovel.Characters}"  IsSynchronizedWithCurrentItem="True" x:Name="CharList" ScrollViewer.CanContentScroll="False" SelectedItem="{Binding Path=SelectedCharacter}">
-                <ListBox.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <VirtualizingStackPanel Orientation="Vertical" IsItemsHost="True" />
-                    </ItemsPanelTemplate>
-                </ListBox.ItemsPanel>
+            <ListBox ItemsSource="{Binding Path=SelectedVisualNovel.Characters}"  x:Name="CharacterList" SelectedItem="{Binding Path=SelectedCharacter}" Style="{StaticResource StandardListBox}">
                 <ListBox.ItemContainerStyle>
                     <Style TargetType="ListBoxItem">
-                        <Setter Property="MaxWidth" Value="{Binding ElementName=CharList, Path=ActualWidth}"/>
-                        <Setter Property="MaxHeight" Value="{Binding ElementName=CharList, Path=ActualHeight}"/>
+                        <Setter Property="MaxWidth" Value="{Binding ElementName=CharacterList, Path=ActualWidth}"/>
+                        <Setter Property="MaxHeight" Value="{Binding ElementName=CharacterList, Path=ActualHeight}"/>
                         <Setter Property="HorizontalContentAlignment" Value="Center" />
                     </Style>
                 </ListBox.ItemContainerStyle>
@@ -273,14 +266,14 @@
                     <DataTemplate>
                         <Grid>
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="{Binding ElementName=CharList, Path=ViewportWidth}"/>
+                                <ColumnDefinition Width="{Binding ElementName=CharacterList, Path=ViewportWidth}"/>
                             </Grid.ColumnDefinitions>
                             <Grid.RowDefinitions>
-                                <RowDefinition Height="{Binding ElementName=CharList, Path=ViewportHeight}"/>
+                                <RowDefinition Height="{Binding ElementName=CharacterList, Path=ViewportHeight}"/>
                             </Grid.RowDefinitions>
-                            <Image Source="{Binding Path=VNDBInformation.image}" Stretch="{Binding Path=StretchImages}">
+                            <Image Source="{Binding Path=VNDBInformation.image, IsAsync=True}" Stretch="{Binding Path=StretchImages}">
                                 <Image.ToolTip>
-                                    <Image Source="{Binding Path=VNDBInformation.image}" Stretch="Uniform"/>
+                                    <Image Source="{Binding Path=VNDBInformation.image, IsAsync=True}" Stretch="Uniform"/>
                                 </Image.ToolTip>
                             </Image>
                         </Grid>
@@ -292,7 +285,7 @@
         <Grid Grid.Column="2" Grid.Row="4" Visibility="{Binding Path=CharacterTabVisibility}">
             <ScrollViewer Grid.Column="3" Grid.RowSpan="3" Margin="5,0,0,0">
                 <StackPanel>
-                    <TextBlock TextWrapping="Wrap" Text="{Binding Path=SelectedCharacter.VNDBInformation.name}" FontSize="14" />
+                    <TextBlock Text="{Binding Path=SelectedCharacter.VNDBInformation.name}" Style="{StaticResource CharacterTextBlock}" />
                     <Separator />
                     <ItemsControl ItemsSource="{Binding Path=SelectedCharacter.ConvertedTraitsSpoilerFree}" AlternationCount="2">
                         <ItemsControl.ItemTemplate>
@@ -302,8 +295,8 @@
                                         <ColumnDefinition Width="10*" MaxWidth="117" MinWidth="117"/>
                                         <ColumnDefinition Width="20*" />
                                     </Grid.ColumnDefinitions>
-                                    <TextBlock Text="{Binding Path=Key}" Margin="0,6,0,2" FontSize="13" />
-                                    <TextBlock TextWrapping="Wrap" Grid.Column="1" Text="{Binding Path=Value}" Margin="0,6,0,2" FontSize="13"/>
+                                    <TextBlock Text="{Binding Path=Key}" Margin="0,6,0,2" Style="{StaticResource CharacterTextBlock}" />
+                                    <TextBlock Grid.Column="1" Text="{Binding Path=Value}" Margin="0,6,0,2" Style="{StaticResource CharacterTextBlock}"/>
                                 </Grid>
                                 <DataTemplate.Triggers>
                                     <Trigger Property="ItemsControl.AlternationIndex" Value="0">
@@ -317,7 +310,7 @@
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
                     <Separator/>
-                    <RichTextBox Grid.Column="1" Grid.Row="2" IsReadOnly="True" BorderThickness="0" Background="{DynamicResource {x:Static SystemColors.MenuBarBrushKey}}" VerticalScrollBarVisibility="Auto" converters:HtmlRichTextBoxBehavior.Text="{Binding Path=SelectedCharacter.Description}" FontSize="14"/>
+                    <RichTextBox Grid.Column="1" Grid.Row="2" converters:HtmlRichTextBoxBehavior.Text="{Binding Path=SelectedCharacter.Description}" Style="{StaticResource StandardRichTextBox}"/>
                 </StackPanel>
             </ScrollViewer>
         </Grid>
@@ -328,13 +321,11 @@
                 <RowDefinition Height="10*"/>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="7.5*"/>
+                <ColumnDefinition Width="10*" MinWidth="320"/>
                 <ColumnDefinition Width="10*"/>
             </Grid.ColumnDefinitions>
-            <TabControl SelectedIndex="{Binding SelectedTagTab}" ItemsSource="{Binding Path=TagCategories}" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-            <DataGrid ItemsSource="{Binding Path=TagsInGrid, UpdateSourceTrigger=PropertyChanged}" Grid.Row="1" CanUserAddRows="False" GridLinesVisibility="None" BorderThickness="0"
-                      AutoGenerateColumns="False" ScrollViewer.VerticalScrollBarVisibility="Visible" CanUserResizeRows="False" CanUserDeleteRows="False" RowHeaderWidth="0" SelectionMode="Single"
-                      Background="{DynamicResource {x:Static SystemColors.ControlLightLightBrushKey}}" SelectedItem="{Binding Path=SelectedTag}">
+            <TabControl SelectedIndex="{Binding SelectedTagTab}" ItemsSource="{Binding Path=TagCategories}" Style="{StaticResource StandardTabControl}"/>
+            <DataGrid ItemsSource="{Binding Path=TagsInGrid, UpdateSourceTrigger=PropertyChanged}" Grid.Row="1" SelectedItem="{Binding Path=SelectedTag}" Style="{StaticResource StandardDataGrid}">
                 <DataGrid.Resources>
                     <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="LightBlue"/>
                     <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="LightBlue"/>
@@ -344,14 +335,14 @@
                     <DataGridTextColumn Header="Score" Binding="{Binding Path=Score}" IsReadOnly="True" Selector.IsSelected="True"/>
                 </DataGrid.Columns>
             </DataGrid>
-            <RichTextBox Grid.Row="2" Grid.Column="1" IsReadOnly="True" BorderThickness="0" Background="{DynamicResource {x:Static SystemColors.MenuBarBrushKey}}" VerticalScrollBarVisibility="Auto" converters:HtmlRichTextBoxBehavior.Text="{Binding Path=SelectedTag.Description}" FontSize="14"/>
+            <RichTextBox Grid.Row="2" Grid.Column="1" converters:HtmlRichTextBoxBehavior.Text="{Binding Path=SelectedTag.Description}" Style="{StaticResource StandardRichTextBox}"/>
         </Grid>
 
         <StatusBar Grid.Row="6" Grid.ColumnSpan="3">
             <StatusBarItem HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch">
                 <Grid>
                     <ProgressBar Minimum="0" Maximum="{Binding Path=CurrentPendingTasks}" Value="{Binding Path=CompletedPendingTasks}" Height="20" HorizontalAlignment="Stretch" Style="{DynamicResource ProgressBarStyle}" OverridesDefaultStyle="True" Foreground="{DynamicResource ProgressBarBackgroundBrush}" Background="{x:Null}"/>
-                    <TextBlock Text="{Binding Path=StatusText}" HorizontalAlignment="Center"/>
+                    <TextBlock Text="{Binding Path=StatusText}" HorizontalAlignment="Center" Style="{StaticResource CharacterTextBlock}"/>
                 </Grid>
             </StatusBarItem>
         </StatusBar>

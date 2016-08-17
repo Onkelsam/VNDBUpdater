@@ -102,5 +102,9 @@ namespace CommunicationLib.VNDB
         /// Deletes wish for given VN and logged in user.
         /// </summary>
         VndbResponse DeleteVNFromWishList(int ID);
+
+        VndbResponse SearchByTitle(string title);
+
+        VndbResponse QueryInformationByTitle(string title);
     }
 }

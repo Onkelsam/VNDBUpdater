@@ -28,8 +28,6 @@ namespace VNDBUpdater.ViewModels
             _User = UserHelper.CurrentUser;
 
             _Commands.AddCommand("Login", ExecuteLoginCommand, CanExecuteSaveCommand);
-            _Commands.AddCommand("SetInstallFolderPath", ExecuteSetInstallFolderPath, CanExecuteSetInstallFolderPath);
-            _Commands.AddCommand("StartIndexing", ExecuteStartIndexing, CanExecuteStartIndexing);
             _Commands.AddCommand("Save", ExecuteSaveSettings);
         }
 
@@ -79,17 +77,6 @@ namespace VNDBUpdater.ViewModels
                 _User.Settings.MinimizeToTray = value;
 
                 OnPropertyChanged(nameof(MinimizeToTray));
-            }
-        }
-
-        public string InstallFolderPath
-        {
-            get { return _User.Settings.InstallFolderPath; }
-            set
-            {
-                _User.Settings.InstallFolderPath = value;
-
-                OnPropertyChanged(nameof(InstallFolderPath));
             }
         }
 
@@ -164,24 +151,6 @@ namespace VNDBUpdater.ViewModels
             Login();
         }
 
-        public void ExecuteSetInstallFolderPath(object parameter)
-        {
-            _User.Settings.InstallFolderPath = FileHelper.GetFolderPath();
-            _User.SaveUser();
-
-            FileHelper.ResetFolders();
-
-            OnPropertyChanged(nameof(InstallFolderPath));
-        }
-
-        public bool CanExecuteSetInstallFolderPath(object parameter)
-        {
-            if (FileIndexer.Status != TaskStatus.Running)
-                return true;
-            else
-                return false;
-        }
-
         public bool CanExecuteSaveCommand(object parameter)
         {
             if (_User.Username != null)
@@ -189,20 +158,6 @@ namespace VNDBUpdater.ViewModels
                     return true;
 
             return false;
-        }
-
-        public void ExecuteStartIndexing(object parameter)
-        {
-            var indexer = new FileIndexer();
-            indexer.Start(_MainScreen);
-        }
-
-        public bool CanExecuteStartIndexing(object parameter)
-        {
-            if (Synchronizer.Status != TaskStatus.Running && FileIndexer.Status != TaskStatus.Running && Refresher.Status != TaskStatus.Running)
-                return true;
-            else
-                return false;
         }
 
         public void ExecuteSaveSettings(object parameter)

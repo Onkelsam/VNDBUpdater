@@ -122,6 +122,7 @@
     <Compile Include="BackgroundTasks\Refresher.cs" />
     <Compile Include="BackgroundTasks\StartUp.cs" />
     <Compile Include="BackgroundTasks\Synchronizer.cs" />
+    <Compile Include="Models\Internal\FileIndexerSettings.cs" />
     <Compile Include="ValueConverters\HtmlRichtTextBoxBehavior.cs" />
     <Compile Include="Data\Constants.cs" />
     <Compile Include="Helper\EventLogger.cs" />
@@ -143,10 +144,8 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="ValueConverters\AliasesConverter.cs" />
-    <Compile Include="ValueConverters\PlayTimeConverter.cs" />
-    <Compile Include="ValueConverters\RelationsConverter.cs" />
     <Compile Include="ViewModels\AboutViewModel.cs" />
+    <Compile Include="ViewModels\FileIndexerViewModel.cs" />
     <Compile Include="ViewModels\OptionsViewModel.cs" />
     <Compile Include="ViewModels\ThreadSafeObservableCollection.cs" />
     <Compile Include="Views\About.xaml.cs">
@@ -171,6 +170,9 @@
     <Compile Include="ViewModels\CommandMap.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
     <Compile Include="ViewModels\ViewModelBase.cs" />
+    <Compile Include="Views\FileIndexer.xaml.cs">
+      <DependentUpon>FileIndexer.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\Options.xaml.cs">
       <DependentUpon>Options.xaml</DependentUpon>
     </Compile>
@@ -206,6 +208,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Views\FileIndexer.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -222,6 +228,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="Views\Options.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Styles.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

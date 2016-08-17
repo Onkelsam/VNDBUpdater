@@ -1,41 +1,12 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.IO.Compression;
-using System.Linq;
 using System.Windows.Forms;
 using VNDBUpdater.Data;
-using VNDBUpdater.Models;
 
 namespace VNDBUpdater.Helper
 {
     public static class FileHelper
     {
-        private static string[] _Folders;
-
-        private static string[] Folders
-        {
-            get
-            {
-                if (_Folders == null)
-                {
-                    var InstallFolder = UserHelper.CurrentUser.Settings.InstallFolderPath;
-
-                    if (InstallFolder != null)
-                    {
-                        _Folders = Directory.GetDirectories(InstallFolder, "*.*", SearchOption.AllDirectories);
-                        return _Folders;
-                    }
-                }
-
-                return _Folders;
-            }
-        }
-
-        public static void ResetFolders()
-        {
-            _Folders = null;
-        }
-
         public static string GetExePath()
         {
             var fileDialog = new Microsoft.Win32.OpenFileDialog
@@ -61,15 +32,12 @@ namespace VNDBUpdater.Helper
         {
             var fileDialog = new FolderBrowserDialog()
             {
-                Description = "Select main folder where your Visual Novels are stored."
+                Description = "Select folder"
             };
 
             fileDialog.ShowDialog();
 
-            if (!string.IsNullOrWhiteSpace(fileDialog.SelectedPath))
-                return fileDialog.SelectedPath;
-            else
-                return UserHelper.CurrentUser.Settings.InstallFolderPath;
+            return fileDialog.SelectedPath;
         }
 
         public static void Decompress(FileInfo fileToDecompress)
@@ -104,8 +72,8 @@ namespace VNDBUpdater.Helper
 
         public static void BackupDatabase()
         {
-            if (File.Exists(Constants.PathToDatabase + Constants.DatabaseName))
-                File.Copy(Constants.PathToDatabase + Constants.DatabaseName, Constants.PathToDatabase + Constants.BackupDatabaseName, true);
+            if (File.Exists(Constants.DirectoryPath + Constants.PathToDatabase + Constants.DatabaseName))
+                File.Copy(Constants.DirectoryPath + Constants.PathToDatabase + Constants.DatabaseName, Constants.DirectoryPath + Constants.PathToDatabase + Constants.BackupDatabaseName, true);
         }
 
         public static void CreateFile(string path)
@@ -114,85 +82,6 @@ namespace VNDBUpdater.Helper
             {
                 using (var fs = File.Create(path)) { } ;
             }
-        }
-
-        public static string SearchForVisualNovelExe(VisualNovel VN)
-        {
-            if (Folders != null)
-            {
-                foreach (var folder in Folders)
-                {
-                    if (new DirectoryInfo(folder).Name.ToLower().Trim() == VN.Basics.VNDBInformation.title.ToLower().Trim())
-                    {
-                        return GetExecuteable(folder);
-                    }
-                }
-
-                // Second try. Use the LevenshteinDistance algorithm to find similiar folders.
-                for (int maxDistance = 2; maxDistance < Constants.MaxDistanceBetweenStringsForIndexer; maxDistance++)
-                {
-                    foreach (var folder in Folders)
-                    {
-                        if (ComputeLevenshteinDistance(new DirectoryInfo(folder).Name.ToLower().Trim(), VN.Basics.VNDBInformation.title.ToLower().Trim()) < maxDistance)
-                        {
-                            return GetExecuteable(folder);
-                        }
-                    }
-                }
-            }
-
-            return string.Empty;
-        }
-
-        private static string GetExecuteable(string folder)
-        {
-            foreach (var file in Directory.GetFiles(folder, "*.exe", SearchOption.AllDirectories))
-            {
-                if (Constants.ExcludedExeFileNames.Any(x => file.Contains(x.ToLower())))
-                    continue;
-
-                return file;
-            }
-
-            return string.Empty;
-        }
-
-        /// <summary>
-        /// Algorithm that compares two strings and returns how many characters are different.
-        /// </summary>
-        private static int ComputeLevenshteinDistance(string s, string t)
-        {
-            if (string.IsNullOrEmpty(s))
-            {
-                if (string.IsNullOrEmpty(t))
-                    return 0;
-                return t.Length;
-            }
-
-            if (string.IsNullOrEmpty(t))
-            {
-                return s.Length;
-            }
-
-            int n = s.Length;
-            int m = t.Length;
-            int[,] d = new int[n + 1, m + 1];
-
-            for (int i = 0; i <= n; d[i, 0] = i++) ;
-            for (int j = 1; j <= m; d[0, j] = j++) ;
-
-            for (int i = 1; i <= n; i++)
-            {
-                for (int j = 1; j <= m; j++)
-                {
-                    int cost = (t[j - 1] == s[i - 1]) ? 0 : 1;
-                    int min1 = d[i - 1, j] + 1;
-                    int min2 = d[i, j - 1] + 1;
-                    int min3 = d[i - 1, j - 1] + cost;
-                    d[i, j] = Math.Min(Math.Min(min1, min2), min3);
-                }
-            }
-            return d[n, m];
         }
     }
 }

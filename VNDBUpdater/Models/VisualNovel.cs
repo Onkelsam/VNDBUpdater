@@ -216,15 +216,6 @@ namespace VNDBUpdater.Models
             }                
         }
 
-        public void CrawlExePath()
-        {
-            if (!InstallationPathExists && (UserHelper.CurrentUser.Settings.InstallFolderPath != null))
-            {
-                ExePath = FileHelper.SearchForVisualNovelExe(this);
-                OnPropertyChanged(nameof(ExePath));
-            }
-        }
-
         public void OnPropertyChanged(string property)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(property));

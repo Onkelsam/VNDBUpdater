@@ -74,6 +74,7 @@ namespace VNDBUpdater.ViewModels
             _Commands.AddCommand("ShowMainWindow", ExecuteShowMainWindow);
             _Commands.AddCommand("StateChanged", ExecuteStateChanged);
             _Commands.AddCommand("Resized", ExecuteResized);
+            _Commands.AddCommand("OpenFileIndexer", ExecuteOpenFileIndexer);
 
             _VisualNovelsInGrid.CollectionChanged += OnCollectionChanged;            
             _TagsInGrid.CollectionChanged += OnCollectionChanged;
@@ -240,7 +241,7 @@ namespace VNDBUpdater.ViewModels
                 if (StartUp.Status == TaskStatus.Running)
                     return StartUp.StatusString;
                 else
-                    return VNDBCommunication.StatusString + " " + Synchronizer.StatusString + " " + FileIndexer.StatusString + " " + Refresher.StatusString;
+                    return VNDBCommunication.StatusString + " " + Synchronizer.StatusString + " " + BackgroundTasks.FileIndexer.StatusString + " " + Refresher.StatusString;
             }
         }
 
@@ -341,7 +342,7 @@ namespace VNDBUpdater.ViewModels
                 UserHelper.CurrentUser.EncryptedPassword == null ||
                 VNDBCommunication.Status == VNDBCommunicationStatus.NotLoggedIn ||
                 VNDBCommunication.Status == VNDBCommunicationStatus.Error ||
-                FileIndexer.Status == TaskStatus.Running ||
+                BackgroundTasks.FileIndexer.Status == TaskStatus.Running ||
                 Refresher.Status == TaskStatus.Running ||
                 StartUp.Status == TaskStatus.Running)
                 return false;
@@ -491,7 +492,7 @@ namespace VNDBUpdater.ViewModels
                 StartUp.Cancel();
                 Refresher.Cancel();
                 Synchronizer.Cancel();
-                FileIndexer.Cancel();
+                BackgroundTasks.FileIndexer.Cancel();
                 UserHelper.CurrentUser.SaveUser();
                 RedisCommunication.SaveRedis();
                 RedisCommunication.Dispose();
@@ -577,6 +578,11 @@ namespace VNDBUpdater.ViewModels
         public void ExecuteOpenOptions(object parameter)
         {
             _WindowHandler.Open(new Options(this));
+        }
+
+        public void ExecuteOpenFileIndexer(object parameter)
+        {
+            _WindowHandler.Open(new Views.FileIndexer(this));
         }
 
         private void UpdateTagGrid()

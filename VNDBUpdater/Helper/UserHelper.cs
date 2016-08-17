@@ -1,5 +1,4 @@
-﻿using VNDBUpdater.Communication.Database;
-using VNDBUpdater.Models;
+﻿using VNDBUpdater.Models;
 
 namespace VNDBUpdater.Helper
 {

@@ -11,11 +11,18 @@
         <local:AboutViewModel/>
     </Window.DataContext>
 
+    <Window.Resources>
+        <Style TargetType="{x:Type Label}">
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+        </Style>
+    </Window.Resources>
+
     <Grid>
         <StackPanel VerticalAlignment="Center">
-            <Label Content="{Binding Path=Version}" HorizontalAlignment="Center" FontWeight="Bold" />
-            <Label Content="{Binding Path=Copyright}"  HorizontalAlignment="Center"/>
-            <Label Content="{Binding Path=LatestRelease}" HorizontalAlignment="Center"/>
+            <Label Content="{Binding Path=Version}" FontWeight="Bold" />
+            <Label Content="{Binding Path=Copyright}"  />
+            <Label Content="{Binding Path=LatestRelease}" />
             <TextBlock HorizontalAlignment="Center">           
                 <Hyperlink NavigateUri="https://github.com/Onkelsam/VNDBUpdater/releases" Command="{Binding Commands.OpenGitHubLink}">
                     Get new Version
