@@ -182,7 +182,7 @@
             </DataGrid.ContextMenu>
         </DataGrid>
 
-        <Image Source="{Binding Path=SelectedVisualNovel.Basics.MainThumb, IsAsync=True}" Stretch="{Binding Path=StretchImages}" Grid.Column="1" Grid.Row="2" Margin="2" />
+        <Image Source="{Binding Path=SelectedVisualNovel.Basics.MainThumb, IsAsync=False}" Stretch="{Binding Path=StretchImages}" Grid.Column="1" Grid.Row="2" Margin="2" />
 
         <ScrollViewer VerticalScrollBarVisibility="Visible" Grid.Column="2" Grid.Row="2" Visibility="{Binding Path=DetailsVisibility}">
             <Grid>
@@ -242,9 +242,9 @@
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="{Binding ElementName=ScreenshotList, Path=ActualHeight}"/>
                             </Grid.RowDefinitions>
-                            <Image Source="{Binding Path=image, IsAsync=True}" Stretch="{Binding Path=StretchImages}">
+                            <Image Source="{Binding Path=image, IsAsync=False}" Stretch="{Binding Path=StretchImages}">
                                 <Image.ToolTip>
-                                    <Image Source="{Binding Path=image, IsAsync=True}" Stretch="Uniform" MaxHeight="1000" MaxWidth="1000"/>
+                                    <Image Source="{Binding Path=image, IsAsync=False}" Stretch="Uniform" MaxHeight="1000" MaxWidth="1000"/>
                                 </Image.ToolTip>
                             </Image>
                         </Grid>
@@ -271,9 +271,9 @@
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="{Binding ElementName=CharacterList, Path=ViewportHeight}"/>
                             </Grid.RowDefinitions>
-                            <Image Source="{Binding Path=VNDBInformation.image, IsAsync=True}" Stretch="{Binding Path=StretchImages}">
+                            <Image Source="{Binding Path=VNDBInformation.image, IsAsync=False}" Stretch="{Binding Path=StretchImages}">
                                 <Image.ToolTip>
-                                    <Image Source="{Binding Path=VNDBInformation.image, IsAsync=True}" Stretch="Uniform"/>
+                                    <Image Source="{Binding Path=VNDBInformation.image, IsAsync=False}" Stretch="Uniform"/>
                                 </Image.ToolTip>
                             </Image>
                         </Grid>
