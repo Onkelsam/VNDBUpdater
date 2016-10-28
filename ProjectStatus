@@ -12,10 +12,6 @@ Current tasks:
 
   Currently doing:
     - Add vns with vn name. Propably in conjunction with the changes to the file indexer. Will be a pain...
-    
-  Minor tasks:
-    - Constant improvements to the codebase through refactoring.
-    - Finding bugs and fixing them.
       
   On Hold:
     - Remember user column reordering and resizing. -> Pretty difficult.
