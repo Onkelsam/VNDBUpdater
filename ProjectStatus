@@ -1,26 +1,41 @@
 Implementation planned:
   
   Minor tasks:
+    - Make character information scroll with the character image.
+    - Add option to show images in a horizontal/vertical row.
+    - Gallery mode for screenshots.
+    - Filter box for tags so you can pre-filter them before selecting one.
+    - User option to set tags as favourite, so it brings them on the top of the list.
+    - Color code tags
     
   Medium tasks:
     - Wishlist implementation. Propably in a new window.
+    - Cache images locally.
+    - Filter by developer, artist, scenario creator, language etc.
+    - Set exe paths and create walkthroughs while not connected to vndb.
     
   Major tasks:
-    
-  
-Current tasks:
-
-  Currently doing:
+    - Implement themes offered by vndb.
     - Add vns with vn name. Propably in conjunction with the changes to the file indexer. Will be a pain...
-      
+  
   On Hold:
     - Remember user column reordering and resizing. -> Pretty difficult.
     - Display related visual novels as link, so you can click on them to get to the VNDB page 
       or select the vn if it is already on your list.
     - Change file indexer so it can find VNs by directory name and fetch the info from VNDB.org. -> Was halfway done, but I wasn't happy with it.
+    
+Current tasks:
 
+  Currently doing:
+    My semester has just begun and I don't have time to work on this, so work is onhold probably until I'm finished with my bachelor thesis 
+    next year (somewhere in june hopefully...).
+      
 
-Done:
+Done (and not yet released):
+
+    - Fixed a crash that occured if you browsed through the vn list with your arrow keys.
+
+Done (and released):
 
   Minor:
     - Add scrollbar to vn description window.
@@ -30,7 +45,7 @@ Done:
     - Make it clear if no character information is found.
     - Added 'No image available' and 'Image is NSFW' images.
     - Images fixed.
-    - Window size will be remembered...
+    - Window size will be remembered...    
   
   Medium:
     - Parse description text etc. correctly (implement a parser for the VNDB markdown text).
