@@ -1,62 +1,23 @@
-﻿
+﻿using System.ComponentModel;
+
 namespace VNDBUpdater.Data
 {
-    public enum TagCategory : byte
+    public enum SpoilerSetting
     {
-        All = 0,
-        cont,
-        ero,
-        tech
-    };
-
-    public enum VisualNovelCatergory : byte
-    {
-        Unknown = 0,
-        Playing,
-        Finished,
-        Stalled,
-        Dropped,
-    };
-
-    public enum ErrorResponse : byte
-    {
-        Throttled = 0,
-        AuthenticationFailed,
-        Unknown
-    };
-
-    public enum VNDBCommunicationStatus : byte
-    {
-        LoggedIn = 0,
-        NotLoggedIn,
-        Error,
-        Throttled,
-    };
-
-    public enum SpoilerSetting : byte
-    {
+        [Description("Hide all")]
         Hide = 0,
+
+        [Description("Show minor spoilers")]
         ShowMinor,
+
+        [Description("Show all spoilers")]
         ShowAll,        
     };
 
-    public enum SpoilerLevel : byte
+    public enum SpoilerLevel
     {
         none = 0,
         minor,
         major
     };
-
-    public enum ControlVisibility : byte
-    {
-        Collapsed = 0,
-        Hidden,
-        Visible
-    };
-
-    public enum SubTabs : byte
-    {
-        Screenshots = 0,
-        Characters
-    }
 }

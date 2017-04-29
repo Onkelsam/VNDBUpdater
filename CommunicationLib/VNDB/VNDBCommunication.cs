@@ -33,7 +33,7 @@ namespace CommunicationLib.VNDB
 
             Client = new VndbConnection();
 
-            var response = Client.Login(username, password);
+            var response =  Client.Login(username, password);
 
             if (response.ResponseType != VndbResponseType.Error)
                 _IsConnected = true;
@@ -70,26 +70,15 @@ namespace CommunicationLib.VNDB
             return Client.Query(command);
         }
 
-        public VndbResponse QueryInformationByTitle(string title)
+        public VndbResponse SearchByTitle(string title, int page)
         {
             CheckConnection();
 
             InputSanitization.CheckStringArgument(title);
 
-            SetOptionsToDefault();
+            SetOptions(page, 25, "id");
 
-            return Query("get vn basic,details,stats,relations,tags,screen (title=" + JsonConvert.SerializeObject(title) + ")");
-        }
-
-        public VndbResponse SearchByTitle(string title)
-        {
-            CheckConnection();
-
-            InputSanitization.CheckStringArgument(title);
-
-            SetOptionsToDefault();
-
-            return Query("get vn basic,details,stats,relations,tags,screen (search~" + JsonConvert.SerializeObject(title) + ")");
+            return Query("get vn basic,details,stats,relations,tags,screens (search~" + JsonConvert.SerializeObject(title) + ")");
         }
 
         public VndbResponse QueryInformation(int[] IDs)

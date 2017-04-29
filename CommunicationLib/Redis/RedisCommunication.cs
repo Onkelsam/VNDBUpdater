@@ -150,6 +150,13 @@ namespace CommunicationLib.Redis
             Client.ForceSave();
         }
 
+        public DateTime GetLastSave()
+        {
+            CheckConnection();
+
+            return Client.GetLastSave();
+        }
+
         private void CheckConnection()
         {
             if (!_IsConnected)

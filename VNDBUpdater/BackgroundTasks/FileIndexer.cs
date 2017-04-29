@@ -3,118 +3,99 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using VNDBUpdater.Data;
-using VNDBUpdater.Helper;
-using VNDBUpdater.Models;
-using VNDBUpdater.Models.Internal;
-using VNDBUpdater.ViewModels;
+using VNDBUpdater.GUI.Models.VisualNovel;
+using VNDBUpdater.Services.Logger;
+using VNDBUpdater.Services.Status;
+using VNDBUpdater.Services.User;
+using VNDBUpdater.Services.VN;
 
 namespace VNDBUpdater.BackgroundTasks
 {
-    public class FileIndexer : BackgroundTask
+    public class FileIndexer : TaskBase
     {
-        private FileIndexerViewModel _FileIndexerView;
+        private IVNService _VNService;
+        private IUserService _UserService;
 
-        private static TaskStatus _Status = TaskStatus.WaitingToRun;
-        private FileIndexerSettings Settings = UserHelper.CurrentUser.FileIndexerSetting;
+        private FileIndexerSettingsModel Settings;
 
-        public static TaskStatus Status
+        public FileIndexer(IStatusService StatusService, IVNService VNService, IUserService UserService, ILoggerService LoggerService)
+            : base(StatusService, LoggerService)
         {
-            get { return _Status; }
+            _VNService = VNService;
+            _UserService = UserService;
+
+            Settings = _UserService.Get().FileIndexerSetting;
         }
 
-        public static string StatusString
+        public override void Start(Action<bool> OnTaskCompleted)
         {
-            get
-            {
-                switch(_Status)
-                {
-                    case (TaskStatus.Running):
-                        return nameof(FileIndexer) +  Constants.TaskRunning + _MainScreen.CompletedPendingTasks + " of " + _MainScreen.CurrentPendingTasks + " Visual Novels indexed.";
-                    case (TaskStatus.RanToCompletion):
-                        return nameof(FileIndexer) + Constants.TaskFinished + " " + LocalVisualNovelHelper.LocalVisualNovels.Count(x => x.ExePath == null || x.ExePath == "") + " could not be indexed.";
-                    case (TaskStatus.Faulted):
-                        return nameof(FileIndexer) + Constants.TaskFaulted;
-                    default:
-                        return string.Empty;
-                }
-            }
+            CurrentTask = nameof(FileIndexer);
+
+            Task.Factory.StartNew(() => Indexing(OnTaskCompleted));
         }
 
-        public void Start(MainViewModel MainScreen, FileIndexerViewModel IndexerView)
-        {
-            if (_Status != TaskStatus.Running)
-            {
-                base.Start(MainScreen);
-
-                _FileIndexerView = IndexerView;
-
-                EventLogger.LogInformation(nameof(FileIndexer) + ":" + nameof(Start), Constants.TaskStarted);
-
-                _MainScreen.CurrentPendingTasks = LocalVisualNovelHelper.LocalVisualNovels.Count(x => x.ExePath == null || x.ExePath == "");
-                _MainScreen.CompletedPendingTasks = 0;
-                _Status = TaskStatus.Running;
-
-                _BackgroundTask = new Task(Indexing, _CancelToken);
-                _BackgroundTask.Start();
-            }
-        }
-
-        public static void Cancel()
-        {
-            if (_Status == TaskStatus.Running)
-            {
-                _CancelTokenSource.Cancel();
-            }
-        }
-
-        private void Indexing()
+        private void Indexing(Action<bool> OnTaskCompleted)
         {
             try
             {
-                EventLogger.LogInformation(nameof(FileIndexer) + ":" + nameof(Indexing), Constants.TasksPending + _MainScreen.CurrentPendingTasks.ToString());
-
+                PercentageCompleted = 0;
+                IsRunning = true;
+                CurrentStatus = nameof(FileIndexer) + " running. Currently getting all subfolders... Will take a while.";
+                
                 List<DirectoryInfo> folders = GetFolders();
 
                 bool vnFound = false;
-                var indexedVNs = new List<VisualNovel>();
+                int successfull = 0;
+                var indexedVNs = new List<VisualNovelModel>();
 
-                foreach (var vn in LocalVisualNovelHelper.LocalVisualNovels.Where(x => x.ExePath == null || x.ExePath == ""))
+                _TasksToDo = _VNService.GetLocal().Count(x => string.IsNullOrEmpty(x.ExePath));
+                CurrentStatus = _TasksToDo + "will be tried to index...";
+
+                foreach (var vn in _VNService.GetLocal().Where(x => string.IsNullOrEmpty(x.ExePath)))
                 {
                     vnFound = CheckForIdenticalMatch(vn, folders);
 
                     if (!vnFound)
+                    {
                         vnFound = UseDistanceAlgorithm(vn, folders);
-
+                    }                        
                     if (vnFound)
+                    {
+                        successfull++;
                         indexedVNs.Add(vn);
-
-                    _MainScreen.CompletedPendingTasks++;
+                    }
+                        
                     vnFound = false;
+
+                    UpdateProgess(1, "Visual Novels have been indexed...");
                 }
 
-                LocalVisualNovelHelper.AddVisualNovels(indexedVNs);
-                
-                _Status = TaskStatus.RanToCompletion;
-                _FileIndexerView.OnPropertyChanged(nameof(_FileIndexerView.NonIndexedVisualNovels));
-                _MainScreen.UpdateStatusText();
+                _VNService.Add(indexedVNs);
 
-                EventLogger.LogInformation(nameof(FileIndexer) + ":" + nameof(Indexing), Constants.TaskFinished);
+                CurrentStatus = nameof(FileIndexer) + " finished. " + successfull + " of " + _TasksToDo + " were successfully indexed...";
+                IsRunning = false;
+
+                OnTaskCompleted(true);
             }
             catch (Exception ex)
             {
-                _Status = TaskStatus.Faulted;
-                EventLogger.LogError(nameof(FileIndexer) + ":" + nameof(Indexing), ex);
+                _Logger.Log(ex);
+
+                CurrentStatus = nameof(FileIndexer) + " ran into error.";
+                IsRunning = false;
+
+                OnTaskCompleted(false);
             }
         }
 
-        private bool CheckForIdenticalMatch(VisualNovel vn, List<DirectoryInfo> folders)
+        private bool CheckForIdenticalMatch(VisualNovelModel vn, List<DirectoryInfo> folders)
         {
             foreach (var folder in folders)
             {
-                if (folder.Name.ToLower().Trim() == vn.Basics.VNDBInformation.title.ToLower().Trim())
+                if (folder.Name.ToLower().Trim() == vn.Basics.Title.ToLower().Trim())
                 {
-                    vn.ExePath = GetExecuteable(folder);
+                    _VNService.SetExePath(vn, GetExecuteable(folder));
+
                     return true;
                 }
             }
@@ -122,15 +103,16 @@ namespace VNDBUpdater.BackgroundTasks
             return false;
         }
 
-        private bool UseDistanceAlgorithm(VisualNovel vn, List<DirectoryInfo> folders)
+        private bool UseDistanceAlgorithm(VisualNovelModel vn, List<DirectoryInfo> folders)
         {
             for (int maxDistance = 2; maxDistance <= Settings.MaxDeviation; maxDistance++)
             {
                 foreach (var folder in folders)
                 {
-                    if (ComputeLevenshteinDistance(folder.Name.ToLower().Trim(), vn.Basics.VNDBInformation.title.ToLower().Trim()) <= maxDistance)
+                    if (ComputeLevenshteinDistance(folder.Name.ToLower().Trim(), vn.Basics.Title.ToLower().Trim()) <= maxDistance)
                     {
-                        vn.ExePath = GetExecuteable(folder);
+                        _VNService.SetExePath(vn, GetExecuteable(folder));
+
                         return true;
                     }
                 }

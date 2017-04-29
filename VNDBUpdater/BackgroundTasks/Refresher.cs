@@ -2,104 +2,84 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using VNDBUpdater.Communication.VNDB;
-using VNDBUpdater.Data;
-using VNDBUpdater.Helper;
-using VNDBUpdater.Models;
-using VNDBUpdater.ViewModels;
+using VNDBUpdater.GUI.Models.VisualNovel;
+using VNDBUpdater.Services.Logger;
+using VNDBUpdater.Services.Status;
+using VNDBUpdater.Services.Tags;
+using VNDBUpdater.Services.Traits;
+using VNDBUpdater.Services.VN;
 
 namespace VNDBUpdater.BackgroundTasks
 {
-    public class Refresher : BackgroundTask
+    public class Refresher : TaskBase
     {
-        private static TaskStatus _Status = TaskStatus.WaitingToRun;
+        private IVNService _VNService;
+        private ITagService _TagService;
+        private ITraitService _TraitService;
 
-        public static TaskStatus Status
+        public Refresher(IStatusService StatusService, IVNService VNService, ITagService TagService, ITraitService TraitService, ILoggerService LoggerService)
+            : base(StatusService, LoggerService)
         {
-            get { return _Status; }
+            _VNService = VNService;
+            _TagService = TagService;
+            _TraitService = TraitService;
         }
 
-        public static string StatusString
+        public override void Start(Action<bool> OnTaskCompleted)
         {
-            get
-            {
-                switch(_Status)
-                {
-                    case (TaskStatus.Running):
-                        return nameof(Refresher) + Constants.TaskRunning + _MainScreen.CompletedPendingTasks + " of " + _MainScreen.CurrentPendingTasks + " Visual Novels updated.";
-                    case (TaskStatus.RanToCompletion):
-                        return nameof(Refresher) + Constants.TaskFinished;
-                    case (TaskStatus.Faulted):
-                        return nameof(Refresher) + Constants.TaskFaulted;
-                    default:
-                        return string.Empty;
-                }
-            }
+            CurrentTask = nameof(Refresher);
+
+            Task.Factory.StartNew(() => Refresh(OnTaskCompleted));
         }
 
-        public override void Start(MainViewModel MainScreen)
-        {
-            if (_Status != TaskStatus.Running)
-            {
-                base.Start(MainScreen);
-
-                EventLogger.LogInformation(nameof(Refresher) + ":" + nameof(Start), Constants.TaskStarted);   
-
-                _MainScreen.CurrentPendingTasks = LocalVisualNovelHelper.LocalVisualNovels.Count;
-                _MainScreen.CompletedPendingTasks = 0;
-                _Status = TaskStatus.Running;
-
-                _BackgroundTask = new Task(Refresh, _CancelToken);
-                _BackgroundTask.Start();
-            }
-        }
-
-        public static void Cancel()
-        {
-            if (_Status == TaskStatus.Running)
-            {                
-                _CancelTokenSource.Cancel();
-            }
-        }
-
-        private void Refresh()
+        private void Refresh(Action<bool> OnTaskCompleted)
         {
             try
             {
-                EventLogger.LogInformation(nameof(Refresher) + ":" + nameof(Refresh), Constants.TasksPending + _MainScreen.CurrentPendingTasks.ToString());
+                PercentageCompleted = 0;
+                IsRunning = true;
+                CurrentStatus = nameof(Refresher) + " running.";
 
-                var updatedVNs = new List<VisualNovel>();
+                _TagService.Refresh();
+                _TraitService.Refresh();
 
-                var idSplitter = new VNIDsSplitter(LocalVisualNovelHelper.LocalVisualNovels.Select(x => x.Basics.VNDBInformation.id).ToArray());
+                CurrentStatus = "Tags and Traits have been refreshed...";
+
+                var updatedVNs = new List<VisualNovelModel>();
+
+                var idSplitter = new VNIDsSplitter(_VNService.GetLocal().Select(x => x.Basics.ID).ToArray());
 
                 idSplitter.Split();
 
+                _TasksToDo = idSplitter.IDs.Length;
+
+                CurrentStatus = _TasksToDo.ToString() + " need to be updated...";
+
                 if (idSplitter.SplittingNeccessary)
                 {
-                    for (int round = 0; round < idSplitter.NumberOfRequest; round++)
+                    for (int round = 0; round < idSplitter.NumberOfRequests; round++)
                     {                        
-                        updatedVNs.AddRange(VNDBCommunication.FetchVisualNovels(idSplitter.IDs.Take(round * Constants.MaxVNsPerRequest, Constants.MaxVNsPerRequest).ToList()));
-                        _MainScreen.CompletedPendingTasks += Constants.MaxVNsPerRequest;
-                        EventLogger.LogInformation(nameof(Refresher) + ":" + nameof(Refresh), Constants.TasksCompleted + _MainScreen.CompletedPendingTasks.ToString());                        
+                        updatedVNs.AddRange(_VNService.Get(Take(idSplitter.IDs, round * idSplitter.MaxVNsPerRequest, idSplitter.MaxVNsPerRequest).ToList()));
+                        UpdateProgess(idSplitter.MaxVNsPerRequest, "Visual Novels have been updated...");
                     }
                         
                     if (idSplitter.Remainder > 0)
                     {                        
-                        updatedVNs.AddRange(VNDBCommunication.FetchVisualNovels(idSplitter.IDs.Take(idSplitter.IDs.Length - idSplitter.Remainder, idSplitter.Remainder).ToList()));
-                        _MainScreen.CompletedPendingTasks += idSplitter.Remainder;
-                        EventLogger.LogInformation(nameof(Refresher) + ":" + nameof(Refresh), Constants.TasksCompleted + _MainScreen.CompletedPendingTasks.ToString());
+                        updatedVNs.AddRange(_VNService.Get(Take(idSplitter.IDs, idSplitter.IDs.Length - idSplitter.Remainder, idSplitter.Remainder).ToList()));
+                        UpdateProgess(idSplitter.Remainder, "Visual Novels have been updated...");
                     }                        
                 }
                 else
                 {
-                    updatedVNs.AddRange(VNDBCommunication.FetchVisualNovels(idSplitter.IDs.ToList()));
-                    _MainScreen.CompletedPendingTasks += idSplitter.IDs.Length;
-                    EventLogger.LogInformation(nameof(Refresher) + ":" + nameof(Refresh), Constants.TasksCompleted + _MainScreen.CompletedPendingTasks.ToString());
+                    updatedVNs.AddRange(_VNService.Get(idSplitter.IDs.ToList()));
+                    UpdateProgess(idSplitter.IDs.Length, "Visual Novels have been updated...");
                 }
+
+                var newVNs = new List<VisualNovelModel>();
 
                 foreach (var vn in updatedVNs)
                 {
-                    VisualNovel vnToUpdate = LocalVisualNovelHelper.LocalVisualNovels.Where(x => x.Basics.VNDBInformation.id == vn.Basics.VNDBInformation.id).FirstOrDefault();
+                    VisualNovelModel vnToUpdate = _VNService.GetLocal(vn.Basics.ID);
 
                     if (vnToUpdate != null)
                     {
@@ -107,19 +87,24 @@ namespace VNDBUpdater.BackgroundTasks
                         vnToUpdate.Characters = vn.Characters;
                     }
 
-                    LocalVisualNovelHelper.AddVisualNovel(vnToUpdate);
+                    newVNs.Add(vnToUpdate);
                 }
 
-                _Status = TaskStatus.RanToCompletion;
-                _MainScreen.UpdateStatusText();
-                _MainScreen.UpdateVisualNovelGrid();
+                _VNService.Add(newVNs);
 
-                EventLogger.LogInformation(nameof(Refresher) + ":" + nameof(Refresh), Constants.TaskFinished);
+                CurrentStatus = nameof(Refresher) + " finished.";
+                IsRunning = false;
+
+                OnTaskCompleted(true);               
             }
             catch (Exception ex)
             {
-                _Status = TaskStatus.Faulted;
-                EventLogger.LogError(nameof(Refresher) + ":" + nameof(Refresh), ex);
+                _Logger.Log(ex);
+
+                CurrentStatus = nameof(Refresher) + " ran into error.";
+                IsRunning = false;
+
+                OnTaskCompleted(false);
             }
         }
     }

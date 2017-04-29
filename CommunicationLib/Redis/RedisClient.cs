@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 
 namespace CommunicationLib.Redis
 {
@@ -43,7 +42,7 @@ namespace CommunicationLib.Redis
             try
             {
                 Server = ConnectionMultiplexer.Connect(IP + ":" + Port.ToString() + ",allowAdmin=true");
-                DB = Server.GetDatabase();
+                DB = Server.GetDatabase();          
             }
             catch (StackExchange.Redis.RedisConnectionException e)
             {
@@ -129,7 +128,12 @@ namespace CommunicationLib.Redis
 
         public void ForceSave()
         {
-            Server.GetServer(IP, Port).Save(SaveType.ForegroundSave);
+            Server.GetServer(IP, Port).Save(SaveType.BackgroundSave);            
+        }
+
+        public DateTime GetLastSave()
+        {
+            return Server.GetServer(IP, Port).LastSave();
         }
 
         public void Dispose()

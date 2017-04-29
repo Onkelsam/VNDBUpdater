@@ -1,0 +1,152 @@
+﻿<Controls:MetroWindow x:Class="VNDBUpdater.GUI.Views.CreateFilter"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:VNDBUpdater.GUI.ViewModels"
+        xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+        Title="VNDBUpdater - Create Filters" Height="409.036" Width="370" ResizeMode="NoResize">
+
+    <Window.Resources>
+        <Thickness x:Key="ControlMargin">0 5 0 0</Thickness>
+        <Style x:Key="LinkButton" TargetType="Button">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <TextBlock>
+                            <ContentPresenter />
+                        </TextBlock>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Content" Value="(Remove)" />
+            <Setter Property="Command" Value="{Binding Path=RemoveTag}" />
+            <Setter Property="CommandParameter" Value="{Binding ElementName=TagName, Path=Text}" />
+            <Setter Property="DataContext" Value="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Controls:MetroWindow}}, Path=DataContext}" />
+            <Setter Property="Foreground" Value="Blue" />
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="true">
+                    <Setter Property="Foreground" Value="Red" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="AddTagStyle" TargetType="{x:Type Button}" BasedOn="{StaticResource  SquareButtonStyle}">
+            <Setter Property="Command" Value="{Binding Path=AddToFilter}" />
+            <Setter Property="CommandParameter" Value="{Binding Path=Content, RelativeSource={RelativeSource Self}}" />
+            <Setter Property="Margin" Value="{StaticResource ControlMargin}" />
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" MaxHeight="40" />
+        </Grid.RowDefinitions>
+        
+        <StackPanel>
+            <GroupBox Header="Select or enter a Tag" 
+                      Margin="{StaticResource ControlMargin}">
+
+                <ComboBox VerticalAlignment="Center" 
+                          Controls:TextBoxHelper.Watermark="Enter a tag..."
+                          ItemsSource="{Binding Path=Tags}" 
+                          SelectedValue="{Binding Path=SelectedTag}" 
+                          IsEditable="True" >
+                    <ComboBox.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <VirtualizingStackPanel VirtualizingStackPanel.IsVirtualizing="True" VirtualizingStackPanel.VirtualizationMode="Recycling"/>
+                        </ItemsPanelTemplate>
+                    </ComboBox.ItemsPanel>
+                </ComboBox>
+            </GroupBox>
+
+            <Grid Margin="5">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <Button Content="AND" Style="{StaticResource AddTagStyle}"/>
+                <Button Content="OR" Style="{StaticResource AddTagStyle}" Grid.Column="1" />
+                <Button Content="NOT" Style="{StaticResource AddTagStyle}" Grid.Column="2" />
+            </Grid>
+
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <GroupBox Header="And Constraint"
+                          BorderThickness="0">
+                    <ListBox ItemsSource="{Binding Path=IncludedWithAnd}">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel>
+                                    <TextBlock Text="{Binding Path=Name}"
+                                               Name="TagName"/>
+                                    <Button Style="{StaticResource LinkButton}"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </GroupBox>
+                <GroupBox Header="Or Constraint" 
+                          BorderThickness="0"
+                          Grid.Column="1">
+
+                    <ListBox ItemsSource="{Binding Path=IncludedWithOr}">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel>
+                                    <TextBlock Text="{Binding Path=Name}" 
+                                               Name="TagName"/>
+                                    <Button Style="{StaticResource LinkButton}"/>
+                                </StackPanel>
+                                
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </GroupBox>
+                <GroupBox Header="Excluded" 
+                          BorderThickness="0" 
+                          Grid.Column="2">
+
+                    <ListBox ItemsSource="{Binding Path=Excluded}">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel>
+                                    <TextBlock Text="{Binding Path=Name}" 
+                                               Name="TagName"/>
+                                    <Button Style="{StaticResource LinkButton}"/>
+                                </StackPanel>
+                                
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </GroupBox>
+            </Grid>
+        </StackPanel>
+
+        <Grid Margin="5" Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <Button Content="Save filter"
+                    Command="{Binding Path=Save}" />
+
+            <TextBox Text="{Binding Path=FilterName, UpdateSourceTrigger=PropertyChanged}"
+                     Controls:TextBoxHelper.Watermark="Enter Filter name..." 
+                     Grid.Column="1"/>
+
+            <Button Content="Clear filter"
+                    Command="{Binding Path=Clear}"
+                    Grid.Column="2"/>
+
+        </Grid>
+    </Grid>
+       
+</Controls:MetroWindow>

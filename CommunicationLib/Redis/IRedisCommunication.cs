@@ -89,5 +89,7 @@ namespace CommunicationLib.Redis
         /// Forces RedisDB to save the current DB to disk.
         /// </summary>
         void ForceSave();
+
+        DateTime GetLastSave();
     }
 }

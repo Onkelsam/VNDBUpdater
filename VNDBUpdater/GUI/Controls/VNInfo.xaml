@@ -1,0 +1,103 @@
+﻿<UserControl x:Class="VNDBUpdater.GUI.Controls.VNInfo"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:VNDBUpdater.GUI.Controls"
+             xmlns:converters="clr-namespace:VNDBUpdater.GUI.Converters"
+             xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="300">
+
+    <UserControl.Resources>
+        <Style x:Key="TextblockStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource MetroTextBlock}">
+            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="Width" Value="75" />
+        </Style>
+    </UserControl.Resources>
+    
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <ScrollViewer VerticalScrollBarVisibility="Visible">
+            <GroupBox Header="{Binding Path=Name}">
+                <StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Style="{StaticResource TextblockStyle}" Text="Aliases:" />
+                        <TextBlock Text="{Binding Path=Aliases}" />
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Background="{DynamicResource AccentColorBrush4}">
+                        <TextBlock Style="{StaticResource TextblockStyle}" Text="Length:" />
+                        <TextBlock Text="{Binding Path=Length}"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Style="{StaticResource TextblockStyle}" Text="Release:" />
+                        <TextBlock Text="{Binding Path=Release}"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Background="{DynamicResource AccentColorBrush4}">
+                        <TextBlock Style="{StaticResource TextblockStyle}" Text="Relations:" />
+                        <ItemsControl ItemsSource="{Binding Path=Relations}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="125*" MaxWidth="125" MinWidth="125"/>
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Text="{Binding Path=Key}" Style="{StaticResource TextblockStyle}" Width="125" MinWidth="125"/>
+                                        <ItemsControl ItemsSource="{Binding Path=Value}" Grid.Column="1">
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate>
+                                                    <StackPanel>
+                                                        <TextBlock Text="{Binding Path=Title}" TextWrapping="Wrap" FontSize="12"/>
+                                                    </StackPanel>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Style="{StaticResource TextblockStyle}" Text="Playtime:" />
+                        <TextBlock Text="{Binding Path=PlayTime}" />
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Background="{DynamicResource AccentColorBrush4}">
+                        <TextBlock Style="{StaticResource TextblockStyle}" Text="Score:" />
+                        <TextBlock Text="{Binding Path=Score}" />
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Style="{StaticResource TextblockStyle}" Text="Popularity:" />
+                        <TextBlock Text="{Binding Path=Popularity}" />
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Background="{DynamicResource AccentColorBrush4}">
+                        <TextBlock Style="{StaticResource TextblockStyle}" Text="Own Score:" />
+                        <TextBlock Text="{Binding Path=OwnScore}" />
+                    </StackPanel>
+                </StackPanel>
+            </GroupBox>
+        </ScrollViewer>
+        
+        <ScrollViewer VerticalScrollBarVisibility="Visible" 
+                      Grid.Column="1">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <GroupBox Header="Description" 
+                          Grid.Row="0">
+
+                    <RichTextBox converters:HtmlRichTextBoxBehavior.Text="{Binding Path=Description}" 
+                                 Grid.Row="1"/>
+
+                </GroupBox>
+            </Grid>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

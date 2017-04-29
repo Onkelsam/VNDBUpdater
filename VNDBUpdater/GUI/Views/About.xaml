@@ -1,0 +1,30 @@
+﻿<Controls:MetroWindow x:Class="VNDBUpdater.GUI.Views.About"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:VNDBUpdater.GUI.ViewModels"
+        mc:Ignorable="d"
+        xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+        Title="VNDBUpdater" Height="150" Width="300" ResizeMode="NoResize" WindowStartupLocation="CenterScreen">
+
+    <Window.Resources>
+        <Style TargetType="{x:Type Label}">
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <StackPanel VerticalAlignment="Center">
+            <Label Content="{Binding Path=Version}" FontWeight="Bold" />
+            <Label Content="{Binding Path=Copyright}"  />
+            <Label Content="{Binding Path=LatestRelease}" />
+            <TextBlock HorizontalAlignment="Center">           
+                <Hyperlink NavigateUri="https://github.com/Onkelsam/VNDBUpdater/releases" Command="{Binding OpenGitHubLink}">
+                    Get new Version
+                </Hyperlink>
+            </TextBlock>
+        </StackPanel>
+    </Grid>
+</Controls:MetroWindow>

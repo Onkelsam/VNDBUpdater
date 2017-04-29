@@ -47,6 +47,12 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowedReferenceRelatedFileExtensions>
+      <!-- Prevent default XML and PDB files copied to output in RELEASE. 
+           Only *.allowedextension files will be included, which doesn't exist in my case.
+       -->
+      .allowedextension
+    </AllowedReferenceRelatedFileExtensions>
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationIcon>MainIcon.ico</ApplicationIcon>
@@ -67,35 +73,52 @@
       <HintPath>..\packages\HtmlToXamlConverter.1.0.5727.24510\lib\net45\HtmlToXamlConverter.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="MahApps.Metro, Version=1.5.0.23, Culture=neutral, PublicKeyToken=f4fb5a3c4d1e5b4f, processorArchitecture=MSIL">
+      <HintPath>..\packages\MahApps.Metro.1.5.0\lib\net45\MahApps.Metro.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Practices.ServiceLocation, Version=1.3.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\CommonServiceLocator.1.3\lib\portable-net4+sl5+netcore45+wpa81+wp8\Microsoft.Practices.ServiceLocation.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Practices.Unity, Version=4.0.0.0, Culture=neutral, PublicKeyToken=6d32ff45e0ccc69f, processorArchitecture=MSIL">
+      <HintPath>..\packages\Unity.4.0.1\lib\net45\Microsoft.Practices.Unity.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Practices.Unity.Configuration, Version=4.0.0.0, Culture=neutral, PublicKeyToken=6d32ff45e0ccc69f, processorArchitecture=MSIL">
+      <HintPath>..\packages\Unity.4.0.1\lib\net45\Microsoft.Practices.Unity.Configuration.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Practices.Unity.RegistrationByConvention, Version=4.0.0.0, Culture=neutral, PublicKeyToken=6d32ff45e0ccc69f, processorArchitecture=MSIL">
+      <HintPath>..\packages\Unity.4.0.1\lib\net45\Microsoft.Practices.Unity.RegistrationByConvention.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Microsoft.VisualBasic" />
-    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.10.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Octokit, Version=0.21.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Octokit.0.21.1\lib\net45\Octokit.dll</HintPath>
+    <Reference Include="Octokit, Version=0.24.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Octokit.0.24.0\lib\net45\Octokit.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="StackExchange.Redis, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\StackExchange.Redis.1.1.603\lib\net45\StackExchange.Redis.dll</HintPath>
+    <Reference Include="StackExchange.Redis, Version=1.2.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\StackExchange.Redis.1.2.1\lib\net45\StackExchange.Redis.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.IO.Compression" />
     <Reference Include="System.Net.Http" />
+    <Reference Include="System.Runtime.Caching" />
     <Reference Include="System.Security" />
     <Reference Include="System.Web" />
-    <Reference Include="System.Windows.Controls.Input.Toolkit, Version=3.5.40128.1, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Infragistics.Themes.MetroLight.Wpf.1.0.0\lib\net40\System.Windows.Controls.Input.Toolkit.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System.Windows.Controls.Layout.Toolkit, Version=3.5.40128.1, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Infragistics.Themes.MetroLight.Wpf.1.0.0\lib\net40\System.Windows.Controls.Layout.Toolkit.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Windows.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="System.Windows.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\MahApps.Metro.1.5.0\lib\net45\System.Windows.Interactivity.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -107,112 +130,223 @@
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
-    <Reference Include="WPFToolkit, Version=3.5.40128.1, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Infragistics.Themes.MetroLight.Wpf.1.0.0\lib\net40\WPFToolkit.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <ApplicationDefinition Include="App.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="BackgroundTasks\BackgroundTaskBase.cs" />
     <Compile Include="BackgroundTasks\FileIndexer.cs" />
+    <Compile Include="BackgroundTasks\Interfaces\ITask.cs" />
+    <Compile Include="BackgroundTasks\Interfaces\ITaskFactory.cs" />
     <Compile Include="BackgroundTasks\Refresher.cs" />
     <Compile Include="BackgroundTasks\StartUp.cs" />
     <Compile Include="BackgroundTasks\Synchronizer.cs" />
-    <Compile Include="Models\Internal\FileIndexerSettings.cs" />
-    <Compile Include="ValueConverters\HtmlRichtTextBoxBehavior.cs" />
+    <Compile Include="BackgroundTasks\Factory\BackgroundTaskFactory.cs" />
+    <Compile Include="BackgroundTasks\TaskBase.cs" />
+    <Compile Include="Communication\Database\Caching\CachingLayer.cs" />
+    <Compile Include="Communication\Database\Entities\BasicInformationEntity.cs" />
+    <Compile Include="Communication\Database\Entities\CharacterInformationEntity.cs" />
+    <Compile Include="Communication\Database\Entities\FileIndexerSettingsEntity.cs" />
+    <Compile Include="Communication\Database\Entities\FilterEntity.cs" />
+    <Compile Include="Communication\Database\Entities\GUISettingsEntity.cs" />
+    <Compile Include="Communication\Database\Entities\RelationEntity.cs" />
+    <Compile Include="Communication\Database\Entities\ScreenshotEntity.cs" />
+    <Compile Include="Communication\Database\Entities\TagEntity.cs" />
+    <Compile Include="Communication\Database\Entities\TraitEntity.cs" />
+    <Compile Include="Communication\Database\Entities\UserEntity.cs" />
+    <Compile Include="Communication\Database\Entities\UserOptionsEntity.cs" />
+    <Compile Include="Communication\Database\Entities\VisualNovelEntity.cs" />
+    <Compile Include="Communication\Database\FilterRepository.cs" />
+    <Compile Include="Communication\Database\Interfaces\ICache.cs" />
+    <Compile Include="Communication\Database\Interfaces\IFilterRepository.cs" />
+    <Compile Include="Communication\Database\Interfaces\IRedis.cs" />
+    <Compile Include="Communication\Database\Interfaces\IRepository.cs" />
+    <Compile Include="Communication\Database\Interfaces\IUserRepository.cs" />
+    <Compile Include="Communication\Database\Interfaces\IVNRepository.cs" />
+    <Compile Include="Communication\Database\UserRepository.cs" />
+    <Compile Include="Communication\Database\VNRepository.cs" />
+    <Compile Include="Communication\VNDB\Entities\Error.cs" />
+    <Compile Include="Communication\VNDB\Entities\GetTemplate.cs" />
+    <Compile Include="Communication\VNDB\Entities\Relation.cs" />
+    <Compile Include="Communication\VNDB\Entities\TagsLookUp.cs" />
+    <Compile Include="Communication\VNDB\Entities\TraitsLookUp.cs" />
+    <Compile Include="Communication\VNDB\Entities\VN.cs" />
+    <Compile Include="Communication\VNDB\Entities\VNCharacterInformation.cs" />
+    <Compile Include="Communication\VNDB\Entities\VNCharacterInformationRoot.cs" />
+    <Compile Include="Communication\VNDB\Entities\VNInformation.cs" />
+    <Compile Include="Communication\VNDB\Entities\VNInformationRoot.cs" />
+    <Compile Include="Communication\VNDB\Entities\VNLinks.cs" />
+    <Compile Include="Communication\VNDB\Entities\VNListRoot.cs" />
+    <Compile Include="Communication\VNDB\Entities\VNScreenshot.cs" />
+    <Compile Include="Communication\VNDB\Entities\Vote.cs" />
+    <Compile Include="Communication\VNDB\Entities\VoteListRoot.cs" />
+    <Compile Include="Communication\VNDB\Entities\Wish.cs" />
+    <Compile Include="Communication\VNDB\Entities\WishListRoot.cs" />
+    <Compile Include="Communication\VNDB\ErrorResponse.cs" />
+    <Compile Include="Communication\VNDB\Interfaces\IVNDB.cs" />
+    <Compile Include="Communication\VNDB\Interfaces\IVNDBGetter.cs" />
+    <Compile Include="Communication\VNDB\Interfaces\IVNDBSetter.cs" />
+    <Compile Include="Communication\VNDB\VNDBGetter.cs" />
+    <Compile Include="Communication\VNDB\VNDBSetter.cs" />
+    <Compile Include="GUI\CustomClasses\Commands\RelayCommand.cs" />
+    <Compile Include="GUI\Controls\CharacterTab.xaml.cs">
+      <DependentUpon>CharacterTab.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\Controls\MenuBar.xaml.cs">
+      <DependentUpon>MenuBar.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\Controls\ScreenshotTab.xaml.cs">
+      <DependentUpon>ScreenshotTab.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\Controls\TagTab.xaml.cs">
+      <DependentUpon>TagTab.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\Controls\VNDatagrid.xaml.cs">
+      <DependentUpon>VNDatagrid.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\Controls\VNInfo.xaml.cs">
+      <DependentUpon>VNInfo.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\Models\StatusModel.cs" />
+    <Compile Include="GUI\Models\VisualNovel\RelationModel.cs" />
+    <Compile Include="GUI\Models\VisualNovel\ScreenshotModel.cs" />
+    <Compile Include="GUI\Models\Theme\AccentColorMenuData.cs" />
+    <Compile Include="GUI\Models\Theme\AppThemeMenuData.cs" />
+    <Compile Include="GUI\ViewModels\Interfaces\IAboutViewModel.cs" />
+    <Compile Include="GUI\ViewModels\Interfaces\IAddVisualNovelsWindowModel.cs" />
+    <Compile Include="GUI\ViewModels\Interfaces\ICharacterTabWindowModel.cs" />
+    <Compile Include="GUI\ViewModels\Interfaces\ICreateFilterWindowModel.cs" />
+    <Compile Include="GUI\ViewModels\Interfaces\IFileIndexerWindowModel.cs" />
+    <Compile Include="GUI\ViewModels\Interfaces\IMainWindowModel.cs" />
+    <Compile Include="GUI\ViewModels\Interfaces\IMenuBarWindowModel.cs" />
+    <Compile Include="GUI\ViewModels\Interfaces\IOptionsWindowModel.cs" />
+    <Compile Include="GUI\ViewModels\Interfaces\IScreenshotTabWindowModel.cs" />
+    <Compile Include="GUI\ViewModels\Interfaces\ISplashScreenWindowModel.cs" />
+    <Compile Include="GUI\ViewModels\Interfaces\ITagTabWIndowModel.cs" />
+    <Compile Include="GUI\ViewModels\Interfaces\IVisualNovelInfoWindowModel.cs" />
+    <Compile Include="GUI\ViewModels\Interfaces\IVisualNovelsGridWindowModel.cs" />
+    <Compile Include="GUI\ViewModels\MainView\CharacterTabViewModel.cs" />
+    <Compile Include="GUI\ViewModels\MainView\MenuBarViewModel.cs" />
+    <Compile Include="GUI\ViewModels\MainView\ScreenshotViewModel.cs" />
+    <Compile Include="GUI\ViewModels\SplashScreenViewModel.cs" />
+    <Compile Include="GUI\ViewModels\MainView\TagTabViewModel.cs" />
+    <Compile Include="GUI\ViewModels\MainView\VNDatagridViewModel.cs" />
+    <Compile Include="GUI\ViewModels\MainView\VNInfoViewModel.cs" />
+    <Compile Include="GUI\Views\SplashScreen.xaml.cs">
+      <DependentUpon>SplashScreen.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\Models\User\FileIndexerSettingsModel.cs" />
+    <Compile Include="GUI\Converters\HtmlRichtTextBoxBehavior.cs" />
     <Compile Include="Data\Constants.cs" />
-    <Compile Include="Helper\EventLogger.cs" />
-    <Compile Include="Helper\TraitsHelper.cs" />
-    <Compile Include="Helper\UserHelper.cs" />
-    <Compile Include="Helper\VersionHelper.cs" />
-    <Compile Include="Helper\LocalVisualNovelHelper.cs" />
-    <Compile Include="Helper\VNIDsSplitter.cs" />
-    <Compile Include="Models\Internal\BasicInformation.cs" />
-    <Compile Include="Models\Internal\CharacterInformation.cs" />
-    <Compile Include="Models\Internal\GUISettings.cs" />
-    <Compile Include="Models\Internal\WindowHandler.cs" />
-    <Compile Include="Models\Internal\UserOptions.cs" />
-    <Compile Include="Models\MenuItem.cs" />
-    <Compile Include="Models\Trait.cs" />
-    <Compile Include="Models\User.cs" />
+    <Compile Include="BackgroundTasks\VNIDsSplitter.cs" />
+    <Compile Include="GUI\Models\VisualNovel\BasicInformationModel.cs" />
+    <Compile Include="GUI\Models\VisualNovel\CharacterInformationModel.cs" />
+    <Compile Include="GUI\Models\User\GUISettingsModel.cs" />
+    <Compile Include="GUI\Models\User\UserOptionsModel.cs" />
+    <Compile Include="GUI\Models\VisualNovel\TraitModel.cs" />
+    <Compile Include="GUI\Models\User\UserModel.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="ViewModels\AboutViewModel.cs" />
-    <Compile Include="ViewModels\FileIndexerViewModel.cs" />
-    <Compile Include="ViewModels\OptionsViewModel.cs" />
-    <Compile Include="ViewModels\ThreadSafeObservableCollection.cs" />
-    <Compile Include="Views\About.xaml.cs">
+    <Compile Include="GUI\ViewModels\AboutViewModel.cs" />
+    <Compile Include="GUI\ViewModels\FileIndexerViewModel.cs" />
+    <Compile Include="GUI\ViewModels\OptionsViewModel.cs" />
+    <Compile Include="GUI\CustomClasses\Collections\ThreadSafeObservableCollection.cs" />
+    <Compile Include="GUI\Views\About.xaml.cs">
       <DependentUpon>About.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\CreateFilter.xaml.cs">
+    <Compile Include="GUI\Views\CreateFilter.xaml.cs">
       <DependentUpon>CreateFilter.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\AddVisualNovels.xaml.cs">
+    <Compile Include="GUI\Views\AddVisualNovels.xaml.cs">
       <DependentUpon>AddVisualNovels.xaml</DependentUpon>
     </Compile>
     <Compile Include="Data\Enums.cs" />
-    <Compile Include="Models\Filter.cs" />
-    <Compile Include="Models\Tag.cs" />
-    <Compile Include="Models\VisualNovel.cs" />
+    <Compile Include="GUI\Models\VisualNovel\FilterModel.cs" />
+    <Compile Include="GUI\Models\VisualNovel\TagModel.cs" />
+    <Compile Include="GUI\Models\VisualNovel\VisualNovelModel.cs" />
     <Compile Include="Helper\ExtensionMethods.cs" />
-    <Compile Include="Helper\FileHelper.cs" />
-    <Compile Include="Helper\InputValidation.cs" />
-    <Compile Include="Helper\TagHelper.cs" />
-    <Compile Include="ViewModels\CreateFilterViewModel.cs" />
-    <Compile Include="ViewModels\AddVisualNovelsViewModel.cs" />
-    <Compile Include="ViewModels\CommandMap.cs" />
-    <Compile Include="ViewModels\MainViewModel.cs" />
-    <Compile Include="ViewModels\ViewModelBase.cs" />
-    <Compile Include="Views\FileIndexer.xaml.cs">
+    <Compile Include="GUI\ViewModels\CreateFilterViewModel.cs" />
+    <Compile Include="GUI\ViewModels\AddVisualNovelsViewModel.cs" />
+    <Compile Include="GUI\ViewModels\MainView\MainViewModel.cs" />
+    <Compile Include="GUI\ViewModels\ViewModelBase.cs" />
+    <Compile Include="GUI\Views\FileIndexer.xaml.cs">
       <DependentUpon>FileIndexer.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\Options.xaml.cs">
+    <Compile Include="GUI\Views\Options.xaml.cs">
       <DependentUpon>Options.xaml</DependentUpon>
     </Compile>
-    <Page Include="Themes\Metro\Metro.MSControls.Core.Implicit.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Themes\Metro\Metro.MSControls.Toolkit.Implicit.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Themes\Metro\Styles.Shared.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Themes\Metro\Styles.WPF.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Themes\Metro\Theme.Colors.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\About.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\CreateFilter.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\AddVisualNovels.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\FileIndexer.xaml">
+    <Compile Include="Services\Dialogs\DialogService.cs" />
+    <Compile Include="Services\Dialogs\IDialogService.cs" />
+    <Compile Include="Services\Filters\FilterService.cs" />
+    <Compile Include="Services\Filters\IFilterService.cs" />
+    <Compile Include="Services\IServiceBase.cs" />
+    <Compile Include="Services\ITagsAndTraits.cs" />
+    <Compile Include="Services\Launch\ILaunchService.cs" />
+    <Compile Include="Services\Launch\LaunchService.cs" />
+    <Compile Include="Services\Logger\ILoggerService.cs" />
+    <Compile Include="Services\Logger\LoggerService.cs" />
+    <Compile Include="Services\Login\ILoginService.cs" />
+    <Compile Include="Services\Login\LoginService.cs" />
+    <Compile Include="Services\Status\IStatusService.cs" />
+    <Compile Include="Services\Status\StatusService.cs" />
+    <Compile Include="Services\TagsAndTraitsBase.cs" />
+    <Compile Include="Services\Tags\ITagService.cs" />
+    <Compile Include="Services\Tags\TagService.cs" />
+    <Compile Include="Services\Traits\ITraitService.cs" />
+    <Compile Include="Services\Traits\TraitService.cs" />
+    <Compile Include="Services\User\IUserService.cs" />
+    <Compile Include="Services\User\UserService.cs" />
+    <Compile Include="Services\Version\IVersionService.cs" />
+    <Compile Include="Services\Version\VersionService.cs" />
+    <Compile Include="Services\VN\IVNService.cs" />
+    <Compile Include="Services\VN\VNService.cs" />
+    <Compile Include="Services\WindowHandler\IWindowHandlerService.cs" />
+    <Compile Include="Services\WindowHandler\WindowHandlerService.cs" />
+    <Page Include="GUI\Controls\CharacterTab.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\MainWindow.xaml">
+    <Page Include="GUI\Controls\MenuBar.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="GUI\Controls\ScreenshotTab.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="GUI\Controls\TagTab.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="GUI\Controls\VNDatagrid.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="GUI\Controls\VNInfo.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="GUI\Views\About.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="GUI\Views\CreateFilter.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="GUI\Views\AddVisualNovels.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="GUI\Views\FileIndexer.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="GUI\Views\MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -220,18 +354,17 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Communication\Database\RedisCommunication.cs" />
-    <Compile Include="Communication\VNDB\VNDBCommunication.cs" />
-    <Compile Include="Communication\VNDB\ResponseObjects.cs" />
-    <Compile Include="Views\MainWindow.xaml.cs">
+    <Compile Include="Communication\Database\RedisBase.cs" />
+    <Compile Include="Communication\VNDB\VNDBBase.cs" />
+    <Compile Include="GUI\Views\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="Views\Options.xaml">
+    <Page Include="GUI\Views\Options.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\Styles.xaml">
+    <Page Include="GUI\Views\SplashScreen.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -296,9 +429,7 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Themes\Metro\HowToApplyTheme.txt" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

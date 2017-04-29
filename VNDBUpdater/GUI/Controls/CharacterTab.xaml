@@ -1,0 +1,93 @@
+﻿<UserControl x:Class="VNDBUpdater.GUI.Controls.CharacterTab"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:VNDBUpdater.GUI.Controls"
+             xmlns:converters="clr-namespace:VNDBUpdater.GUI.Converters"
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="300">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+            <ListView ItemsSource="{Binding Path=Characters}"  
+                      x:Name="CharacterList" 
+                      SelectedItem="{Binding Path=SelectedCharacter}"
+                      ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                <ListView.ItemContainerStyle>
+                    <Style TargetType="ListBoxItem">
+                        <Setter Property="MaxWidth" 
+                                Value="{Binding ElementName=CharacterList, Path=ActualWidth}"/>
+                        <Setter Property="MaxHeight" 
+                                Value="{Binding ElementName=CharacterList, Path=ActualHeight}"/>
+                        <Setter Property="HorizontalContentAlignment" 
+                                Value="Center" />
+                    </Style>
+                </ListView.ItemContainerStyle>
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="{Binding ElementName=CharacterList, Path=ActualWidth}"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="{Binding ElementName=CharacterList, Path=ActualHeight}"/>
+                            </Grid.RowDefinitions>
+                        <Image Source="{Binding Path=Image.Path, IsAsync=True}" 
+                                   Stretch="Uniform">
+                                <Image.ToolTip>
+                                <Image Source="{Binding Path=Image.Path, IsAsync=False}" 
+                                           Stretch="Uniform"/>
+                                </Image.ToolTip>
+                            </Image>
+                        </Grid>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+
+        <Grid Grid.Row="1">
+            <ScrollViewer>
+                <GroupBox Header="{Binding Path=CharacterName}">
+                    <StackPanel>
+                        <ItemsControl ItemsSource="{Binding Path=Traits}" 
+                                      AlternationCount="2">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+
+                                    <Grid x:Name="ItemGrid">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="10*" 
+                                                              MaxWidth="120" 
+                                                              MinWidth="120"/>
+                                            <ColumnDefinition Width="20*" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Text="{Binding Path=Key.Name, StringFormat={}{0}:}"
+                                                   Margin="0,6,0,2"
+                                                   FontWeight="Bold"/>
+                                        <TextBlock Grid.Column="1" 
+                                                   Text="{Binding Path=Value}" 
+                                                   Margin="0,6,0,2" 
+                                                   TextWrapping="Wrap"/>
+                                    </Grid>
+
+                                    <DataTemplate.Triggers>
+                                        <Trigger Property="ItemsControl.AlternationIndex" Value="1">
+                                            <Setter Property="Background" Value="{DynamicResource AccentColorBrush4}" TargetName="ItemGrid"/>
+                                        </Trigger>
+                                    </DataTemplate.Triggers>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                        <RichTextBox Grid.Column="1" 
+                                     Grid.Row="2" 
+                                     converters:HtmlRichTextBoxBehavior.Text="{Binding Path=Description}" 
+                                     Margin="0, 10, 0, 0" />
+                    </StackPanel>
+                </GroupBox>
+            </ScrollViewer>
+        </Grid>
+    </Grid>
+</UserControl>

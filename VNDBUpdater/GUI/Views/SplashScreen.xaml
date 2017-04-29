@@ -1,0 +1,98 @@
+﻿<Controls:MetroWindow 
+        x:Class="VNDBUpdater.GUI.Views.SplashScreen"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:Dialog="clr-namespace:MahApps.Metro.Controls.Dialogs;assembly=MahApps.Metro"
+        xmlns:local="clr-namespace:VNDBUpdater.GUI.ViewModels"
+        xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+        mc:Ignorable="d"
+        Height="450" 
+        Width="300" 
+        ResizeMode="CanMinimize" 
+        ShowInTaskbar="True" 
+        BorderThickness="0"
+        WindowStartupLocation="CenterScreen" 
+        AllowsTransparency="True" 
+        Background="{DynamicResource {x:Static SystemColors.WindowFrameBrushKey}}"               
+        Dialog:DialogParticipation.Register="{Binding}">
+
+    <Controls:MetroWindow.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Colors.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/Blue.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/BaseDark.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Controls:MetroWindow.Resources>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" MaxWidth="50" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="10*" />
+            <RowDefinition Height="10*" />
+            <RowDefinition Height="50*" />
+            <RowDefinition Height="10*" MaxHeight="25" />
+        </Grid.RowDefinitions>
+        
+        <TextBlock Margin="3" 
+                   Grid.ColumnSpan="2" 
+                   Text="{Binding Path=Title}" 
+                   FontFamily="Segoe UI Symbol" 
+                   FontSize="32" 
+                   HorizontalAlignment="Center"/>
+                
+        <TextBlock Grid.Column="1" 
+                   Grid.Row="1" 
+                   Text="{Binding Path=Version}" 
+                   FontFamily="Segoe UI Symbol" 
+                   VerticalAlignment="Center" 
+                   FontSize="18" 
+                   HorizontalAlignment="Left"/>
+        
+        <Polygon Grid.Row="1"
+                 HorizontalAlignment="Left" 
+                 VerticalAlignment="Center" 
+                 Points="0,0 30,25 0,50" 
+                 Fill="{DynamicResource {x:Static SystemColors.AppWorkspaceBrushKey}}"/>
+
+        <Button Visibility="{Binding Path=LoginRequired, Converter={StaticResource Bool2Vis}}" 
+                Command="{Binding Login}" 
+                Content="Login Required" 
+                Grid.Row="2" 
+                Grid.ColumnSpan="2" 
+                VerticalAlignment="Center"/>
+
+        <Controls:ProgressRing Visibility="{Binding Path=TaskRunning, Converter={StaticResource Bool2Vis}, Mode=OneWay}"  
+                               Grid.Row="2" 
+                               Grid.ColumnSpan="2" 
+                               VerticalAlignment="Center" />
+
+        <StatusBar Grid.Row="4" 
+                   Grid.ColumnSpan="2" >
+            <StatusBarItem HorizontalAlignment="Stretch" 
+                           HorizontalContentAlignment="Stretch" 
+                           Background="{DynamicResource {x:Static SystemColors.WindowFrameBrushKey}}">
+                <Grid>
+                    <Controls:MetroProgressBar Minimum="0" 
+                                               Maximum="100" 
+                                               Value="{Binding Path=PercentageTaskCompleted, Mode=OneWay}" 
+                                               Visibility="{Binding Path=TaskRunning, Converter={StaticResource Bool2Vis}, Mode=OneWay}" 
+                                               Height="20" 
+                                               HorizontalAlignment="Stretch" 
+                                               Foreground="{DynamicResource AccentColorBrush}"/>
+                    <TextBlock Text="{Binding Path=Status, Mode=OneWay}" 
+                               HorizontalAlignment="Center"/>
+                </Grid>
+            </StatusBarItem>
+        </StatusBar>
+    </Grid>
+</Controls:MetroWindow>

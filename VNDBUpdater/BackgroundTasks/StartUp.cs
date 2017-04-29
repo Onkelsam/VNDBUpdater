@@ -1,88 +1,61 @@
 ﻿using System;
-using System.IO;
 using System.Threading.Tasks;
-using VNDBUpdater.Data;
-using VNDBUpdater.Helper;
-using VNDBUpdater.Models;
-using VNDBUpdater.ViewModels;
+using VNDBUpdater.Services.Logger;
+using VNDBUpdater.Services.Status;
+using VNDBUpdater.Services.Tags;
+using VNDBUpdater.Services.Traits;
 
 namespace VNDBUpdater.BackgroundTasks
 {
-    public class StartUp : BackgroundTask
+    public class StartUp : TaskBase
     {
-        private static TaskStatus _Status = TaskStatus.WaitingToRun;
+        private ITagService _TagService;
+        private ITraitService _TraitService;
 
-        public static TaskStatus Status
+        public StartUp(IStatusService StatusService, ITagService TagService, ITraitService TraitService, ILoggerService LoggerService)
+            : base(StatusService, LoggerService)
         {
-            get { return _Status; }
+            _TagService = TagService;
+            _TraitService = TraitService;
         }
 
-        public static string StatusString
+        public override void Start(Action<bool> OnTaskCompleted)
         {
-            get
-            {
-                switch(_Status)
-                {
-                    case (TaskStatus.Running):
-                        return nameof(StartUp) + Constants.TaskRunning;
-                    case (TaskStatus.Faulted):
-                        return nameof(StartUp) + Constants.TaskFaulted;
-                    default:
-                        return string.Empty;
-                }
-            }
+            CurrentTask = nameof(StartUp);
+
+            Task.Factory.StartNew(() => StartUpProgram(OnTaskCompleted));
         }
 
-        public override void Start(MainViewModel MainScreen)
-        {
-            if (_Status != TaskStatus.Running)
-            {
-                base.Start(MainScreen);                
-
-                EventLogger.LogInformation(nameof(StartUp) + ":" + nameof(Start), Constants.TaskStarted + "Version: " + VersionHelper.CurrentVersion + " New Version available: " + VersionHelper.NewVersionAvailable().ToString());                
-
-                _Status = TaskStatus.Running;
-
-                _BackgroundTask = new Task(StartUpProgram, _CancelToken);
-                _BackgroundTask.Start();
-            }
-        }
-
-        public static void Cancel()
-        {
-            if (_Status == TaskStatus.Running)
-            {
-                _CancelTokenSource.Cancel();
-            }
-        }
-
-        private void StartUpProgram()
+        private void StartUpProgram(Action<bool> OnTaskCompleted)
         {
             try
             {
-                FileHelper.BackupDatabase();                
+                IsRunning = true;
+                CurrentStatus = nameof(StartUp) + " running.";
 
-                if (!File.Exists(Constants.TagsJsonFileName))
-                    Tag.RefreshTags();
+                PercentageCompleted = 0;
 
-                if (!File.Exists(Constants.TraitsJsonFileName))
-                    Trait.RefreshTraits();
-               
-                if (UserHelper.CurrentUser.Username != null)
-                {
-                    var BackgroundSynchronizer = new Synchronizer();
-                    BackgroundSynchronizer.Start(_MainScreen);
-                }
+                _TagService.Refresh();
 
-                _Status = TaskStatus.RanToCompletion;
-                _MainScreen.UpdateStatusText();
+                PercentageCompleted = 40;
 
-                EventLogger.LogInformation(nameof(StartUp) + ":" + nameof(StartUpProgram), Constants.TaskFinished);
+                _TraitService.Refresh();
+                                                                    
+                PercentageCompleted = 100;
+
+                CurrentStatus = nameof(StartUp) + " finished.";
+                IsRunning = false;
+
+                OnTaskCompleted(true);                
             }
             catch (Exception ex)
             {
-                _Status = TaskStatus.Faulted;
-                EventLogger.LogError(nameof(StartUp) + ":" + nameof(StartUpProgram), ex);
+                _Logger.Log(ex);
+
+                CurrentStatus = nameof(StartUp) + " faulted.";
+                IsRunning = false;
+
+                OnTaskCompleted(false);
             }
         }
     }

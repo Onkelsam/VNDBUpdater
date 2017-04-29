@@ -1,0 +1,151 @@
+﻿<UserControl x:Class="VNDBUpdater.GUI.Controls.VNDatagrid"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:VNDBUpdater.GUI.ViewModels.MainView"
+             xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+             xmlns:Dialog="clr-namespace:MahApps.Metro.Controls.Dialogs;assembly=MahApps.Metro"
+             mc:Ignorable="d"
+             Dialog:DialogParticipation.Register="{Binding}">
+
+    <UserControl.Resources>
+        <Style x:Key="ListViewStyle" TargetType="{x:Type ListView}" BasedOn="{StaticResource MetroListView}">
+            <Setter Property="SelectedItem" Value="{Binding Path=SelectedVisualNovel}" />
+            <Setter Property="ItemsPanel">
+                <Setter.Value>
+                    <ItemsPanelTemplate>
+                        <WrapPanel />
+                    </ItemsPanelTemplate>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
+        </Style>
+        <DataTemplate x:Key="ItemTemplate">
+            <StackPanel Width="{Binding Path=DataContext.StackPanelDimension, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type UserControl}}}" 
+                        Height="{Binding Path=DataContext.StackPanelDimension, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type UserControl}}}">
+                
+                <Image Source="{Binding Basics.ThumbNail.Path}" 
+                       Stretch="Uniform" 
+                       Width="{Binding Path=DataContext.ImageDimension, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type UserControl}}}" 
+                       Height="{Binding Path=DataContext.ImageDimension, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type UserControl}}}" />
+                
+                <TextBlock Text="{Binding Path=Basics.Title}" 
+                           VerticalAlignment="Bottom" 
+                           HorizontalAlignment="Center" 
+                           TextAlignment="Center" 
+                           TextWrapping="Wrap"/>
+            </StackPanel>
+        </DataTemplate>
+        <ContextMenu x:Key="ContextMenuTemplate">
+            <MenuItem Header="Start Game" Command="{Binding Path=StartVisualNovel}" />
+            <MenuItem Header="Open Folder" Command="{Binding Path=OpenVisualNovelFolder}" />
+            <MenuItem Header="Set Exe Path" Command="{Binding Path=SetExePath}" />
+            <Separator />
+            <MenuItem Header="Open Walkthrough" Command="{Binding Path=OpenWalkthrough}" />
+            <MenuItem Header="Create Walkthrough" Command="{Binding Path=CreateWalkthrough}" />
+            <Separator />
+            <MenuItem Header="View on VNDB" Command="{Binding Path=ViewOnVNDB}" />
+            <MenuItem Header="Update" Command="{Binding Path=UpdateVisualNovel}" />
+            <MenuItem Header="Delete Visual Novel" Command="{Binding Path=DeleteVisualNovel}" />
+            <MenuItem Header="Set as" ItemsSource="{Binding Path=Categories}">
+                <MenuItem.ItemContainerStyle>
+                    <Style TargetType="{x:Type MenuItem}">
+                        <Setter Property="Command" Value="{Binding Path=DataContext.SetCategory, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type MenuItem}}}" />
+                        <Setter Property="CommandParameter" Value="{Binding RelativeSource={RelativeSource Self}, Path=Header}"/>
+                    </Style>
+                </MenuItem.ItemContainerStyle>
+            </MenuItem>
+            <MenuItem Header="Search on Goolge">
+                <MenuItem Header="Walkthrough" Command="{Binding SearchOnline}" CommandParameter="{Binding Path=Header, RelativeSource={RelativeSource Self}}" />
+                <MenuItem Header="Savegame" Command="{Binding SearchOnline}" CommandParameter="{Binding Path=Header, RelativeSource={RelativeSource Self}}"/>
+            </MenuItem>
+            <MenuItem Header="Set Score" Command="{Binding SetScore}" />
+            <MenuItem Header="Relations">
+                <MenuItem Header="Relations not in your list" ItemsSource="{Binding Path=DataContext.Relations, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type MenuItem}}}">
+                    <MenuItem.ItemContainerStyle>
+                        <Style TargetType="{x:Type MenuItem}">
+                            <Setter Property="Header" Value="{Binding Path=Title}" />
+                            <Setter Property="Command"  Value="{Binding Path=DataContext.ViewRelationOnVNDB, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type MenuItem}}}" />
+                            <Setter Property="CommandParameter" Value="{Binding Path=Header, RelativeSource={RelativeSource Self}}" />
+                        </Style>
+                    </MenuItem.ItemContainerStyle>
+                </MenuItem>
+                <MenuItem Header="Relations in your list" ItemsSource="{Binding Path=DataContext.RelationsInVisualNovelList, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type MenuItem}}}">
+                    <MenuItem.ItemContainerStyle>
+                        <Style TargetType="{x:Type MenuItem}">
+                            <Setter Property="Header" Value="{Binding Path=Title}" />
+                            <Setter Property="Command"  Value="{Binding Path=DataContext.SelectVisualNovel, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type MenuItem}}}" />
+                            <Setter Property="CommandParameter" Value="{Binding Path=Header, RelativeSource={RelativeSource Self}}" />
+                        </Style>
+                    </MenuItem.ItemContainerStyle>
+                </MenuItem>
+            </MenuItem>
+        </ContextMenu>
+        <DataTemplate x:Key="OrderMenu">
+            <Grid Margin="8,0,0,8" DataContext="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type UserControl}}, Path=DataContext}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <ComboBox ItemsSource="{Binding Path=SortingMethods}" SelectedItem="{Binding Path=SelectedSortingMethod}" Controls:TextBoxHelper.Watermark="Order By..." IsReadOnly="True" />
+                <ComboBox ItemsSource="{Binding Path=SortingDirections}" SelectedItem="{Binding Path=SelectedSortingDirection}" Controls:TextBoxHelper.Watermark="Set Order Direction..." Grid.Column="1" IsReadOnly="True"/>
+            </Grid>
+        </DataTemplate>
+    </UserControl.Resources>
+
+    <Grid>
+        <Controls:MetroAnimatedSingleRowTabControl>
+            <TabItem Header="Unknown">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="40" MaxHeight="40" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <ContentControl ContentTemplate="{StaticResource OrderMenu}" />
+                    <ListView ItemsSource="{Binding Path=VisualNovelsInUnknownGroup}" Style="{StaticResource ListViewStyle}" ItemTemplate="{StaticResource ItemTemplate}" ContextMenu="{StaticResource ContextMenuTemplate}" Grid.Row="1" />
+                </Grid>
+            </TabItem>
+            <TabItem Header="Playing">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="40" MaxHeight="40" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <ContentControl ContentTemplate="{StaticResource OrderMenu}" />
+                    <ListView ItemsSource="{Binding Path=VisualNovelsInPlayingGroup}" Style="{StaticResource ListViewStyle}" ItemTemplate="{StaticResource ItemTemplate}" ContextMenu="{StaticResource ContextMenuTemplate}" Grid.Row="1" />
+                </Grid>
+            </TabItem>
+            <TabItem Header="Finished">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="40" MaxHeight="40" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <ContentControl ContentTemplate="{StaticResource OrderMenu}" />
+                    <ListView ItemsSource="{Binding Path=VisualNovelsInFinishedGroup}" Style="{StaticResource ListViewStyle}" ItemTemplate="{StaticResource ItemTemplate}" ContextMenu="{StaticResource ContextMenuTemplate}" Grid.Row="1"/>
+                </Grid>
+            </TabItem>
+            <TabItem Header="Stalled">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="40" MaxHeight="40" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <ContentControl ContentTemplate="{StaticResource OrderMenu}" />
+                    <ListView ItemsSource="{Binding Path=VisualNovelsInStalledGroup}" Style="{StaticResource ListViewStyle}" ItemTemplate="{StaticResource ItemTemplate}" ContextMenu="{StaticResource ContextMenuTemplate}" Grid.Row="1"/>
+                </Grid>
+            </TabItem>
+            <TabItem Header="Dropped">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="40" MaxHeight="40" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <ContentControl ContentTemplate="{StaticResource OrderMenu}" />
+                    <ListView ItemsSource="{Binding Path=VisualNovelsInDroppedGroup}" Style="{StaticResource ListViewStyle}" ItemTemplate="{StaticResource ItemTemplate}" ContextMenu="{StaticResource ContextMenuTemplate}" Grid.Row="1"/>
+                </Grid>
+            </TabItem>
+        </Controls:MetroAnimatedSingleRowTabControl>
+    </Grid>
+</UserControl>

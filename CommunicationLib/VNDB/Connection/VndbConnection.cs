@@ -21,7 +21,7 @@ namespace CommunicationLib.VNDB.Connection
         }
 
         public VndbConnection()
-        {            
+        {
             TcpClient = new TcpClient();
 
             TcpClient.Connect(VNDBHost, VNDBPort);
@@ -32,7 +32,6 @@ namespace CommunicationLib.VNDB.Connection
 
             Stream = sslStream;
         }
-
         public VndbResponse Login(string username, string password)
         {
             var Login = new LoginData(username, password);
@@ -106,6 +105,5 @@ namespace CommunicationLib.VNDB.Connection
                 Stream.Dispose();
             }
         }
-
     }
 }

@@ -1,0 +1,99 @@
+﻿<UserControl x:Class="VNDBUpdater.GUI.Controls.MenuBar"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:VNDBUpdater.GUI.Controls"
+             xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+             mc:Ignorable="d" 
+             d:DesignHeight="30" d:DesignWidth="290">
+
+    <UserControl.Resources>
+        <Ellipse x:Key="AppThemeMenuIcon"
+                     Width="16"
+                     Height="16"
+                     Fill="{Binding ColorBrush, Mode=OneWay}"
+                     Stroke="{Binding BorderColorBrush, Mode=OneWay}"
+                     StrokeThickness="1"
+                     x:Shared="False" />
+        <Ellipse x:Key="AccentMenuIcon"
+                     Width="16"
+                     Height="16"
+                     Fill="{Binding ColorBrush, Mode=OneWay}"
+                     x:Shared="False" />
+
+        <Style x:Key="AppThemeMenuItemStyle"
+                   BasedOn="{StaticResource MetroMenuItem}"
+                   TargetType="{x:Type MenuItem}">
+            <Setter Property="Command" Value="{Binding ChangeAccentCommand}" />
+            <Setter Property="Header" Value="{Binding Name, Mode=OneWay}" />
+            <Setter Property="Icon" Value="{StaticResource AppThemeMenuIcon}" />
+        </Style>
+
+        <Style x:Key="AccentColorMenuItemStyle"
+                   BasedOn="{StaticResource MetroMenuItem}"
+                   TargetType="{x:Type MenuItem}">
+            <Setter Property="Command" Value="{Binding ChangeAccentCommand}" />
+            <Setter Property="Header" Value="{Binding Name, Mode=OneWay}" />
+            <Setter Property="Icon" Value="{StaticResource AccentMenuIcon}" />
+        </Style>
+    </UserControl.Resources>
+    
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <Menu>
+            <MenuItem Header="File">
+                <MenuItem Header="Add Visual Novels" Command="{Binding AddVisualNovels}" />
+                <MenuItem Header="Update Visual Novels" Command="{Binding RefreshVisualNovels}" />
+                <MenuItem Header="Synchronize with VNDB" Command="{Binding SynchronizeWithVNDB}" />
+            </MenuItem>
+            <MenuItem Header="Filter">
+                <MenuItem Header="Create Filter" Command="{Binding AddFilter}"/>
+                <MenuItem Header="Apply Filter" ItemsSource="{Binding AvailableFilters}">
+                    <MenuItem.ItemContainerStyle>
+                        <Style TargetType="{x:Type MenuItem}">
+                            <Setter Property="Command" Value="{Binding DataContext.ApplyFilter, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type MenuItem}}}" />
+                            <Setter Property="CommandParameter" Value="{Binding RelativeSource={RelativeSource Self}, Path=Header}"/>
+                        </Style>
+                    </MenuItem.ItemContainerStyle>
+                </MenuItem>
+                <MenuItem Header="Delete Filters" ItemsSource="{Binding AvailableFilters}">
+                    <MenuItem.ItemContainerStyle>
+                        <Style TargetType="{x:Type MenuItem}">
+                            <Setter Property="Command" Value="{Binding DataContext.DeleteFilter, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type MenuItem}}}" />
+                            <Setter Property="CommandParameter" Value="{Binding RelativeSource={RelativeSource Self}, Path=Header}"/>
+                        </Style>
+                    </MenuItem.ItemContainerStyle>
+                </MenuItem>
+                <MenuItem Header="Reset Filters" Command="{Binding ResetFilters}" />
+            </MenuItem>
+            <MenuItem Header="Options">
+                <MenuItem Header="Open Options Menu" Command="{Binding OpenOptions}" />
+                <MenuItem Header="Adjust image size">
+                    <Slider Maximum="360" 
+                            Minimum="100" 
+                            SmallChange="1" 
+                            LargeChange="10" 
+                            Orientation="Horizontal"
+                            Value="{Binding Path=ImageDimension}" 
+                            Width="200" 
+                            Controls:SliderHelper.EnableMouseWheel="MouseHover"
+                            Controls:SliderHelper.ChangeValueBy="LargeChange"
+                            Style="{DynamicResource FlatSlider}"/>
+                </MenuItem>
+            </MenuItem>
+            <MenuItem Header="File Indexer" Command="{Binding OpenFileIndexer}"/>
+            <MenuItem Header="Theme"
+                      ItemContainerStyle="{StaticResource AppThemeMenuItemStyle}"
+                      ItemsSource="{Binding AppThemes, Mode=OneWay}" />
+            <MenuItem Header="Accent"
+                      ItemContainerStyle="{StaticResource AccentColorMenuItemStyle}"
+                      ItemsSource="{Binding AccentColors, Mode=OneWay}" />
+            <MenuItem Header="About" Command="{Binding About}" />
+        </Menu>
+    </Grid>
+</UserControl>

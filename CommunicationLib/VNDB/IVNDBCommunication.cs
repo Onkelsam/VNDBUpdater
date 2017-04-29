@@ -103,8 +103,6 @@ namespace CommunicationLib.VNDB
         /// </summary>
         VndbResponse DeleteVNFromWishList(int ID);
 
-        VndbResponse SearchByTitle(string title);
-
-        VndbResponse QueryInformationByTitle(string title);
+        VndbResponse SearchByTitle(string title, int page);
     }
 }

@@ -1,0 +1,54 @@
+﻿<Window x:Class="VNDBUpdater.GUI.Views.AddVisualNovels"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:VNDBUpdater.GUI.ViewModels"
+        xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+        Title="VNDBUpdater - Add Visual Novels" Height="516.675" Width="667">
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="200*" MaxWidth="200"/>
+            <ColumnDefinition Width="100*" MaxWidth="100"/>
+            <ColumnDefinition Width="246*"/>
+            <ColumnDefinition Width="100*" MaxWidth="100"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="60*" MaxHeight="50" MinHeight="50"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="150*" MaxHeight="150" MinHeight="150"/>
+        </Grid.RowDefinitions>
+        
+        <TextBox Margin="0,19,0,0" Text="{Binding Path=Title}" />
+        <Button Content="Fetch"  Grid.Column="1" Command="{Binding Fetch}" Margin="0,19,0,0"/>
+
+        <DataGrid ItemsSource="{Binding Path=FoundVisualNovels}" SelectedItem="{Binding Path=SelectedVisualNovel}" Grid.Row ="1" Grid.ColumnSpan="4">
+            <DataGrid.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="Set as" ItemsSource="{Binding Path=Categories}">
+                        <MenuItem.ItemContainerStyle>
+                            <Style TargetType="{x:Type MenuItem}">
+                                <Setter Property="Command" Value="{Binding Path=DataContext.AddVN, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type MenuItem}}}" />
+                                <Setter Property="CommandParameter" Value="{Binding RelativeSource={RelativeSource Self}, Path=Header}"/>
+                            </Style>
+                        </MenuItem.ItemContainerStyle>
+                    </MenuItem>
+                </ContextMenu>
+            </DataGrid.ContextMenu>
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Visual Novel ID" Binding="{Binding Path=Basics.ID}"/>
+                <DataGridTextColumn Header="Name" Binding="{Binding Path=Basics.Title}" Width="*"/>
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <Image Grid.Row="2" Source="{Binding Path=ThumbNail, Mode=OneWay}"/>
+        <RichTextBox Grid.Column="1" Grid.Row="2" Grid.ColumnSpan="3" >
+            <FlowDocument>
+                <Paragraph>
+                    <Run Text="{Binding Path=Description, Mode=OneWay}"/>
+                </Paragraph>
+            </FlowDocument>
+        </RichTextBox>
+    </Grid>
+</Window>

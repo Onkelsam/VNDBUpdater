@@ -1,14 +1,49 @@
 ﻿<Application x:Class="VNDBUpdater.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             StartupUri="Views/MainWindow.xaml">
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="Themes/Metro/Metro.MSControls.Core.Implicit.xaml" />
-                <ResourceDictionary Source="Themes/Metro/Metro.MSControls.Toolkit.Implicit.xaml" />
-                <ResourceDictionary Source="Views/Styles.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Colors.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/Blue.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/BaseLight.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.AnimatedSingleRowTabControl.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/FlatSlider.xaml" />
             </ResourceDictionary.MergedDictionaries>
+
+            <Style TargetType="{x:Type GroupBox}" BasedOn="{StaticResource MetroGroupBox}">
+                <Setter Property="BorderThickness" Value="1" />
+                <Setter Property="Margin" Value="0" />
+            </Style>
+
+            <Style TargetType="{x:Type RichTextBox}" BasedOn="{StaticResource MetroRichTextBox}">
+                <Setter Property="IsReadOnly" Value="True" />
+                <Setter Property="BorderThickness" Value="0" />
+                <Setter Property="FontSize" Value="14" />
+            </Style>
+
+            <Style TargetType="{x:Type DataGridTextColumn}" BasedOn="{StaticResource MetroDataGridTextColumn}">
+                <Setter Property="IsReadOnly" Value="True" />
+            </Style>
+
+            <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource MetroTextBlock}">
+                <Setter Property="TextWrapping" Value="Wrap" />
+            </Style>
+
+            <Style TargetType="{x:Type Button}" BasedOn="{StaticResource SquareButtonStyle}">
+                
+            </Style>
+
+            <Style TargetType="{x:Type DataGrid}" BasedOn="{StaticResource MetroDataGrid}">
+                <Setter Property="IsReadOnly" Value="True" />
+                <Setter Property="AutoGenerateColumns" Value="False" />
+            </Style>
+            
+            <BooleanToVisibilityConverter x:Key="Bool2Vis" />
         </ResourceDictionary>
+
     </Application.Resources>
+    
 </Application>

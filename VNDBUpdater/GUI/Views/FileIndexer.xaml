@@ -1,0 +1,120 @@
+﻿<Controls:MetroWindow x:Class="VNDBUpdater.GUI.Views.FileIndexer"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:VNDBUpdater.GUI.ViewModels"
+        xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+        xmlns:Dialog="clr-namespace:MahApps.Metro.Controls.Dialogs;assembly=MahApps.Metro"
+        mc:Ignorable="d"
+        Title="VNDBUpdater - FileIndexer" Height="600" Width="820" ResizeMode="NoResize" WindowStartupLocation="CenterScreen"
+        Dialog:DialogParticipation.Register="{Binding}">
+    
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <GroupBox Header="General Settings">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <GroupBox Header="Folders to Search">
+                        <ListBox ItemsSource="{Binding Path=Folders}" SelectionMode="Single" SelectedItem="{Binding Path=SelectedItem}" MinHeight="200" Name="FoldersToSearch">
+                            <ListBox.ToolTip>
+                                <ToolTip Content="These folders will be searched for Visual Novels. Includes all child folders."/>
+                            </ListBox.ToolTip>
+                            <ListBox.ContextMenu>
+                                <ContextMenu>
+                                    <MenuItem Header="Add" Command="{Binding Path=Add}" CommandParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ContextMenu}}, Path=PlacementTarget.Name}"/>
+                                    <MenuItem Header="Remove" Command="{Binding Path=Remove}" CommandParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ContextMenu}}, Path=PlacementTarget.Name}"/>
+                                </ContextMenu>
+                            </ListBox.ContextMenu>
+                        </ListBox>
+                </GroupBox>
+                <StackPanel Grid.Row="1">
+                    <Button Content="Reset All Indexed VNs" Command="{Binding ResetIndexedVNs}" Margin="0,10,0,0" VerticalAlignment="Bottom">
+                        <Button.ToolTip>
+                            <ToolTip Content="Resets the installed folder for all Visual Novels. Enables you to index them again."/>
+                        </Button.ToolTip>
+                    </Button>
+                    <Button Content="Default Settings" Command="{Binding SetToDefaultSettings}" Margin="0,10,0,0" VerticalAlignment="Bottom" />
+                    <Button Content="Start Indexing" Command="{Binding StartIndexing}" Margin="0,10,0,0" VerticalAlignment="Bottom"/>
+                </StackPanel>
+            </Grid>
+        </GroupBox>
+
+        <GroupBox Grid.Column="1">
+            <GroupBox.Header>
+                <CheckBox Content="Enable Advanced Settings" IsChecked="{Binding Path=AdvancedModeActivated}" Height="16" />
+            </GroupBox.Header>
+            <Grid IsEnabled="{Binding Path=AdvancedModeActivated}">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <GroupBox Header="Excluded Folders">
+                    <ListBox ItemsSource="{Binding Path=ExcludedFolders}" SelectedItem="{Binding Path=SelectedItem}" SelectionMode="Single" Name="Excluded">
+                        <ListBox.ToolTip>
+                            <ToolTip Content="Excluded folders won't be searched. Includes all child folders."/>
+                        </ListBox.ToolTip>
+                        <ListBox.ContextMenu>
+                            <ContextMenu>
+                                <MenuItem Header="Add" Command="{Binding Path=Add}" CommandParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ContextMenu}}, Path=PlacementTarget.Name}"/>
+                                <MenuItem Header="Remove" Command="{Binding Path=Remove}" CommandParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ContextMenu}}, Path=PlacementTarget.Name}"/>
+                            </ContextMenu>
+                        </ListBox.ContextMenu>
+                    </ListBox>
+                </GroupBox>
+                    <GroupBox Header="Excluded Exe Strings" Grid.Row="1">
+                            <ListBox ItemsSource="{Binding Path=ExcludedExeNames}" SelectedItem="{Binding Path=SelectedItem}" SelectionMode="Single">
+                                <ListBox.ToolTip>
+                                    <ToolTip Content="Exe-Files with these names will be excluded."/>
+                                </ListBox.ToolTip>
+                                <ListBox.ContextMenu>
+                                    <ContextMenu>
+                                        <MenuItem Header="Add" Command="{Binding Path=Add}" CommandParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ContextMenu}}, Path=PlacementTarget.Name}"/>
+                                        <MenuItem Header="Remove" Command="{Binding Path=Remove}" CommandParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ContextMenu}}, Path=PlacementTarget.Name}"/>
+                                    </ContextMenu>
+                                </ListBox.ContextMenu>
+                            </ListBox>
+                    </GroupBox>
+                <GroupBox Header="Length Settings" Grid.Row="2">
+                    <StackPanel>
+                        <Label Content="Minimal Folder Length:"/>
+                        <TextBox Text="{Binding Path=MinimalFolderLength}">
+                            <TextBox.ToolTip>
+                                <ToolTip Content="The minimal length a folder name has to be to be included in the search. 3 is recommended."/>
+                            </TextBox.ToolTip>
+                        </TextBox>
+                        <Label Content="Max Deviation:"/>
+                        <TextBox Text="{Binding Path=MaxDeviation}">
+                            <TextBox.ToolTip>
+                                <ToolTip Content="If a Visual Novel could not be found by an exact matching folder, the indexer will search again for a folder with a similiar name. A deviation value of 5 means 5 characters can be different."/>
+                            </TextBox.ToolTip>
+                        </TextBox>
+                    </StackPanel>
+                </GroupBox>
+            </Grid>
+        </GroupBox>
+        
+        <GroupBox Grid.Column="2" Header="Non indexed VNs (double click to index):">
+            <ListBox ItemsSource="{Binding Path=NonIndexedVisualNovels}" SelectedItem="{Binding Path=SelectedVisualNovel}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Path=Basics.Title}">
+                            <TextBlock.InputBindings>
+                                <MouseBinding Gesture="LeftDoubleClick" Command="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=DataContext.SetExePath}"/>
+                            </TextBlock.InputBindings>
+                        </TextBlock>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </GroupBox>
+    </Grid>
+</Controls:MetroWindow>
