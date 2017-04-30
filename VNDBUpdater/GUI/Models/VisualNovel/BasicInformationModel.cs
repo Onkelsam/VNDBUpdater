@@ -39,12 +39,8 @@ namespace VNDBUpdater.GUI.Models.VisualNovel
             Aliases = VNDBEntity.aliases;
             Release = DateTime.Parse(VNDBEntity.released);
             Rating = VNDBEntity.rating;
-            Popularity = VNDBEntity.popularity;            
-
-            if (getScreenshots)
-            {                
-                Screenshots = VNDBEntity.screens.Select(x => DownloadScreenshot(new ScreenshotModel(x))).ToList();
-            }
+            Popularity = VNDBEntity.popularity;
+            Screenshots = VNDBEntity.screens.Select(x => new ScreenshotModel(x.image, x.nsfw, x.height, x.width)).ToList();
 
             ThumbNail = DownloadScreenshot(new ScreenshotModel(VNDBEntity.image, VNDBEntity.image_nsfw, 0, 0));
             Relations = VNDBEntity.relations.Select(x => new RelationModel(x)).ToList();
@@ -130,28 +126,26 @@ namespace VNDBUpdater.GUI.Models.VisualNovel
 
         private ScreenshotModel DownloadScreenshot(ScreenshotModel screenshot)
         {
-            string ImageFolder = @"Resources\Images";
+            string ImageFolder = @"Resources\Thumbnails";
             string CurrentPath = AppDomain.CurrentDomain.BaseDirectory;
 
             if (!string.IsNullOrEmpty(screenshot.Path))
             {
+                string newPath = Path.Combine(CurrentPath, ImageFolder, ID.ToString());
+                string newImageFile = Path.Combine(newPath, screenshot.Path.Split('/').Last());
+
+                if (!Directory.Exists(newPath))
+                {
+                    Directory.CreateDirectory(newPath);
+                }
+                if (File.Exists(newImageFile))
+                {
+                    return new ScreenshotModel(newImageFile, screenshot.NSFW, screenshot.Height, screenshot.Width);
+                }
+
                 using (var client = new WebClient())
                 {
-                    string newPath = Path.Combine(CurrentPath, ImageFolder, ID.ToString());
-                    string newImageFile = Path.Combine(newPath, screenshot.Path.Split('/').Last());
-
-                    byte[] data = client.DownloadData(screenshot.Path);
-
-                    if (!Directory.Exists(newPath))
-                    {
-                        Directory.CreateDirectory(newPath);
-                    }
-                    if (File.Exists(newImageFile))
-                    {
-                        return new ScreenshotModel(newImageFile, screenshot.NSFW, screenshot.Height, screenshot.Width);
-                    }
-
-                    File.WriteAllBytes(newImageFile, data);
+                    File.WriteAllBytes(newImageFile, client.DownloadData(screenshot.Path));
 
                     return new ScreenshotModel(newImageFile, screenshot.NSFW, screenshot.Height, screenshot.Width);
                 }

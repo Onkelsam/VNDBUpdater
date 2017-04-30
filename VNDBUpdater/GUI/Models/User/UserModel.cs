@@ -8,7 +8,7 @@ namespace VNDBUpdater.GUI.Models.VisualNovel
         {
             Settings = new UserOptionsModel();
             GUI = new GUISettingsModel();
-            FileIndexerSetting = new FileIndexerSettingsModel().SetDefault();
+            FileIndexerSetting = new FileIndexerSettingsModel();
             Username = null;
             EncryptedPassword = null;
             SaveLogin = false;
@@ -57,7 +57,7 @@ namespace VNDBUpdater.GUI.Models.VisualNovel
         public FileIndexerSettingsModel FileIndexerSetting
         {
             get;
-            set;
+            private set;
         }
     }
 }

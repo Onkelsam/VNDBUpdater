@@ -280,7 +280,7 @@ namespace VNDBUpdater.GUI.ViewModels
         {
             if (!string.IsNullOrEmpty(exe))
             {
-                if (!_User.FileIndexerSetting.ExcludedExes.Any(x => x.ToLower().Trim() == exe.ToLower().Trim()))
+                if (!_User.FileIndexerSetting.ExcludedExes.Any(x => string.Equals(x, exe)))
                 {
                     _User.FileIndexerSetting.ExcludedExes.Insert(0, exe);
                     _UserService.Update(_User);

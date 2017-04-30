@@ -26,6 +26,7 @@ namespace VNDBUpdater.Communication.Database
 
         private int _ConnectionTries = 0;
         private const int _MaxConnectionTries = 4;
+        private bool _IsSaving;
 
         public RedisBase(ILoggerService LoggerService)
         {
@@ -112,13 +113,20 @@ namespace VNDBUpdater.Communication.Database
 
         public void Save()
         {
+            if (_IsSaving)
+                return;
+
+            _IsSaving = true;
+
             CheckConnection();
 
             DateTime lastSave = _Connection.GetLastSave();
 
             _Connection.ForceSave();
 
-            while (_Connection.GetLastSave() == lastSave) { }            
+            while (_Connection.GetLastSave() == lastSave) { }
+
+            _IsSaving = false;     
         }
 
         public void CheckConnection()

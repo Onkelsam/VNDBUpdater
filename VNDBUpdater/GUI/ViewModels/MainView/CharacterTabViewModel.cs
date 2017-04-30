@@ -102,7 +102,7 @@ namespace VNDBUpdater.GUI.ViewModels.MainView
         private void OnSelectedVisualNovelPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName == nameof(_VisualNovelsGridModel.SelectedVisualNovel))
-            {
+            {              
                 OnPropertyChanged(nameof(Characters));
             }
         }

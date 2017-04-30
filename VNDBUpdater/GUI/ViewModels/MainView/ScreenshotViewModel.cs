@@ -1,9 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Threading.Tasks;
 using VNDBUpdater.GUI.Models.VisualNovel;
 using VNDBUpdater.GUI.ViewModels.Interfaces;
 using VNDBUpdater.Services.User;
+using VNDBUpdater.Services.VN;
 
 namespace VNDBUpdater.GUI.ViewModels.MainView
 {
@@ -13,14 +15,16 @@ namespace VNDBUpdater.GUI.ViewModels.MainView
 
         private IVisualNovelsGridWindowModel _VisualNovelsGridModel;
         private IUserService _UserService;
+        private IVNService _VNService;
 
-        public ScreenshotViewModel(IVisualNovelsGridWindowModel VisualNovelsGridModel, IUserService UserService)
+        public ScreenshotViewModel(IVisualNovelsGridWindowModel VisualNovelsGridModel, IUserService UserService, IVNService VNService)
             : base()
         {
             _VisualNovelsGridModel = VisualNovelsGridModel;
             _VisualNovelsGridModel.PropertyChanged += OnSelectedVisualNovelPropertyChanged;
 
             _UserService = UserService;
+            _VNService = VNService;
             _User = _UserService.Get();
 
             _UserService.SubscribeToTUpdated(OnUserUpdated);
@@ -46,7 +50,14 @@ namespace VNDBUpdater.GUI.ViewModels.MainView
         {
             if (e.PropertyName == nameof(_VisualNovelsGridModel.SelectedVisualNovel))
             {
-                OnPropertyChanged(nameof(Screenshots));
+                if (_VisualNovelsGridModel.SelectedVisualNovel.Basics.Screenshots.Any(x => x.Path.Contains("https://")))
+                {
+                    Task.Factory.StartNew(() => _VNService.DownloadImages(_VisualNovelsGridModel.SelectedVisualNovel)).ContinueWith(_ => OnPropertyChanged(nameof(Screenshots)));
+                }           
+                else
+                {
+                    OnPropertyChanged(nameof(Screenshots));
+                }     
             }
         }
     }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Net;
 using VNDBUpdater.Communication.Database.Entities;
 using VNDBUpdater.Communication.Database.Interfaces;
 using VNDBUpdater.Communication.VNDB.Interfaces;
@@ -36,7 +37,7 @@ namespace VNDBUpdater.Services.VN
         public void Add(VisualNovelModel model)
         {
             _VNRepository.Add(new VisualNovelEntity(model));
-            
+
             _OnVisualNovelAdded?.Invoke(model);
         }
 
@@ -203,23 +204,17 @@ namespace VNDBUpdater.Services.VN
         {
             if (InstallationPathExists(model))
             {
-                var proc = new Process()
-                {
-                    EnableRaisingEvents = true,
-                };
-
-                proc.Exited += OnVisualNovelExited;
-                proc.StartInfo.FileName = model.ExePath;
-
-                proc.Start();
+                Process.Start(model.ExePath);
             }
         }
 
-        private void OnVisualNovelExited(object sender, EventArgs e)
+        public void AddToPlayTime(VisualNovelModel model, TimeSpan timeToAdd)
         {
-            Debug.Write("Hallo");
-            //PlayTime += DateTime.Now - (sender as Process).StartTime;
-            //RedisDatabaseAccess.AddVisualNovel(this);
+            model.PlayTime += timeToAdd;
+
+            _VNRepository.Add(new VisualNovelEntity(model));
+
+            _OnVisualNovelUpdated?.Invoke(model);
         }
 
         public void Update(VisualNovelModel model)
@@ -283,6 +278,59 @@ namespace VNDBUpdater.Services.VN
             if (!_OnRefreshAll.GetInvocationList().Contains(onRefreshed))
             {
                 _OnRefreshAll += onRefreshed;
+            }
+        }
+
+        public void DownloadImages(VisualNovelModel model)
+        {            
+            var newScreenshots = new List<ScreenshotModel>(model.Basics.Screenshots);
+            var newCharimages = new List<ScreenshotModel>(model.Characters.Select(x => x.Image));
+
+            model.Basics.Screenshots.Clear();
+
+            foreach (var screenshot in newScreenshots)
+            {
+                model.Basics.Screenshots.Add(UpdateImages(screenshot, model.Basics.ID, "Screenshots"));
+            }
+            foreach (var character in model.Characters)
+            {
+                character.Image = UpdateImages(character.Image, model.Basics.ID, "CharacterImages");
+            }
+
+            _VNRepository.Add(new VisualNovelEntity(model));
+
+            _OnVisualNovelUpdated?.Invoke(model);
+        }
+
+        private ScreenshotModel UpdateImages(ScreenshotModel screenshot, int visualNovelId, string path)
+        {
+            string ImageFolder = @"Resources\" + path;
+            string CurrentFolder = AppDomain.CurrentDomain.BaseDirectory;
+
+            if (!string.IsNullOrEmpty(screenshot.Path))
+            {
+                string newPath = Path.Combine(CurrentFolder, ImageFolder, visualNovelId.ToString());
+                string newImageFile = Path.Combine(newPath, screenshot.Path.Split('/').Last());
+
+                if (!Directory.Exists(newPath))
+                {
+                    Directory.CreateDirectory(newPath);
+                }
+                if (File.Exists(newImageFile))
+                {
+                    return new ScreenshotModel(newImageFile, screenshot.NSFW, screenshot.Height, screenshot.Width);
+                }
+
+                using (var client = new WebClient())
+                {
+                    File.WriteAllBytes(newImageFile, client.DownloadData(screenshot.Path));
+
+                    return new ScreenshotModel(newImageFile, screenshot.NSFW, screenshot.Height, screenshot.Width);
+                }
+            }
+            else
+            {
+                return new ScreenshotModel();
             }
         }
     }

@@ -127,7 +127,7 @@ namespace CommunicationLib.Redis
         }
 
         public void ForceSave()
-        {
+        {            
             Server.GetServer(IP, Port).Save(SaveType.BackgroundSave);            
         }
 

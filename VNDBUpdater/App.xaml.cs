@@ -16,6 +16,7 @@ using VNDBUpdater.GUI.ViewModels.MainView;
 using VNDBUpdater.Services.Dialogs;
 using VNDBUpdater.Services.Filters;
 using VNDBUpdater.Services.Launch;
+using VNDBUpdater.Services.LaunchMonitor;
 using VNDBUpdater.Services.Logger;
 using VNDBUpdater.Services.Login;
 using VNDBUpdater.Services.Status;
@@ -42,6 +43,10 @@ namespace VNDBUpdater
             Initialize();
 
             ShutdownMode = ShutdownMode.OnExplicitShutdown;
+
+            var monitor = Container.Resolve<ILaunchMonitorService>();
+
+            monitor.StartMonitoring();
 
             var splash = Container.Resolve<GUI.Views.SplashScreen>();
 
@@ -81,6 +86,7 @@ namespace VNDBUpdater
             Container.RegisterType<ILoginService, LoginService>();
             Container.RegisterType<ILaunchService, LaunchService>();
             Container.RegisterType<IWindowHandlerService, WindowHandlerService>(new ContainerControlledLifetimeManager());
+            Container.RegisterType<ILaunchMonitorService, LaunchMonitorService>(new ContainerControlledLifetimeManager());
 
 
             // Main View Initialization.
@@ -142,6 +148,10 @@ namespace VNDBUpdater
             var vndb = Container.Resolve<IVNDB>();
 
             vndb.Dispose();
+
+            var monitor = Container.Resolve<ILaunchMonitorService>();
+
+            monitor.Dispose();
         }
 
         public App()

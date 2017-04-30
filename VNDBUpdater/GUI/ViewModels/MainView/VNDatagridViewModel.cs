@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Data;
 using System.Windows.Input;
 using VNDBUpdater.GUI.CustomClasses.Commands;
@@ -156,7 +157,7 @@ namespace VNDBUpdater.GUI.ViewModels.MainView
             _VisualNovels.Remove(model);
             _VisualNovels.Add(model);
                         
-            _TabMapper[model.Category].Remove(model);
+            _TabMapper[model.Category].Remove(_TabMapper[model.Category].First(x => x.Basics.ID == model.Basics.ID));
             _TabMapper[model.Category].Add(model);
 
             OnPropertyChanged(_CategoryToPropertyMapper[model.Category]);
@@ -404,7 +405,7 @@ namespace VNDBUpdater.GUI.ViewModels.MainView
             get
             {
                 return _UpdateVisualNovel ??
-                    (_UpdateVisualNovel = new RelayCommand(x => { _VNService.Update(_SelectedVisualNovel); OnPropertyChanged(nameof(SelectedVisualNovel)); }, x => _SelectedVisualNovel != null));
+                    (_UpdateVisualNovel = new RelayCommand(async x => await Task.Factory.StartNew(() => { _VNService.Update(_SelectedVisualNovel); OnPropertyChanged(nameof(SelectedVisualNovel)); }), x => _SelectedVisualNovel != null));
             }
         }
 
@@ -452,7 +453,7 @@ namespace VNDBUpdater.GUI.ViewModels.MainView
             get
             {
                 return _SetCategory ??
-                    (_SetCategory = new RelayCommand((parameter) => ExecuteSetCategory(parameter), x => _SelectedVisualNovel != null));
+                    (_SetCategory = new RelayCommand(async (parameter) => await ExecuteSetCategory(parameter), x => _SelectedVisualNovel != null));
             }
         }
 
@@ -478,16 +479,19 @@ namespace VNDBUpdater.GUI.ViewModels.MainView
             }
         }
 
-        private void ExecuteSetCategory(object parameter)
+        private async Task ExecuteSetCategory(object parameter)
         {
-            var category = (VisualNovelModel.VisualNovelCatergory)Enum.Parse(typeof(VisualNovelModel.VisualNovelCatergory), parameter.ToString(), true);
-            var oldCategory = _SelectedVisualNovel.Category;
+            await Task.Factory.StartNew(() =>
+            {
+                var category = (VisualNovelModel.VisualNovelCatergory)Enum.Parse(typeof(VisualNovelModel.VisualNovelCatergory), parameter.ToString(), true);
+                var oldCategory = _SelectedVisualNovel.Category;
 
-            _VNService.SetCategory(_SelectedVisualNovel, category);
+                _VNService.SetCategory(_SelectedVisualNovel, category);
 
-            _TabMapper[oldCategory].Remove(_SelectedVisualNovel);
+                _TabMapper[oldCategory].Remove(_SelectedVisualNovel);
 
-            OnPropertyChanged(_CategoryToPropertyMapper[oldCategory]);
+                OnPropertyChanged(_CategoryToPropertyMapper[oldCategory]);
+            });
         }
 
         private void ExecuteSetScore(string score)

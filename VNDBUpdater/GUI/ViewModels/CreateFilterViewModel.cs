@@ -25,6 +25,7 @@ namespace VNDBUpdater.GUI.ViewModels
             _FilterService = FilterService;
 
             _Filter = new FilterModel();
+            _TagService = TagService;
             _Tags = _TagService.Get().Select(x => x).OrderBy(x => x.Name).ToList();
 
             _BoolToTagMapper = new Dictionary<FilterModel.BooleanOperations, ObservableCollection<TagModel>>();

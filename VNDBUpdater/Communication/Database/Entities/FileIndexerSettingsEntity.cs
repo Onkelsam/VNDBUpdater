@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using VNDBUpdater.Data;
 using VNDBUpdater.GUI.Models.VisualNovel;
 
 namespace VNDBUpdater.Communication.Database.Entities
@@ -12,7 +11,6 @@ namespace VNDBUpdater.Communication.Database.Entities
             ExcludedFolders = new List<string>();
             ExcludedExes = new List<string>();
 
-            ExcludedExes.AddRange(Constants.ExcludedExeFileNames);
             MinFolderLength = 3;
             MaxDeviation = 5;
         }
@@ -26,10 +24,10 @@ namespace VNDBUpdater.Communication.Database.Entities
             MaxDeviation = model.MaxDeviation;
         }
 
-        public int MinFolderLength { get; set; }
-        public int MaxDeviation { get; set; }
-        public List<string> Folders { get; set; }
-        public List<string> ExcludedFolders { get; set; }
-        public List<string> ExcludedExes { get; set; }
+        public int MinFolderLength { get; private set; }
+        public int MaxDeviation { get; private set; }
+        public List<string> Folders { get; private set; }
+        public List<string> ExcludedFolders { get; private set; }
+        public List<string> ExcludedExes { get; private set; }
     }
 }

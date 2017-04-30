@@ -17,6 +17,7 @@ namespace VNDBUpdater.BackgroundTasks
         private IUserService _UserService;
 
         private FileIndexerSettingsModel Settings;
+        private List<VisualNovelModel> _IndexedVisualNovels;
 
         public FileIndexer(IStatusService StatusService, IVNService VNService, IUserService UserService, ILoggerService LoggerService)
             : base(StatusService, LoggerService)
@@ -40,7 +41,7 @@ namespace VNDBUpdater.BackgroundTasks
             {
                 PercentageCompleted = 0;
                 IsRunning = true;
-                CurrentStatus = nameof(FileIndexer) + " running. Currently getting all subfolders... Will take a while.";
+                CurrentStatus = nameof(FileIndexer) + " running. Currently getting all subfolders... Will take a while...";
                 
                 List<DirectoryInfo> folders = GetFolders();
 
@@ -49,9 +50,10 @@ namespace VNDBUpdater.BackgroundTasks
                 var indexedVNs = new List<VisualNovelModel>();
 
                 _TasksToDo = _VNService.GetLocal().Count(x => string.IsNullOrEmpty(x.ExePath));
-                CurrentStatus = _TasksToDo + "will be tried to index...";
 
-                foreach (var vn in _VNService.GetLocal().Where(x => string.IsNullOrEmpty(x.ExePath)))
+                _IndexedVisualNovels = _VNService.GetLocal().Where(x => !string.IsNullOrEmpty(x.ExePath)).OrderBy(x => x.Basics.Title).ToList();
+
+                foreach (var vn in _VNService.GetLocal().Where(x => string.IsNullOrEmpty(x.ExePath)).OrderBy(x => x.Basics.Title))
                 {
                     vnFound = CheckForIdenticalMatch(vn, folders);
 
@@ -92,11 +94,21 @@ namespace VNDBUpdater.BackgroundTasks
         {
             foreach (var folder in folders)
             {
-                if (folder.Name.ToLower().Trim() == vn.Basics.Title.ToLower().Trim())
+                if (string.Equals(folder.Name, vn.Basics.Title, StringComparison.OrdinalIgnoreCase))
                 {
-                    _VNService.SetExePath(vn, GetExecuteable(folder));
+                    var executeable = GetExecuteable(folder);
 
-                    return true;
+                    if (_IndexedVisualNovels.OrderBy(x => x.Basics.Title).Any(x => string.Equals(x.ExePath, executeable, StringComparison.OrdinalIgnoreCase)))
+                    {
+                        return false;
+                    }
+                    else
+                    {
+                        _VNService.SetExePath(vn, executeable);
+                        _IndexedVisualNovels.Add(vn);
+
+                        return true;
+                    }                    
                 }
             }
 
@@ -111,9 +123,19 @@ namespace VNDBUpdater.BackgroundTasks
                 {
                     if (ComputeLevenshteinDistance(folder.Name.ToLower().Trim(), vn.Basics.Title.ToLower().Trim()) <= maxDistance)
                     {
-                        _VNService.SetExePath(vn, GetExecuteable(folder));
+                        var executeable = GetExecuteable(folder);
 
-                        return true;
+                        if (_IndexedVisualNovels.OrderBy(x => x.Basics.Title).Any(x => string.Equals(x.ExePath, executeable, StringComparison.OrdinalIgnoreCase)))
+                        {
+                            return false;
+                        }
+                        else
+                        {
+                            _VNService.SetExePath(vn, executeable);
+                            _IndexedVisualNovels.Add(vn);
+
+                            return true;
+                        }
                     }
                 }
             }
@@ -132,7 +154,9 @@ namespace VNDBUpdater.BackgroundTasks
                 foreach (var rawFolder in rawFolders)
                 {
                     if (new DirectoryInfo(rawFolder).Name.Length < Settings.MinFolderLength || Settings.ExcludedFolders.Any(x => rawFolder.Contains(x)))
+                    {
                         continue;
+                    }                        
 
                     folders.Add(new DirectoryInfo(rawFolder));
                 }
@@ -145,9 +169,11 @@ namespace VNDBUpdater.BackgroundTasks
         {
             foreach (var file in Directory.GetFiles(folder.FullName, "*.exe", SearchOption.AllDirectories))
             {
-                if (Settings.ExcludedExes.Any(x => file.Contains(x.ToLower())))
+                if (Settings.ExcludedExes.Any(x => string.Equals(x, file, StringComparison.OrdinalIgnoreCase)))
+                {
                     continue;
-            
+                }
+                                
                 return file;
             }
 

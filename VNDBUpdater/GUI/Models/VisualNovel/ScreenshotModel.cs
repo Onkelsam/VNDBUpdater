@@ -5,6 +5,8 @@ namespace VNDBUpdater.GUI.Models.VisualNovel
 {
     public class ScreenshotModel
     {
+        public ScreenshotModel() { }
+
         public ScreenshotModel(string path, bool nsfw, int height, int width)
         {
             Path = path;

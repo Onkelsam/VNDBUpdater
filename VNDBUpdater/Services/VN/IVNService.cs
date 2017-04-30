@@ -36,6 +36,8 @@ namespace VNDBUpdater.Services.VN
         void SetExePath(VisualNovelModel model, string path);
         bool InstallationPathExists(VisualNovelModel model);
         bool WalkthroughAvailable(VisualNovelModel model);
+        void DownloadImages(VisualNovelModel model);
+        void AddToPlayTime(VisualNovelModel model, TimeSpan timeToAdd);
 
 
         void SubscribeToRefreshAll(Action onRefreshed);

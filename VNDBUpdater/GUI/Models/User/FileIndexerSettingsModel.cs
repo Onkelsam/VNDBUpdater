@@ -1,18 +1,20 @@
 ﻿using System.Collections.Generic;
 using VNDBUpdater.Communication.Database.Entities;
-using VNDBUpdater.Data;
 
 namespace VNDBUpdater.GUI.Models.VisualNovel
 {
     public class FileIndexerSettingsModel
     {
+        private readonly List<string> ExcludedExeFileNames = new List<string>() { "uninstall", "エンジン設定", "unins000", "supporttools",
+            "startuptool", "filechk", "directxcheck", "setup", "uninst64", "uninst", "cmvscheck64", "cmvsconfig64", "uninst32", "cmvscheck32", "cmvsconfig32", "gameupdate64", "filechecker", "config", "uninstaller",
+            "inst", "patch", "_uninst", "setting", "authtool", "ファイル破損チェックツール", "launcher" };
+
         public FileIndexerSettingsModel()
         {
             Folders = new List<string>();
             ExcludedFolders = new List<string>();
-            ExcludedExes = new List<string>();
+            ExcludedExes = new List<string>(ExcludedExeFileNames);
 
-            ExcludedExes.AddRange(Constants.ExcludedExeFileNames);
             MinFolderLength = 3;
             MaxDeviation = 5;
         }
@@ -31,19 +33,19 @@ namespace VNDBUpdater.GUI.Models.VisualNovel
         public List<string> Folders
         {
             get;
-            set;
+            private set;
         }
 
         public List<string> ExcludedFolders
         {
             get;
-            set;
+            private set;
         }
 
         public List<string> ExcludedExes
         {
             get;
-            set;
+            private set;
         }
 
         public int MinFolderLength
@@ -61,9 +63,8 @@ namespace VNDBUpdater.GUI.Models.VisualNovel
         public FileIndexerSettingsModel SetDefault()
         {
             ExcludedFolders = new List<string>();
-            ExcludedExes = new List<string>();
+            ExcludedExes = new List<string>(ExcludedExeFileNames);
 
-            ExcludedExes.AddRange(Constants.ExcludedExeFileNames);
             MinFolderLength = 3;
             MaxDeviation = 5;
 

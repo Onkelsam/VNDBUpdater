@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using CodeKicker.BBCode;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using VNDBUpdater.GUI.Models.VisualNovel;
@@ -61,7 +62,7 @@ namespace VNDBUpdater.GUI.ViewModels.MainView
 
         public string Description
         {
-            get { return _SelectedTag?.Description != null ? _SelectedTag.Description : string.Empty; }
+            get { return _SelectedTag?.Description != null ? BBCode.ToHtml(_SelectedTag.Description) : string.Empty; }
         }
 
         private TagModel _SelectedTag;
