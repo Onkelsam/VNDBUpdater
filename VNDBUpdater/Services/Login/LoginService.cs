@@ -1,6 +1,7 @@
 ﻿using MahApps.Metro.Controls.Dialogs;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading.Tasks;
 using VNDBUpdater.GUI.Models.VisualNovel;
 using VNDBUpdater.Services.Status;
 using VNDBUpdater.Services.User;
@@ -21,14 +22,19 @@ namespace VNDBUpdater.Services.Login
 
             _User = _UserService.Get();
 
-            if (!_UserService.Login(_User))
+            Task.Factory.StartNew(async () => await CheckLoginStatus());
+        }
+
+        private async Task CheckLoginStatus()
+        {
+            if (!await _UserService.Login(_User))
             {
                 _LoginRequired = true;
             }
             else
             {
                 _LoginRequired = _User.Username == null || !_User.SaveLogin;
-            }                   
+            }
 
             if (!LoginRequired)
             {
@@ -44,7 +50,7 @@ namespace VNDBUpdater.Services.Login
             set { _LoginRequired = value; }
         }
 
-        public bool Login(LoginDialogData loginData)
+        public async Task<bool> Login(LoginDialogData loginData)
         {
             if (loginData != null && !string.IsNullOrEmpty(loginData.Username) && !string.IsNullOrEmpty(loginData.Password))
             {
@@ -52,7 +58,7 @@ namespace VNDBUpdater.Services.Login
                 _User.SaveLogin = loginData.ShouldRemember;
                 _User.EncryptedPassword = ProtectedData.Protect(Encoding.UTF8.GetBytes(loginData.Password), null, DataProtectionScope.CurrentUser);
 
-                if (_UserService.Login(_User))
+                if (await _UserService.Login(_User))
                 {
                     _LoginRequired = false;
                     _StatusService.CurrentUser = _User.Username;

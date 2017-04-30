@@ -1,4 +1,5 @@
 ﻿using MahApps.Metro.Controls.Dialogs;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using VNDBUpdater.GUI.CustomClasses.Commands;
@@ -93,14 +94,16 @@ namespace VNDBUpdater.GUI.ViewModels
                      {
                          _DialogCoordinator
                             .ShowLoginAsync(this, "Login needed", "Please login using you VNDB login data...", new LoginDialogSettings() { RememberCheckBoxVisibility = Visibility.Visible })
-                            .ContinueWith(y => ExecuteLogin(y.Result));
+                            .ContinueWith(async y => await ExecuteLogin(y.Result));
                      }));
             }
         }
 
-        private void ExecuteLogin(LoginDialogData answer)
+        private async Task ExecuteLogin(LoginDialogData answer)
         {
-            if (_LoginService.Login(answer))
+            bool loginsuccessfull = await _LoginService.Login(answer);
+
+            if (loginsuccessfull)
             {
                 _LaunchService.Launch(OnLaunchComplete);
 

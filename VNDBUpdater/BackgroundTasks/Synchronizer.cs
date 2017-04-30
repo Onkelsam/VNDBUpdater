@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using VNDBUpdater.Communication.VNDB.Entities;
@@ -28,7 +27,7 @@ namespace VNDBUpdater.BackgroundTasks
             Task.Factory.StartNew(() => Synchronize(OnTaskCompleted));
         }
 
-        private void Synchronize(Action<bool> OnTaskCompleted)
+        private async Task Synchronize(Action<bool> OnTaskCompleted)
         {
             try
             {
@@ -36,32 +35,18 @@ namespace VNDBUpdater.BackgroundTasks
                 IsRunning = true;
                 CurrentStatus = nameof(Synchronizer) + " running.";
 
-                Stopwatch sw = new Stopwatch();
-                sw.Start();
+                var vns = await _VNService.GetVNList();
+                var votes = await _VNService.GetVoteList();
 
-                List<VN> VNList = _VNService.GetVNList().ToList();
-
-                _Logger.Log("Get VN List: " + sw.ElapsedMilliseconds.ToString());
-                sw.Restart();
-
-                List<Vote> VoteList = _VNService.GetVoteList().ToList();
-
-                _Logger.Log("Get Vote List: " + sw.ElapsedMilliseconds.ToString());
-                sw.Restart();
+                var VNList = new List<VN>(vns);
+                var VoteList = new List<Vote>(votes);
 
                 _TasksToDo = VNList.Count + VoteList.Count;
 
                 CurrentStatus = _TasksDone + " Visual Novels of " + _TasksToDo + " synchronized";                
 
-                SynchronizeVNs(VNList);
-
-                _Logger.Log("Synchronize VNs: " + sw.ElapsedMilliseconds.ToString());
-                sw.Restart();
-
-                SynchronizeVotes(VoteList);
-
-                _Logger.Log("Synchronize Votes: " + sw.ElapsedMilliseconds.ToString());
-                sw.Restart();
+                await SynchronizeVNs(VNList);
+                await SynchronizeVotes(VoteList);
 
                 CurrentStatus = nameof(Synchronizer) + " finished.";
                 IsRunning = false;
@@ -79,7 +64,7 @@ namespace VNDBUpdater.BackgroundTasks
             }
         }
 
-        private void SynchronizeVNs(List<VN> VNsToSynchronize)
+        private async Task SynchronizeVNs(List<VN> VNsToSynchronize)
         {
             var VNsToAdd = new List<VN>();
 
@@ -105,11 +90,11 @@ namespace VNDBUpdater.BackgroundTasks
 
             if (VNsToAdd.Any())
             {
-                GetVNs(VNsToAdd);
+                await GetVNs(VNsToAdd);
             }
         }
 
-        private void SynchronizeVotes(List<Vote> VotesToSynchronize)
+        private async Task SynchronizeVotes(List<Vote> VotesToSynchronize)
         {
             foreach (var vote in VotesToSynchronize)
             {
@@ -126,7 +111,7 @@ namespace VNDBUpdater.BackgroundTasks
             }
         }
 
-        private void GetVNs(List<VN> VNs)
+        private async Task GetVNs(List<VN> VNs)
         {
             var idSplitter = new VNIDsSplitter(VNs.Select(x => x.vn).ToArray());
 
@@ -136,23 +121,24 @@ namespace VNDBUpdater.BackgroundTasks
             {
                 for (int round = 0; round < idSplitter.NumberOfRequests; round++)
                 {
-                    AddVNs(Take(idSplitter.IDs, round * idSplitter.MaxVNsPerRequest, idSplitter.MaxVNsPerRequest), VNs);
+                    await AddVNs(Take(idSplitter.IDs, round * idSplitter.MaxVNsPerRequest, idSplitter.MaxVNsPerRequest), VNs);
                 }
 
                 if (idSplitter.Remainder > 0)
                 {
-                    AddVNs(Take(idSplitter.IDs, idSplitter.IDs.Length - idSplitter.Remainder, idSplitter.Remainder), VNs);
+                    await AddVNs(Take(idSplitter.IDs, idSplitter.IDs.Length - idSplitter.Remainder, idSplitter.Remainder), VNs);
                 }
             }
             else
             {
-                AddVNs(idSplitter.IDs, VNs);
+                await AddVNs(idSplitter.IDs, VNs);
             }
         }
 
-        private void AddVNs(int[] ids, List<VN> VNs)
+        private async Task AddVNs(int[] ids, List<VN> VNs)
         {
-            List<VisualNovelModel> newVisualNovels = _VNService.Get(ids.ToList()).ToList();
+            var newVNs = await _VNService.Get(ids.ToList());
+            var newVisualNovels = new List<VisualNovelModel>(newVNs);
 
             newVisualNovels.ForEach(x => x.Category = (VisualNovelModel.VisualNovelCatergory)VNs.First(y => y.vn == x.Basics.ID).status);
             newVisualNovels.ForEach(x => x.Score = 0);

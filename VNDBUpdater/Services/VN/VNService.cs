@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Threading.Tasks;
 using VNDBUpdater.Communication.Database.Entities;
 using VNDBUpdater.Communication.Database.Interfaces;
 using VNDBUpdater.Communication.VNDB.Interfaces;
@@ -58,29 +59,29 @@ namespace VNDBUpdater.Services.VN
             return new VisualNovelModel(_VNRepository.Get(ID));
         }
 
-        public IList<VisualNovelModel> Get(string title)
+        public async Task<IList<VisualNovelModel>> Get(string title)
         {
-            return _VNDBGetter.Get(title);
+            return await _VNDBGetter.Get(title);
         }
 
-        public IList<VisualNovelModel> Get(List<int> IDs)
+        public async Task<IList<VisualNovelModel>> Get(List<int> IDs)
         {
-            return _VNDBGetter.Get(IDs);
+            return await _VNDBGetter.Get(IDs);
         }
 
-        public VisualNovelModel Get(int ID)
+        public async Task<VisualNovelModel> Get(int ID)
         {
-            return _VNDBGetter.Get(ID);
+            return await _VNDBGetter.Get(ID);
         }
 
-        public IList<Communication.VNDB.Entities.VN> GetVNList()
+        public async Task<IList<Communication.VNDB.Entities.VN>> GetVNList()
         {
-            return _VNDBGetter.GetVNList();
+            return await _VNDBGetter.GetVNList();
         }
 
-        public IList<Communication.VNDB.Entities.Vote> GetVoteList()
+        public async Task<IList<Communication.VNDB.Entities.Vote>> GetVoteList()
         {
-            return _VNDBGetter.GetVoteList();
+            return await _VNDBGetter.GetVoteList();
         }
 
         public void SetVNList(VisualNovelModel model)
@@ -217,9 +218,9 @@ namespace VNDBUpdater.Services.VN
             _OnVisualNovelUpdated?.Invoke(model);
         }
 
-        public void Update(VisualNovelModel model)
+        public async Task Update(VisualNovelModel model)
         {
-            VisualNovelModel updatedVisualNovel = _VNDBGetter.Get(model.Basics.ID);
+            VisualNovelModel updatedVisualNovel = await _VNDBGetter.Get(model.Basics.ID);
 
             model.Basics = updatedVisualNovel.Basics;
             model.Characters = updatedVisualNovel.Characters;

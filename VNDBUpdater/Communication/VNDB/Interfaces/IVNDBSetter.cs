@@ -1,12 +1,13 @@
-﻿using VNDBUpdater.GUI.Models.VisualNovel;
+﻿using System.Threading.Tasks;
+using VNDBUpdater.GUI.Models.VisualNovel;
 
 namespace VNDBUpdater.Communication.VNDB.Interfaces
 {
     public interface IVNDBSetter
     {
-        void AddToVNList(VisualNovelModel model);
-        void AddToScoreList(VisualNovelModel model);
-        void RemoveFromVNList(VisualNovelModel model);
-        void RemoveFromScoreList(VisualNovelModel model);
+        Task AddToVNList(VisualNovelModel model);
+        Task AddToScoreList(VisualNovelModel model);
+        Task RemoveFromVNList(VisualNovelModel model);
+        Task RemoveFromScoreList(VisualNovelModel model);
     }
 }

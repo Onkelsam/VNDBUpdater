@@ -4,6 +4,7 @@ using System.IO;
 using System.Net.Security;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace CommunicationLib.VNDB.Connection
 {
@@ -22,29 +23,34 @@ namespace CommunicationLib.VNDB.Connection
 
         public VndbConnection()
         {
+        }
+
+        public async Task Connect()
+        {
             TcpClient = new TcpClient();
 
-            TcpClient.Connect(VNDBHost, VNDBPort);
+            await TcpClient.ConnectAsync(VNDBHost, VNDBPort);
 
             var sslStream = new SslStream(TcpClient.GetStream());
 
-            sslStream.AuthenticateAsClient("api.vndb.org");
+            await sslStream.AuthenticateAsClientAsync("api.vndb.org");
 
             Stream = sslStream;
         }
-        public VndbResponse Login(string username, string password)
+
+        public async Task<VndbResponse> Login(string username, string password)
         {
             var Login = new LoginData(username, password);
 
-            return IssueCommandReadResponse("login " + JsonConvert.SerializeObject(Login));
+            return await IssueCommandReadResponse("login " + JsonConvert.SerializeObject(Login));
         }
 
-        public VndbResponse Query(string query)
+        public async Task<VndbResponse> Query(string query)
         {
-            return IssueCommandReadResponse(query);
+            return await IssueCommandReadResponse(query);
         }
 
-        private VndbResponse IssueCommandReadResponse(string command)
+        private async Task<VndbResponse> IssueCommandReadResponse(string command)
         {
             byte[] encoded = Encoding.UTF8.GetBytes(command);
 
@@ -53,14 +59,14 @@ namespace CommunicationLib.VNDB.Connection
             Buffer.BlockCopy(encoded, 0, requestBuffer, 0, encoded.Length);
             requestBuffer[encoded.Length] = VndbProtocol.EndOfStreamByte;
 
-            Stream.Write(requestBuffer, 0, requestBuffer.Length);
+            await Stream.WriteAsync(requestBuffer, 0, requestBuffer.Length);
 
             var responseBuffer = new byte[4096];
             int totalRead = 0;
 
             while (true)
             {
-                int currentRead = Stream.Read(responseBuffer, totalRead, responseBuffer.Length - totalRead);
+                int currentRead = await Stream.ReadAsync(responseBuffer, totalRead, responseBuffer.Length - totalRead);
 
                 if (currentRead == 0)
                     throw new Exception("Connection closed while reading login response.");

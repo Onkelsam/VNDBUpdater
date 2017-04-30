@@ -4,6 +4,7 @@ using Newtonsoft.Json;
 using System;
 using System.IO;
 using System.Threading;
+using System.Threading.Tasks;
 using VNDBUpdater.Communication.Database.Interfaces;
 using VNDBUpdater.Communication.VNDB.Entities;
 using VNDBUpdater.Communication.VNDB.Interfaces;
@@ -24,8 +25,6 @@ namespace VNDBUpdater.Communication.VNDB
         {
             _UserRepository = UserRepository;
             _Logger = LoggerService;
-
-            Connect();
         }
 
         private string _Status;
@@ -56,14 +55,14 @@ namespace VNDBUpdater.Communication.VNDB
             get { return _Throttled; }
         }
 
-        public void Connect()
+        public async Task Connect()
         {
             if (!_LoggedIn || !_Connection.IsConnected)
             {
                 try
                 {
                     _Connection = new CommunicationLib.Communication().GetVNDBCommunication();
-                    VndbResponse response = _Connection.Connect(_UserRepository.Get(0).Username, Convert.ToBase64String(_UserRepository.Get(0).EncryptedPassword));
+                    VndbResponse response = await _Connection.Connect(_UserRepository.Get(0).Username, Convert.ToBase64String(_UserRepository.Get(0).EncryptedPassword));
 
                     if (response.ResponseType == VndbResponseType.Error)
                     {
@@ -72,7 +71,7 @@ namespace VNDBUpdater.Communication.VNDB
                         if (result == ErrorResponse.Throttled)
                         {
                             _Logger.Log("Connecting to VNDB failed because of throttling error. Trying reconnect.");
-                            Connect();
+                            await Connect();
                         }
                         else if (result == ErrorResponse.AuthenticationFailed)
                         {
@@ -105,7 +104,7 @@ namespace VNDBUpdater.Communication.VNDB
                     if (_ConnectionTries != _MaxConnectionTries)
                     {
                         _Logger.Log("Error was handled. Trying reconnect. Current tries: " + _ConnectionTries.ToString());
-                        Connect();
+                        await Connect();
                     }
                     else
                     {
@@ -124,10 +123,10 @@ namespace VNDBUpdater.Communication.VNDB
             }
         }
 
-        public void Reconnect()
+        public async Task Reconnect()
         {
             Disconnect();
-            Connect();
+            await Connect();
         }
 
         public void Disconnect()
@@ -167,59 +166,59 @@ namespace VNDBUpdater.Communication.VNDB
             }
         }
 
-        public VndbResponse SetVNList(int ID, SetJSONObjects.State state)
+        public async Task<VndbResponse> SetVNList(int ID, SetJSONObjects.State state)
         {
-            return _Connection.SetVNList(ID, state);
+            return await _Connection.SetVNList(ID, state);
         }
 
-        public VndbResponse SetVote(int ID, SetJSONObjects.Vote vote)
+        public async Task<VndbResponse> SetVote(int ID, SetJSONObjects.Vote vote)
         {
-            return _Connection.SetVote(ID, vote);
+            return await _Connection.SetVote(ID, vote);
         }
 
-        public VndbResponse DeleteVote(int ID)
+        public async Task<VndbResponse> DeleteVote(int ID)
         {
-            return _Connection.DeleteVote(ID);
+            return await _Connection.DeleteVote(ID);
         }
 
-        public VndbResponse DeleteVNFromVNList(int ID)
+        public async Task<VndbResponse> DeleteVNFromVNList(int ID)
         {
-            return _Connection.DeleteVNFromVNList(ID);
+            return await _Connection.DeleteVNFromVNList(ID);
         }
 
-        public VndbResponse QueryCharacterInformation(int[] IDs, int page)
+        public async Task<VndbResponse> QueryCharacterInformation(int[] IDs, int page)
         {
-            return _Connection.QueryCharacterInformation(IDs, page);
+            return await _Connection.QueryCharacterInformation(IDs, page);
         }
 
-        public VndbResponse QueryCharacterInformation(int ID)
+        public async Task<VndbResponse> QueryCharacterInformation(int ID)
         {
-            return _Connection.QueryCharacterInformation(ID);
+            return await _Connection.QueryCharacterInformation(ID);
         }
 
-        public VndbResponse QueryInformation(int ID)
+        public async Task<VndbResponse> QueryInformation(int ID)
         {
-            return _Connection.QueryInformation(ID);
+            return await _Connection.QueryInformation(ID);
         }
 
-        public VndbResponse SearchByTitle(string title, int page)
+        public async Task<VndbResponse> SearchByTitle(string title, int page)
         {
-            return _Connection.SearchByTitle(title, page);
+            return await _Connection.SearchByTitle(title, page);
         }
 
-        public VndbResponse QueryInformation(int[] IDs)
+        public async Task<VndbResponse> QueryInformation(int[] IDs)
         {
-            return _Connection.QueryInformation(IDs);
+            return await _Connection.QueryInformation(IDs);
         }
 
-        public VndbResponse QueryVNList(int page = 1)
+        public async Task<VndbResponse> QueryVNList(int page = 1)
         {
-            return _Connection.QueryVNList(page);
+            return await _Connection.QueryVNList(page);
         }
 
-        public VndbResponse QueryVoteList(int page = 1)
+        public async Task<VndbResponse> QueryVoteList(int page = 1)
         {
-            return _Connection.QueryVoteList(page);
+            return await _Connection.QueryVoteList(page);
         }
 
         public void Dispose()

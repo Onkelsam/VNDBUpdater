@@ -157,7 +157,11 @@ namespace VNDBUpdater.GUI.ViewModels.MainView
             _VisualNovels.Remove(model);
             _VisualNovels.Add(model);
                         
-            _TabMapper[model.Category].Remove(_TabMapper[model.Category].First(x => x.Basics.ID == model.Basics.ID));
+            if (_TabMapper[model.Category].Any(x => x.Basics.ID == model.Basics.ID))
+            {
+                _TabMapper[model.Category].Remove(_TabMapper[model.Category].First(x => x.Basics.ID == model.Basics.ID));
+            }
+            
             _TabMapper[model.Category].Add(model);
 
             OnPropertyChanged(_CategoryToPropertyMapper[model.Category]);

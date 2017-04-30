@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using VNDBUpdater.GUI.Models.VisualNovel;
 
 namespace VNDBUpdater.Services.VN
@@ -7,13 +8,13 @@ namespace VNDBUpdater.Services.VN
     public interface IVNService : IServiceBase<VisualNovelModel>
     {
         IList<VisualNovelModel> GetLocal();
-        IList<VisualNovelModel> Get(string title);
-        IList<VisualNovelModel> Get(List<int> IDs);
-        VisualNovelModel Get(int ID);
+        Task<IList<VisualNovelModel>> Get(string title);
+        Task<IList<VisualNovelModel>> Get(List<int> IDs);
+        Task<VisualNovelModel> Get(int ID);
         VisualNovelModel GetLocal(int ID);
 
-        IList<Communication.VNDB.Entities.VN> GetVNList();
-        IList<Communication.VNDB.Entities.Vote> GetVoteList();
+        Task<IList<Communication.VNDB.Entities.VN>> GetVNList();
+        Task<IList<Communication.VNDB.Entities.Vote>> GetVoteList();
         void SetVNList(VisualNovelModel model);
 
         bool VNExists(int ID);
@@ -22,7 +23,7 @@ namespace VNDBUpdater.Services.VN
         void Add(IList<VisualNovelModel> models);
         void Delete(VisualNovelModel model);
 
-        void Update(VisualNovelModel model);
+        Task Update(VisualNovelModel model);
 
         void Start(VisualNovelModel model);
         void OpenFolder(VisualNovelModel model);

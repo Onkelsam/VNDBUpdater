@@ -1,5 +1,6 @@
 ﻿using CommunicationLib.VNDB.Connection;
 using Newtonsoft.Json;
+using System.Threading.Tasks;
 
 namespace CommunicationLib.VNDB
 {
@@ -21,19 +22,23 @@ namespace CommunicationLib.VNDB
             set { _VNDBOptions = value; }
         }
 
-        public VndbResponse Connect(string username, string password)
-        {
-            if (IsConnected)
-                Disconnect();
-
+        public async Task<VndbResponse> Connect(string username, string password)
+        {            
             InputSanitization.CheckStringArgument(username);
             InputSanitization.CheckStringArgument(password);
+
+            if (IsConnected)
+            {
+                Disconnect();
+            }
 
             _VNDBOptions = new Options();
 
             Client = new VndbConnection();
 
-            var response =  Client.Login(username, password);
+            await Client.Connect();
+
+            var response = await Client.Login(username, password);
 
             if (response.ResponseType != VndbResponseType.Error)
                 _IsConnected = true;
@@ -52,25 +57,25 @@ namespace CommunicationLib.VNDB
             }                
         }
 
-        public VndbResponse Query(string command)
+        public async Task<VndbResponse> Query(string command)
         {
             CheckConnection();
 
             InputSanitization.CheckStringArgument(command);
 
-            return Client.Query(command + " " + JsonConvert.SerializeObject(_VNDBOptions));
+            return await Client.Query(command + " " + JsonConvert.SerializeObject(_VNDBOptions));
         }
 
-        public VndbResponse Set(string command)
+        public async Task<VndbResponse> Set(string command)
         {
             CheckConnection();
 
             InputSanitization.CheckStringArgument(command);
 
-            return Client.Query(command);
+            return await Client.Query(command);
         }
 
-        public VndbResponse SearchByTitle(string title, int page)
+        public async Task<VndbResponse> SearchByTitle(string title, int page)
         {
             CheckConnection();
 
@@ -78,10 +83,10 @@ namespace CommunicationLib.VNDB
 
             SetOptions(page, 25, "id");
 
-            return Query("get vn basic,details,stats,relations,tags,screens (search~" + JsonConvert.SerializeObject(title) + ")");
+            return await Query("get vn basic,details,stats,relations,tags,screens (search~" + JsonConvert.SerializeObject(title) + ")");
         }
 
-        public VndbResponse QueryInformation(int[] IDs)
+        public async Task<VndbResponse> QueryInformation(int[] IDs)
         {
             CheckConnection();
 
@@ -89,10 +94,10 @@ namespace CommunicationLib.VNDB
 
             SetOptionsToDefault();
 
-            return Query("get vn basic,details,stats,relations,tags,screens (id = [" + string.Join(",", IDs) + "] )");
+            return await Query("get vn basic,details,stats,relations,tags,screens (id = [" + string.Join(",", IDs) + "] )");
         }
 
-        public VndbResponse QueryCharacterInformation(int[] IDs, int page)
+        public async Task<VndbResponse> QueryCharacterInformation(int[] IDs, int page)
         {
             CheckConnection();
 
@@ -101,10 +106,10 @@ namespace CommunicationLib.VNDB
 
             SetOptions(page, 25, "id");
 
-            return Query("get character basic,details,traits,vns (vn = [" + string.Join(",", IDs) + "] )");
+            return await Query("get character basic,details,traits,vns (vn = [" + string.Join(",", IDs) + "] )");
         }
 
-        public VndbResponse QueryInformation(int ID)
+        public async Task<VndbResponse> QueryInformation(int ID)
         {
             CheckConnection();
 
@@ -112,10 +117,10 @@ namespace CommunicationLib.VNDB
 
             SetOptionsToDefault();
 
-            return Query("get vn basic,details,stats,relations,tags,screens (id = " + ID + ")");
+            return await Query("get vn basic,details,stats,relations,tags,screens (id = " + ID + ")");
         }
 
-        public VndbResponse QueryCharacterInformation(int ID)
+        public async Task<VndbResponse> QueryCharacterInformation(int ID)
         {
             CheckConnection();
 
@@ -123,10 +128,10 @@ namespace CommunicationLib.VNDB
 
             SetOptionsToDefault();
 
-            return Query("get character basic,details,traits,vns (vn = " + ID + ")");
+            return await Query("get character basic,details,traits,vns (vn = " + ID + ")");
         }
 
-        public VndbResponse QueryVoteList(int page = 1)
+        public async Task<VndbResponse> QueryVoteList(int page = 1)
         {
             CheckConnection();
 
@@ -134,10 +139,10 @@ namespace CommunicationLib.VNDB
 
             SetOptions(page, 100, "vn");
 
-            return Query("get votelist basic (uid = 0)");
+            return await Query("get votelist basic (uid = 0)");
         }
 
-        public VndbResponse QueryVNList(int page = 1)
+        public async Task<VndbResponse> QueryVNList(int page = 1)
         {
             CheckConnection();
 
@@ -145,10 +150,10 @@ namespace CommunicationLib.VNDB
 
             SetOptions(page, 100, "vn");
 
-            return Query("get vnlist basic (uid = 0)");
+            return await Query("get vnlist basic (uid = 0)");
         }
 
-        public VndbResponse QueryWishList(int page = 1)
+        public async Task<VndbResponse> QueryWishList(int page = 1)
         {
             CheckConnection();
 
@@ -156,10 +161,10 @@ namespace CommunicationLib.VNDB
 
             SetOptions(page, 100, "vn");
 
-            return Query("get wishlist basic (uid = 0)");
+            return await Query("get wishlist basic (uid = 0)");
         }
 
-        public VndbResponse SetVote(int ID, SetJSONObjects.Vote vote)
+        public async Task<VndbResponse> SetVote(int ID, SetJSONObjects.Vote vote)
         {
             CheckConnection();
 
@@ -167,19 +172,19 @@ namespace CommunicationLib.VNDB
 
             InputSanitization.CheckRange(vote.vote, 10, 100);
 
-            return Set("set votelist " + ID + " " + JsonConvert.SerializeObject(vote));
+            return await Set("set votelist " + ID + " " + JsonConvert.SerializeObject(vote));
         }
 
-        public VndbResponse DeleteVote(int ID)
+        public async Task<VndbResponse> DeleteVote(int ID)
         {
             CheckConnection();
 
             InputSanitization.CheckInt(ID);
 
-            return Set("set votelist " + ID);
+            return await Set("set votelist " + ID);
         }
 
-        public VndbResponse SetVNList(int ID, SetJSONObjects.State state)
+        public async Task<VndbResponse> SetVNList(int ID, SetJSONObjects.State state)
         {
             CheckConnection();
 
@@ -187,19 +192,19 @@ namespace CommunicationLib.VNDB
 
             InputSanitization.CheckRange(state.status, 0, 4);
 
-            return Set("set vnlist " + ID + " " + JsonConvert.SerializeObject(state));
+            return await Set("set vnlist " + ID + " " + JsonConvert.SerializeObject(state));
         }
 
-        public VndbResponse DeleteVNFromVNList(int ID)
+        public async Task<VndbResponse> DeleteVNFromVNList(int ID)
         {
             CheckConnection();
 
             InputSanitization.CheckInt(ID);
 
-            return Set("set vnlist " + ID);
+            return await Set("set vnlist " + ID);
         }
 
-        public VndbResponse SetWishList(int ID, SetJSONObjects.Priority priority)
+        public async Task<VndbResponse> SetWishList(int ID, SetJSONObjects.Priority priority)
         {
             CheckConnection();
 
@@ -207,16 +212,16 @@ namespace CommunicationLib.VNDB
 
             InputSanitization.CheckRange(priority.priority, 0, 3);
 
-            return Set("set wishlist " + ID + " " + JsonConvert.SerializeObject(priority));
+            return await Set("set wishlist " + ID + " " + JsonConvert.SerializeObject(priority));
         }
 
-        public VndbResponse DeleteVNFromWishList(int ID)
+        public async Task<VndbResponse> DeleteVNFromWishList(int ID)
         {
             CheckConnection();
 
             InputSanitization.CheckInt(ID);
 
-            return Set("set wishlist " + ID);
+            return await Set("set wishlist " + ID);
         }
 
         private void CheckConnection()

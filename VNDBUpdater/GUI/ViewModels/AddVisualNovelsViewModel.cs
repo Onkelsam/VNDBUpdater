@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Input;
 using VNDBUpdater.GUI.CustomClasses.Commands;
 using VNDBUpdater.GUI.Models.VisualNovel;
@@ -93,7 +94,7 @@ namespace VNDBUpdater.GUI.ViewModels
         {
             get {
                 return _Fetch ??
-                  (_Fetch = new RelayCommand(ExecuteFetchVisualNovels));
+                  (_Fetch = new RelayCommand(async _ => await ExecuteFetchVisualNovels(null)));
             }
         }
 
@@ -104,15 +105,15 @@ namespace VNDBUpdater.GUI.ViewModels
             get
             {
                 return _AddVN ??
-                    (_AddVN = new RelayCommand((paramter) => ExecuteAddVN(paramter), x => _SelectedVisualNovel != null));
+                    (_AddVN = new RelayCommand(async (paramter) => await ExecuteAddVN(paramter), x => _SelectedVisualNovel != null));
             }
         }
 
-        private void ExecuteAddVN(object parameter)
+        private async Task ExecuteAddVN(object parameter)
         {
             var category = (VisualNovelModel.VisualNovelCatergory)Enum.Parse(typeof(VisualNovelModel.VisualNovelCatergory), parameter.ToString(), true);
 
-            var newVN = _VNService.Get(_SelectedVisualNovel.Basics.ID);
+            var newVN = await _VNService.Get(_SelectedVisualNovel.Basics.ID);
 
             newVN.Category = category;
 
@@ -122,11 +123,11 @@ namespace VNDBUpdater.GUI.ViewModels
             FoundVisualNovels.Remove(_SelectedVisualNovel);
         }
 
-        public void ExecuteFetchVisualNovels(object paramter)
+        public async Task ExecuteFetchVisualNovels(object paramter)
         {
-            var newVNs = _VNService.Get(_Title).Where(x => !ExistingVisualNovels.Any(y => y.Basics.ID == x.Basics.ID)).ToList();
+            var newVNs = await _VNService.Get(_Title);
 
-            FoundVisualNovels = new AsyncObservableCollection<VisualNovelModel>(newVNs);
+            FoundVisualNovels = new AsyncObservableCollection<VisualNovelModel>(newVNs.Where(x => !ExistingVisualNovels.Any(y => y.Basics.ID == x.Basics.ID)));
         }
     }    
 }

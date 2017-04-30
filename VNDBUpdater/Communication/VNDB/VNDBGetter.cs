@@ -2,12 +2,11 @@
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 using VNDBUpdater.Communication.VNDB.Entities;
 using VNDBUpdater.Communication.VNDB.Interfaces;
 using VNDBUpdater.GUI.Models.VisualNovel;
-using VNDBUpdater.Services.Logger;
 using VNDBUpdater.Services.Tags;
 using VNDBUpdater.Services.Traits;
 
@@ -18,29 +17,30 @@ namespace VNDBUpdater.Communication.VNDB
         private IVNDB _VNDBService;
         private ITagService _TagService;
         private ITraitService _TraitService;
-        private ILoggerService _LoggerService;
 
-        public VNDBGetter(IVNDB VNDBService, ITagService TagService, ITraitService TraitService, ILoggerService LoggerService)
+        public VNDBGetter(IVNDB VNDBService, ITagService TagService, ITraitService TraitService)
         {
             _VNDBService = VNDBService;
             _TagService = TagService;
             _TraitService = TraitService;
-            _LoggerService = LoggerService;
         }
 
-        public VisualNovelModel Get(int ID)
+        public async Task<VisualNovelModel> Get(int ID)
         {
             var visualNovel = new VisualNovelModel();
 
-            visualNovel.Basics = new BasicInformationModel(GetBasicInformation(ID).items[0], _TagService);
-            visualNovel.Characters = GetCharInfo(ID).Select(x => new CharacterInformationModel(x, _TraitService)).ToList();
+            var basic = await GetBasicInformation(ID);
+            var character = await GetCharInfo(ID);
+
+            visualNovel.Basics = new BasicInformationModel(basic.items[0], _TagService);
+            visualNovel.Characters = character.Select(x => new CharacterInformationModel(x, _TraitService)).ToList();
 
             return visualNovel;
         }
 
-        public IList<VisualNovelModel> Get(string title)
+        public async Task<IList<VisualNovelModel>> Get(string title)
         {
-            List<VNInformation> result = GetBasicInformation(title);
+            List<VNInformation> result = await GetBasicInformation(title);
             var models = new List<VisualNovelModel>();
 
             foreach (var vn in result)
@@ -54,25 +54,14 @@ namespace VNDBUpdater.Communication.VNDB
             return models;
         }
 
-        public IList<VisualNovelModel> Get(List<int> IDs)
+        public async Task<IList<VisualNovelModel>> Get(List<int> IDs)
         {
             var vns = new List<VisualNovelModel>();
 
-            Stopwatch sw = new Stopwatch();
-            sw.Start();
+            var basicinfo = await GetBasicInformation(IDs);
 
-            List<VNInformation> basicInformation = GetBasicInformation(IDs).items;
-
-            _LoggerService.Log("Get basic information for: " + IDs.Count + " ids: " + sw.ElapsedMilliseconds.ToString());
-            sw.Restart();
-
-
-            List<VNCharacterInformation> charInformation = GetCharInfo(IDs);
-
-
-            _LoggerService.Log("Get char information for: " + IDs.Count + " ids: " + sw.ElapsedMilliseconds.ToString());
-            sw.Restart();
-
+            List<VNInformation> basicInformation = basicinfo.items;
+            List<VNCharacterInformation> charInformation = await GetCharInfo(IDs);
 
             foreach (var id in IDs)
             {
@@ -86,13 +75,7 @@ namespace VNDBUpdater.Communication.VNDB
 
                     newVN.Basics = new BasicInformationModel(basic, _TagService);
 
-                    _LoggerService.Log("Build basic information: " + sw.ElapsedMilliseconds.ToString());
-                    sw.Restart();
-
                     newVN.Characters = chars.Select(x => new CharacterInformationModel(x, _TraitService)).ToList();
-
-                    _LoggerService.Log("Build Character information: " + sw.ElapsedMilliseconds.ToString());
-                    sw.Restart();
 
                     vns.Add(newVN);
                 }
@@ -101,7 +84,7 @@ namespace VNDBUpdater.Communication.VNDB
             return vns;
         }
 
-        private List<VNInformation> GetBasicInformation(string title)
+        private async Task<List<VNInformation>> GetBasicInformation(string title)
         {
             var infos = new List<VNInformation>();
 
@@ -110,7 +93,7 @@ namespace VNDBUpdater.Communication.VNDB
 
             do
             {
-                convertedResult = QueryBasicInformation(title, page);
+                convertedResult = await QueryBasicInformation(title, page);
 
                 page++;
 
@@ -121,15 +104,15 @@ namespace VNDBUpdater.Communication.VNDB
             return infos;
         }
 
-        private  VNInformationRoot QueryBasicInformation(string title, int page)
+        private async Task<VNInformationRoot> QueryBasicInformation(string title, int page)
         {
-            VndbResponse result = _VNDBService.SearchByTitle(title, page);
+            VndbResponse result = await _VNDBService.SearchByTitle(title, page);
 
             if (result.ResponseType == VndbResponseType.Error)
             {
                 if (_VNDBService.HandleError(result) == ErrorResponse.Throttled)
                 {
-                    return  QueryBasicInformation(title, page);
+                    return await QueryBasicInformation(title, page);
                 }
                 else
                 {
@@ -142,15 +125,15 @@ namespace VNDBUpdater.Communication.VNDB
             }
         }
 
-        private  VNInformationRoot GetBasicInformation(int ID)
+        private async Task<VNInformationRoot> GetBasicInformation(int ID)
         {
-            VndbResponse result = _VNDBService.QueryInformation(ID);
+            VndbResponse result = await _VNDBService.QueryInformation(ID);
 
             if (result.ResponseType == VndbResponseType.Error)
             {
                 if (_VNDBService.HandleError(result) == ErrorResponse.Throttled)
                 {
-                    return  GetBasicInformation(ID);
+                    return await GetBasicInformation(ID);
                 }
                 else
                 {
@@ -163,15 +146,15 @@ namespace VNDBUpdater.Communication.VNDB
             }
         }
 
-        private  VNInformationRoot GetBasicInformation(List<int> IDs)
+        private async Task<VNInformationRoot> GetBasicInformation(List<int> IDs)
         {
-            VndbResponse result = _VNDBService.QueryInformation(IDs.ToArray());
+            VndbResponse result = await _VNDBService.QueryInformation(IDs.ToArray());
 
             if (result.ResponseType == VndbResponseType.Error)
             {
                 if (_VNDBService.HandleError(result) == ErrorResponse.Throttled)
                 {
-                    return  GetBasicInformation(IDs);
+                    return await GetBasicInformation(IDs);
                 }                    
                 else
                 {
@@ -184,15 +167,15 @@ namespace VNDBUpdater.Communication.VNDB
             }
         }
 
-        private  List<VNCharacterInformation> GetCharInfo(int ID)
+        private async Task<List<VNCharacterInformation>> GetCharInfo(int ID)
         {
-            VndbResponse result = _VNDBService.QueryCharacterInformation(ID);
+            VndbResponse result = await _VNDBService.QueryCharacterInformation(ID);
 
             if (result.ResponseType == VndbResponseType.Error)
             {
                 if (_VNDBService.HandleError(result) == ErrorResponse.Throttled)
                 {
-                    return  GetCharInfo(ID);
+                    return await GetCharInfo(ID);
                 }
                 else
                 {
@@ -205,7 +188,7 @@ namespace VNDBUpdater.Communication.VNDB
             }
         }
 
-        private List<VNCharacterInformation> GetCharInfo(List<int> IDs)
+        private async Task<List<VNCharacterInformation>> GetCharInfo(List<int> IDs)
         {
             var Chars = new List<VNCharacterInformation>();
 
@@ -214,7 +197,9 @@ namespace VNDBUpdater.Communication.VNDB
 
             do
             {
-                convertedResult = JsonConvert.DeserializeObject<VNCharacterInformationRoot>(QueryChar(_VNDBService.QueryCharacterInformation, page,  IDs.ToArray()).Payload);
+                var result = await QueryChar(_VNDBService.QueryCharacterInformation, page, IDs.ToArray());
+
+                convertedResult = JsonConvert.DeserializeObject<VNCharacterInformationRoot>(result.Payload);
 
                 page++;
 
@@ -225,15 +210,15 @@ namespace VNDBUpdater.Communication.VNDB
             return Chars;
         }
 
-        private VndbResponse QueryChar(Func<int[], int, VndbResponse> Query, int page, int[] IDs)
+        private async Task<VndbResponse> QueryChar(Func<int[], int, Task<VndbResponse>> Query, int page, int[] IDs)
         {
-            VndbResponse result = Query(IDs, page);
+            VndbResponse result = await Query(IDs, page);
 
             if (result.ResponseType == VndbResponseType.Error)
             {
                 if (_VNDBService.HandleError(result) == ErrorResponse.Throttled)
                 {
-                    return QueryChar(Query, page, IDs);
+                    return await QueryChar(Query, page, IDs);
                 }
                 {
                     return null;
@@ -245,17 +230,17 @@ namespace VNDBUpdater.Communication.VNDB
             }                
         }
 
-        public IList<VN> GetVNList()
+        public async Task<IList<VN>> GetVNList()
         {
-            return GetList<VN, VNListRoot>(_VNDBService.QueryVNList);
+            return await GetList<VN, VNListRoot>(_VNDBService.QueryVNList);
         }
 
-        public IList<Vote> GetVoteList()
+        public async Task<IList<Vote>> GetVoteList()
         {
-            return GetList<Vote, VoteListRoot>(_VNDBService.QueryVoteList);
+            return await GetList<Vote, VoteListRoot>(_VNDBService.QueryVoteList);
         }
 
-        private List<T> GetList<T, U>(Func<int, VndbResponse> Query) where U : GetTemplate<T>
+        private async Task<List<T>> GetList<T, U>(Func<int, Task<VndbResponse>> Query) where U : GetTemplate<T>
         {
             var List = new List<T>();
 
@@ -264,7 +249,7 @@ namespace VNDBUpdater.Communication.VNDB
 
             do
             {
-                convertedResult = JsonConvert.DeserializeObject<U>(QueryList(Query, page));
+                convertedResult = JsonConvert.DeserializeObject<U>(await QueryList(Query, page));
                 page++;
 
                 List.AddRange(convertedResult.items);
@@ -274,15 +259,15 @@ namespace VNDBUpdater.Communication.VNDB
             return List;
         }
 
-        private string QueryList(Func<int, VndbResponse> Query, int page)
+        private async Task<string> QueryList(Func<int, Task<VndbResponse>> Query, int page)
         {
-            VndbResponse result = Query(page);
+            VndbResponse result = await Query(page);
 
             if (result.ResponseType == VndbResponseType.Error)
             {
                 if (_VNDBService.HandleError(result) == ErrorResponse.Throttled)
                 {
-                    return QueryList(Query, page);
+                    return await QueryList(Query, page);
                 }
                 else
                 {

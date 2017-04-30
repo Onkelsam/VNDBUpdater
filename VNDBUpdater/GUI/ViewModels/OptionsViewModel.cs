@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Input;
 using VNDBUpdater.Data;
 using VNDBUpdater.GUI.CustomClasses.Commands;
@@ -135,7 +136,7 @@ namespace VNDBUpdater.GUI.ViewModels
                 return _Login ?? (_Login = new RelayCommand(
                      x =>
                     {
-                         _DialogCoordinator.ShowLoginAsync(this, "Warning", "This will delete all local data! Are you sure you want to procede? Press ESC to cancel.", _LoginDialog).ContinueWith(y => ExecuteLogin(y.Result));
+                         _DialogCoordinator.ShowLoginAsync(this, "Warning", "This will delete all local data! Are you sure you want to procede? Press ESC to cancel.", _LoginDialog).ContinueWith(async y => await ExecuteLogin(y.Result));
                     }));
             }
         }
@@ -161,9 +162,11 @@ namespace VNDBUpdater.GUI.ViewModels
             _UserService.Update(_User);
         }
 
-        public void ExecuteLogin(LoginDialogData answer)
-        { 
-            if (_LoginService.Login(answer))
+        public async Task ExecuteLogin(LoginDialogData answer)
+        {
+            bool loginSuccessfull = await _LoginService.Login(answer);
+
+            if (loginSuccessfull)
             {
                 _LaunchService.Launch((successfull)  => {
                     Status = successfull ? "Login successfull..." : "Login failed...";

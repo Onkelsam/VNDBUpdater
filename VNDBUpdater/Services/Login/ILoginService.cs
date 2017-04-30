@@ -1,4 +1,5 @@
 ﻿using MahApps.Metro.Controls.Dialogs;
+using System.Threading.Tasks;
 
 namespace VNDBUpdater.Services.Login
 {
@@ -6,6 +7,6 @@ namespace VNDBUpdater.Services.Login
     {
         bool LoginRequired { get; }
 
-        bool Login(LoginDialogData loginData);
+        Task<bool> Login(LoginDialogData loginData);
     }
 }

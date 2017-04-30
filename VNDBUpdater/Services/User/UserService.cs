@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading.Tasks;
 using VNDBUpdater.Communication.Database.Entities;
 using VNDBUpdater.Communication.Database.Interfaces;
 using VNDBUpdater.Communication.VNDB.Interfaces;
@@ -46,7 +47,7 @@ namespace VNDBUpdater.Services.User
             return new UserModel(_UserRepository.Get(0));
         }
 
-        public bool Login(UserModel model)
+        public async Task<bool> Login(UserModel model)
         {
             UserModel existingUser = Get();
 
@@ -54,7 +55,7 @@ namespace VNDBUpdater.Services.User
             {
                 Add(model);
 
-                _VNDBConnection.Reconnect();
+                await _VNDBConnection.Reconnect();
 
                 _OnUserAdded?.Invoke(model);
 
@@ -64,7 +65,7 @@ namespace VNDBUpdater.Services.User
             {
                 if (!_VNDBConnection.LoggedIn)
                 {
-                    _VNDBConnection.Reconnect();
+                    await _VNDBConnection.Reconnect();
                 }
 
                 Add(model);
@@ -77,7 +78,7 @@ namespace VNDBUpdater.Services.User
 
                 Add(model);
 
-                _VNDBConnection.Reconnect();
+                await _VNDBConnection.Reconnect();
 
                 _OnUserAdded?.Invoke(model);
 

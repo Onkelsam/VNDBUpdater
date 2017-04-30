@@ -1,4 +1,5 @@
-﻿using VNDBUpdater.GUI.Models.VisualNovel;
+﻿using System.Threading.Tasks;
+using VNDBUpdater.GUI.Models.VisualNovel;
 
 namespace VNDBUpdater.Services.User
 {
@@ -8,6 +9,6 @@ namespace VNDBUpdater.Services.User
         void Add(UserModel model);
         void Update(UserModel model);
 
-        bool Login(UserModel model);
+        Task<bool> Login(UserModel model);
     }
 }
