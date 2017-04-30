@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Input;
 using VNDBUpdater.BackgroundTasks.Interfaces;
 using VNDBUpdater.GUI.CustomClasses.Commands;
@@ -37,7 +38,22 @@ namespace VNDBUpdater.GUI.ViewModels
             _StatusService = StatusService;
             _DialogService = DialogService;
 
-            _User = _UserService.Get();
+            Task.Factory.StartNew(async () => await Initialize());
+        }
+
+        private async Task Initialize()
+        {
+            _User = await _UserService.Get();
+
+            OnPropertyChanged(nameof(Folders));
+            OnPropertyChanged(nameof(ExcludedFolders));
+            OnPropertyChanged(nameof(ExcludedExeNames));
+            OnPropertyChanged(nameof(MinimalFolderLength));
+            OnPropertyChanged(nameof(MaxDeviation));
+
+            var vns = await _VNService.GetLocal();
+
+            NonIndexedVisualNovels = new ObservableCollection<VisualNovelModel>(vns.Where(x => string.IsNullOrEmpty(x.ExePath)).OrderBy(x => x.Basics.Title));
         }
 
         private bool _AdvancedModeActivated = false;
@@ -68,9 +84,12 @@ namespace VNDBUpdater.GUI.ViewModels
             get { return new ObservableCollection<string>(_User.FileIndexerSetting.ExcludedExes.OrderBy(x => x)); }
         }
 
+        private ObservableCollection<VisualNovelModel> _NonIndexedVisualNovels;
+
         public ObservableCollection<VisualNovelModel> NonIndexedVisualNovels
         {
-            get { return new ObservableCollection<VisualNovelModel>(new List<VisualNovelModel>(_VNService.GetLocal().Where(x => string.IsNullOrEmpty(x.ExePath)).OrderBy(x => x.Basics.Title))); }
+            get { return _NonIndexedVisualNovels; }
+            private set { _NonIndexedVisualNovels = value;  OnPropertyChanged(nameof(NonIndexedVisualNovels)); }
         }
 
         private VisualNovelModel _SelectedVisualNovel;
@@ -257,11 +276,11 @@ namespace VNDBUpdater.GUI.ViewModels
             get
             {
                 return _ResetIndexedVNs ??
-                    (_ResetIndexedVNs = new RelayCommand(x =>
+                    (_ResetIndexedVNs = new RelayCommand(async x =>
                     {
                         var vnsToReset = new List<VisualNovelModel>();
 
-                        foreach (var vn in _VNService.GetLocal())
+                        foreach (var vn in await _VNService.GetLocal())
                         {
                             vn.ExePath = string.Empty;
                             vn.FolderPath = string.Empty;
@@ -269,7 +288,7 @@ namespace VNDBUpdater.GUI.ViewModels
                             vnsToReset.Add(vn);
                         }
 
-                        _VNService.Add(vnsToReset);
+                        await _VNService.Add(vnsToReset);
 
                         OnPropertyChanged(nameof(NonIndexedVisualNovels));
                     }));

@@ -19,48 +19,41 @@ namespace VNDBUpdater.Services.Login
         {
             _UserService = UserService;
             _StatusService = StatusService;
-
-            _User = _UserService.Get();
-
-            Task.Factory.StartNew(async () => await CheckLoginStatus());
         }
 
-        private async Task CheckLoginStatus()
+        public async Task<bool> CheckLoginStatus()
         {
+            _User = await _UserService.Get();
+
+            bool loginRequired = true;
+
             if (!await _UserService.Login(_User))
             {
-                _LoginRequired = true;
+                loginRequired = true;
             }
             else
             {
-                _LoginRequired = _User.Username == null || !_User.SaveLogin;
+                loginRequired = _User.Username == null || !_User.SaveLogin;
             }
 
-            if (!LoginRequired)
+            if (!loginRequired)
             {
                 _StatusService.CurrentUser = _User.Username;
             }
-        }
 
-        private bool _LoginRequired;
-
-        public bool LoginRequired
-        {
-            get { return _LoginRequired; }
-            set { _LoginRequired = value; }
+            return loginRequired;
         }
 
         public async Task<bool> Login(LoginDialogData loginData)
         {
             if (loginData != null && !string.IsNullOrEmpty(loginData.Username) && !string.IsNullOrEmpty(loginData.Password))
-            {
+            {                
                 _User.Username = loginData.Username;
                 _User.SaveLogin = loginData.ShouldRemember;
                 _User.EncryptedPassword = ProtectedData.Protect(Encoding.UTF8.GetBytes(loginData.Password), null, DataProtectionScope.CurrentUser);
 
                 if (await _UserService.Login(_User))
                 {
-                    _LoginRequired = false;
                     _StatusService.CurrentUser = _User.Username;
 
                     return true;

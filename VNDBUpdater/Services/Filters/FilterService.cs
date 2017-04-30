@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using VNDBUpdater.Communication.Database.Entities;
+using System.Threading.Tasks;
 using VNDBUpdater.Communication.Database.Interfaces;
 using VNDBUpdater.GUI.Models.VisualNovel;
 
@@ -11,23 +11,22 @@ namespace VNDBUpdater.Services.Filters
     {
         private IFilterRepository _FilterRepository;
 
-        private static event Action<FilterModel> _OnFilterAdded = delegate { };
-        private static event Action<FilterModel> _OnFilterUpdated = delegate { };
-        private static event Action<FilterModel> _OnFilterDeleted = delegate { };
-
-        private static event Action<FilterModel> _OnFilterApply = delegate { };
-        private static event Action _OnFilterReset = delegate { };
+        public event EventHandler<FilterModel> OnAdded = delegate { };
+        public event EventHandler<FilterModel> OnUpdated = delegate { };
+        public event EventHandler<FilterModel> OnDeleted = delegate { };
+        public event EventHandler<FilterModel> OnApplied = delegate { };
+        public event EventHandler OnReset = delegate { };
 
         public FilterService(IFilterRepository filterRepository)
         {
             _FilterRepository = filterRepository;
         }
 
-        public void Add(FilterModel model)
+        public async Task Add(FilterModel model)
         {
-            _FilterRepository.Add(new FilterEntity(model));
+            await _FilterRepository.Add(model);
 
-            _OnFilterAdded?.Invoke(model);
+            OnAdded?.Invoke(this, model);
         }
 
         public void AddTagToFilter(FilterModel model, FilterModel.BooleanOperations operation, TagModel tag)
@@ -43,21 +42,21 @@ namespace VNDBUpdater.Services.Filters
             model.FilterParameter[operation].Add(tag);
         }
 
-        public void Delete(FilterModel model)
+        public async Task Delete(FilterModel model)
         {
-            _FilterRepository.Delete(model.Name);
+            await _FilterRepository.Delete(model.Name);
 
-            _OnFilterDeleted?.Invoke(model);
+            OnDeleted?.Invoke(this, model);
         }
 
-        public IList<FilterModel> Get()
+        public async Task<IList<FilterModel>> Get()
         {
-            return _FilterRepository.Get().Select(x => new FilterModel(x)).ToList();
+            return await _FilterRepository.Get();
         }
 
-        public FilterModel Get(string name)
+        public async Task<FilterModel> Get(string name)
         {
-            return new FilterModel(_FilterRepository.Get(name));
+            return await _FilterRepository.Get(name);
         }
 
         public void RemoveTagFromFilter(FilterModel model, string tagname)
@@ -68,30 +67,6 @@ namespace VNDBUpdater.Services.Filters
                 {
                     entry.Value.Remove(entry.Value.First(x => x.Name == tagname));
                 }
-            }
-        }
-
-        public void SubscribeToTAdded(Action<FilterModel> onTAdded)
-        {
-            if (!_OnFilterAdded.GetInvocationList().Contains(onTAdded))
-            {
-                _OnFilterAdded += onTAdded;
-            }            
-        }
-
-        public void SubscribeToTDeleted(Action<FilterModel> onTDeleted)
-        {
-            if (!_OnFilterDeleted.GetInvocationList().Contains(onTDeleted))
-            {
-                _OnFilterDeleted += onTDeleted;
-            }
-        }
-
-        public void SubscribeToTUpdated(Action<FilterModel> onTUpdated)
-        {
-            if (!_OnFilterUpdated.GetInvocationList().Contains(onTUpdated))
-            {
-                _OnFilterUpdated += onTUpdated;
             }
         }
 
@@ -118,30 +93,14 @@ namespace VNDBUpdater.Services.Filters
             return true;
         }
 
-        public void SubscribeToFilterReset(Action onFilterReset)
-        {
-            if (!_OnFilterReset.GetInvocationList().Contains(onFilterReset))
-            {
-                _OnFilterReset += onFilterReset;
-            }
-        }
-
         public void ResetFilters()
         {
-            _OnFilterReset?.Invoke();
+            OnReset?.Invoke(this, null);
         }
 
         public void ApplyFilter(FilterModel model)
         {
-            _OnFilterApply?.Invoke(model);
-        }
-
-        public void SubscribeToFilterApply(Action<FilterModel> onFilterApply)
-        {
-            if (!_OnFilterApply.GetInvocationList().Contains(onFilterApply))
-            {
-                _OnFilterApply += onFilterApply;
-            }
+            OnApplied?.Invoke(this, model);
         }
     }
 }

@@ -26,9 +26,7 @@ namespace VNDBUpdater.GUI.ViewModels
         private ILoginService _LoginService;
         private ILaunchService _LaunchService;
 
-        private IDialogCoordinator _DialogCoordinator;     
-          
-
+        private IDialogCoordinator _DialogCoordinator;              
 
         public OptionsViewModel(IDialogCoordinator dialogCoordinator, IUserService UserService, IStatusService StatusService, ILoginService LoginService, ILaunchService LaunchService)
             : base()
@@ -39,13 +37,24 @@ namespace VNDBUpdater.GUI.ViewModels
             _LoginService = LoginService;
             _LaunchService = LaunchService;
 
-            _User = UserService.Get(); 
+            Task.Factory.StartNew(async () => await Initialize());
+        }
+
+        private async Task Initialize()
+        {
+            _User = await _UserService.Get();
 
             _SaveLogin = _User.SaveLogin;
             _SpoilerLevel = _User.Settings.SpoilerSetting;
             _ShowNSFWImages = _User.Settings.ShowNSFWImages;
             _MinimizeToTray = _User.Settings.MinimizeToTray;
+
+            OnPropertyChanged(nameof(SaveLogin));
+            OnPropertyChanged(nameof(SpoilerLevel));
+            OnPropertyChanged(nameof(ShowNSFWImages));
+            OnPropertyChanged(nameof(MinimizeToTray));
         }
+
 
         public string Username
         {

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 using VNDBUpdater.GUI.Models.VisualNovel;
@@ -21,12 +22,12 @@ namespace VNDBUpdater.Services.WindowHandler
             _WindowCollection = new List<Window>();
 
             _UserService = UserService;
-            _User = _UserService.Get();
+            _User = Task.Run(() => _UserService.Get()).Result;
 
-            _UserService.SubscribeToTUpdated(OnUserUpdated);
+            _UserService.OnUpdated += OnUserUpdated;
         }
 
-        private void OnUserUpdated(UserModel User)
+        private void OnUserUpdated(object sender, UserModel User)
         {
             _User = User;
         }

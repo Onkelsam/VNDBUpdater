@@ -1,10 +1,11 @@
-﻿using VNDBUpdater.Communication.Database.Entities;
+﻿using System.Threading.Tasks;
+using VNDBUpdater.GUI.Models.VisualNovel;
 
 namespace VNDBUpdater.Communication.Database.Interfaces
 {
-    public interface IFilterRepository : IRepository<FilterEntity>
+    public interface IFilterRepository : IRepository<FilterModel>
     {
-        void Delete(string name);
-        FilterEntity Get(string name);
+        Task Delete(string name);
+        Task<FilterModel> Get(string name);
     }
 }

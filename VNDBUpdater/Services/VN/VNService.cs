@@ -5,7 +5,6 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using VNDBUpdater.Communication.Database.Entities;
 using VNDBUpdater.Communication.Database.Interfaces;
 using VNDBUpdater.Communication.VNDB.Interfaces;
 using VNDBUpdater.GUI.Models.VisualNovel;
@@ -22,11 +21,10 @@ namespace VNDBUpdater.Services.VN
         private const string _VNDBVNLink = "https://vndb.org/v";
         private const string _GoogleLink = "https://www.google.de/#q=";
 
-        private static event Action<VisualNovelModel> _OnVisualNovelAdded = delegate { };
-        private static event Action<VisualNovelModel> _OnVisualNovelDeleted = delegate { };
-        private static event Action<VisualNovelModel> _OnVisualNovelUpdated = delegate { };
-
-        private static event Action _OnRefreshAll = delegate { };
+        public event EventHandler<VisualNovelModel> OnAdded = delegate { };
+        public event EventHandler<VisualNovelModel> OnUpdated = delegate { };
+        public event EventHandler<VisualNovelModel> OnDeleted = delegate { };
+        public event EventHandler OnRefreshed = delegate { };
 
         public VNService(IVNRepository VNRepository, IVNDBSetter VNDBSetter, IVNDBGetter VNDBGetter)
         {
@@ -35,28 +33,28 @@ namespace VNDBUpdater.Services.VN
             _VNDBGetter = VNDBGetter;
         }
 
-        public void Add(VisualNovelModel model)
+        public async Task Add(VisualNovelModel model)
         {
-            _VNRepository.Add(new VisualNovelEntity(model));
+            await _VNRepository.Add(model);
 
-            _OnVisualNovelAdded?.Invoke(model);
+            OnAdded?.Invoke(this, model);
         }
 
-        public void Add(IList<VisualNovelModel> models)
+        public async Task Add(IList<VisualNovelModel> models)
         {
-            models.ToList().ForEach(x => _VNRepository.Add(new VisualNovelEntity(x)));
+            models.ToList().ForEach(async x => await _VNRepository.Add(x));
 
-            _OnRefreshAll?.Invoke();
+            OnRefreshed?.Invoke(this, null);
         }
 
-        public IList<VisualNovelModel> GetLocal()
+        public async Task<IList<VisualNovelModel>> GetLocal()
         {
-            return _VNRepository.Get().Select(x => new VisualNovelModel(x)).ToList();
+            return await _VNRepository.Get();
         }
 
-        public VisualNovelModel GetLocal(int ID)
+        public async Task<VisualNovelModel> GetLocal(int ID)
         {
-            return new VisualNovelModel(_VNRepository.Get(ID));
+            return await _VNRepository.Get(ID);
         }
 
         public async Task<IList<VisualNovelModel>> Get(string title)
@@ -84,26 +82,26 @@ namespace VNDBUpdater.Services.VN
             return await _VNDBGetter.GetVoteList();
         }
 
-        public void SetVNList(VisualNovelModel model)
+        public async Task SetVNList(VisualNovelModel model)
         {
-            _VNDBSetter.AddToVNList(model);
+            await _VNDBSetter.AddToVNList(model);
         }
 
-        public bool VNExists(int ID)
+        public async Task<bool> VNExists(int ID)
         {
-            return _VNRepository.VisualNovelExists(ID);
+            return await _VNRepository.VisualNovelExists(ID);
         }
 
-        public void Delete(VisualNovelModel model)
+        public async Task Delete(VisualNovelModel model)
         {
-            _VNRepository.Delete(model.Basics.ID);
-            _VNDBSetter.RemoveFromVNList(model);
-            _VNDBSetter.RemoveFromScoreList(model);
+            await _VNRepository.Delete(model.Basics.ID);
+            await _VNDBSetter.RemoveFromVNList(model);
+            await _VNDBSetter.RemoveFromScoreList(model);
 
-            _OnVisualNovelDeleted?.Invoke(model);
+            OnDeleted?.Invoke(this, model);
         }
 
-        public void CreateWalkthrough(VisualNovelModel model)
+        public async Task CreateWalkthrough(VisualNovelModel model)
         {
             if (InstallationPathExists(model) && !WalkthroughAvailable(model))
             {
@@ -111,7 +109,7 @@ namespace VNDBUpdater.Services.VN
 
                 OpenWalkthrough(model);
 
-                _VNRepository.Add(new VisualNovelEntity(model));
+                await _VNRepository.Add(model);
             }
         }
 
@@ -151,17 +149,17 @@ namespace VNDBUpdater.Services.VN
             }
         }
 
-        public void SetCategory(VisualNovelModel model, VisualNovelModel.VisualNovelCatergory category)
+        public async Task SetCategory(VisualNovelModel model, VisualNovelModel.VisualNovelCatergory category)
         {
             model.Category = category;
 
-            _VNRepository.Add(new VisualNovelEntity(model));
-            _VNDBSetter.AddToVNList(model);
+            await _VNRepository.Add(model);
+            await _VNDBSetter.AddToVNList(model);
 
-            _OnVisualNovelUpdated?.Invoke(model);
+            OnUpdated?.Invoke(this, model);
         }
 
-        public void SetExePath(VisualNovelModel model, string path)
+        public async Task SetExePath(VisualNovelModel model, string path)
         {
             if (!string.IsNullOrEmpty(path))
             {
@@ -176,11 +174,11 @@ namespace VNDBUpdater.Services.VN
                     model.FolderPath = model.ExePath;
                 }
 
-                _VNRepository.Add(new VisualNovelEntity(model));
+                await _VNRepository.Add(model);
             }
         }
 
-        public void SetScore(VisualNovelModel model, int score)
+        public async Task SetScore(VisualNovelModel model, int score)
         {
             if (score < 0 || score > 100)
             {
@@ -191,14 +189,14 @@ namespace VNDBUpdater.Services.VN
 
             if (model.Score == 0)
             {
-                _VNDBSetter.RemoveFromScoreList(model);
+                await _VNDBSetter.RemoveFromScoreList(model);
             }
             else
             {
-                _VNDBSetter.AddToScoreList(model);
+                await _VNDBSetter.AddToScoreList(model);
             }
 
-            _VNRepository.Add(new VisualNovelEntity(model));
+            await _VNRepository.Add(model);
         }
 
         public void Start(VisualNovelModel model)
@@ -209,13 +207,13 @@ namespace VNDBUpdater.Services.VN
             }
         }
 
-        public void AddToPlayTime(VisualNovelModel model, TimeSpan timeToAdd)
+        public async Task AddToPlayTime(VisualNovelModel model, TimeSpan timeToAdd)
         {
             model.PlayTime += timeToAdd;
 
-            _VNRepository.Add(new VisualNovelEntity(model));
+            await _VNRepository.Add(model);
 
-            _OnVisualNovelUpdated?.Invoke(model);
+            OnUpdated?.Invoke(this, model);
         }
 
         public async Task Update(VisualNovelModel model)
@@ -225,9 +223,9 @@ namespace VNDBUpdater.Services.VN
             model.Basics = updatedVisualNovel.Basics;
             model.Characters = updatedVisualNovel.Characters;
 
-            _VNRepository.Add(new VisualNovelEntity(model));
+            await _VNRepository.Add(model);
 
-            _OnVisualNovelUpdated?.Invoke(model);
+            OnUpdated?.Invoke(this, model);
         }
 
         public void ViewOnVNDB(VisualNovelModel model)
@@ -250,39 +248,7 @@ namespace VNDBUpdater.Services.VN
             return !string.IsNullOrEmpty(model.FolderPath) ? File.Exists(model.FolderPath + _WalkthroughFileName) : false;
         }
 
-        public void SubscribeToTAdded(Action<VisualNovelModel> onTAdded)
-        {
-            if (!_OnVisualNovelAdded.GetInvocationList().Contains(onTAdded))
-            {
-                _OnVisualNovelAdded += onTAdded;
-            }
-        }
-
-        public void SubscribeToTUpdated(Action<VisualNovelModel> onTUpdated)
-        {
-            if (!_OnVisualNovelUpdated.GetInvocationList().Contains(onTUpdated))
-            {
-                _OnVisualNovelUpdated += onTUpdated;
-            }
-        }
-
-        public void SubscribeToTDeleted(Action<VisualNovelModel> onTDeleted)
-        {
-            if (!_OnVisualNovelDeleted.GetInvocationList().Contains(onTDeleted))
-            {
-                _OnVisualNovelDeleted += onTDeleted;
-            }
-        }
-
-        public void SubscribeToRefreshAll(Action onRefreshed)
-        {
-            if (!_OnRefreshAll.GetInvocationList().Contains(onRefreshed))
-            {
-                _OnRefreshAll += onRefreshed;
-            }
-        }
-
-        public void DownloadImages(VisualNovelModel model)
+        public async Task DownloadImages(VisualNovelModel model)
         {            
             var newScreenshots = new List<ScreenshotModel>(model.Basics.Screenshots);
             var newCharimages = new List<ScreenshotModel>(model.Characters.Select(x => x.Image));
@@ -298,9 +264,9 @@ namespace VNDBUpdater.Services.VN
                 character.Image = UpdateImages(character.Image, model.Basics.ID, "CharacterImages");
             }
 
-            _VNRepository.Add(new VisualNovelEntity(model));
+            await _VNRepository.Add(model);
 
-            _OnVisualNovelUpdated?.Invoke(model);
+            OnUpdated?.Invoke(this, model);
         }
 
         private ScreenshotModel UpdateImages(ScreenshotModel screenshot, int visualNovelId, string path)

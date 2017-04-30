@@ -61,8 +61,10 @@ namespace VNDBUpdater.Communication.VNDB
             {
                 try
                 {
+                    var user = await _UserRepository.Get(0);
+
                     _Connection = new CommunicationLib.Communication().GetVNDBCommunication();
-                    VndbResponse response = await _Connection.Connect(_UserRepository.Get(0).Username, Convert.ToBase64String(_UserRepository.Get(0).EncryptedPassword));
+                    VndbResponse response = await _Connection.Connect(user.Username, Convert.ToBase64String(user.EncryptedPassword));
 
                     if (response.ResponseType == VndbResponseType.Error)
                     {

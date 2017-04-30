@@ -30,6 +30,6 @@ namespace VNDBUpdater.GUI.ViewModels
         public void OnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             CollectionChanged?.Invoke(sender, e);
-        }      
+        }
     }
 }

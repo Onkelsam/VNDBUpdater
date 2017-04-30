@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using VNDBUpdater.Communication.Database.Entities;
 using VNDBUpdater.Communication.Database.Interfaces;
+using VNDBUpdater.GUI.Models.VisualNovel;
 
 namespace VNDBUpdater.Communication.Database
 {
@@ -16,26 +18,28 @@ namespace VNDBUpdater.Communication.Database
             _RedisService = redisService;
         }
 
-        public void Add(UserEntity entity)
+        public async Task Add(UserModel model)
         {
-            _RedisService.WriteEntity<UserEntity>(_UserKey, entity);
+            await _RedisService.WriteEntity(_UserKey, new UserEntity(model));
         }
 
-        public void Delete(int ID)
+        public async Task Delete(int ID)
         {
             throw new NotImplementedException();
         }
 
-        public IList<UserEntity> Get()
+        public async Task<IList<UserModel>> Get()
         {
             throw new NotImplementedException();
         }
 
-        public UserEntity Get(int ID)
+        public async Task<UserModel> Get(int ID)
         {
-            UserEntity user = _RedisService.ReadEntity<UserEntity>(_UserKey);
+            var entity = await _RedisService.ReadEntity<UserEntity>(_UserKey);
 
-            return user ?? new UserEntity();
+            return entity == null 
+                ? new UserModel() 
+                : new UserModel(entity);
         }
     }
 }

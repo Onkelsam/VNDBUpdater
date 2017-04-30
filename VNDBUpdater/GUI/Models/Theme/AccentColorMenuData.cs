@@ -1,19 +1,35 @@
 ﻿using MahApps.Metro;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
 using VNDBUpdater.GUI.CustomClasses.Commands;
+using VNDBUpdater.GUI.Models.VisualNovel;
 using VNDBUpdater.Services.User;
 
 namespace VNDBUpdater.GUI.Models.Theme
 {
     public class AccentColorMenuData
     {
-        private IUserService _UserService;
+        protected UserModel _User;
+        protected IUserService _UserService;
 
         public AccentColorMenuData(IUserService UserService)
         {
             _UserService = UserService;
+            _UserService.OnUpdated += OnUserUpdated;
+
+            Task.Factory.StartNew(async () => await Initialize());
+        }
+
+        private async Task Initialize()
+        {
+            OnUserUpdated(this, await _UserService.Get());
+        }
+
+        private void OnUserUpdated(object sender, UserModel User)
+        {
+            _User = User;
         }
 
         public string Name { get; set; }
@@ -38,8 +54,10 @@ namespace VNDBUpdater.GUI.Models.Theme
 
             ThemeManager.ChangeAppStyle(Application.Current, accent, theme.Item1);
 
-            _UserService.Get().GUI.SelectedAppTheme = theme.Item1.Name;
-            _UserService.Get().GUI.SelectedAppAccent = accent.Name;
+            _User.GUI.SelectedAppTheme = theme.Item1.Name;
+            _User.GUI.SelectedAppAccent = accent.Name;
+
+            _UserService.Update(_User);
         }
     }
 }

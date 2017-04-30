@@ -1,4 +1,5 @@
 ﻿using MahApps.Metro.Controls.Dialogs;
+using System;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
@@ -30,7 +31,14 @@ namespace VNDBUpdater.GUI.ViewModels
 
             _DialogCoordinator = dialogCoordinator;
 
-            _StatusService.SubscribeToStatusUpdated(OnStatusUpdated);
+            _StatusService.OnUpdated += OnStatusUpdated;
+
+            Task.Factory.StartNew(async () => await Initialize());
+        }
+
+        private async Task Initialize()
+        {
+            LoginRequired = await _LoginService.CheckLoginStatus();
 
             if (!LoginRequired)
             {
@@ -38,7 +46,7 @@ namespace VNDBUpdater.GUI.ViewModels
             }
         }
 
-        private void OnStatusUpdated()
+        private void OnStatusUpdated(object sender, EventArgs e)
         {
             OnPropertyChanged(nameof(Status));
             OnPropertyChanged(nameof(TaskRunning));
@@ -53,6 +61,14 @@ namespace VNDBUpdater.GUI.ViewModels
             set { _SplashScreen = value; }
         }
 
+        private bool _LoginRequired;
+
+        public bool LoginRequired
+        {
+            get { return _LoginRequired; }
+            private set { _LoginRequired = value; OnPropertyChanged(nameof(LoginRequired)); }
+        }
+
         public string Title
         {
             get { return "VNDB Updater"; }
@@ -61,11 +77,6 @@ namespace VNDBUpdater.GUI.ViewModels
         public string Version
         {
             get { return "Version: " + _VersionService.CurrentVersion; }
-        }
-
-        public bool LoginRequired
-        {
-            get { return _LoginService.LoginRequired; }
         }
 
         public bool TaskRunning
@@ -106,6 +117,7 @@ namespace VNDBUpdater.GUI.ViewModels
             if (loginsuccessfull)
             {
                 _LaunchService.Launch(OnLaunchComplete);
+                LoginRequired = false;
 
                 OnPropertyChanged(nameof(LoginRequired));
             }

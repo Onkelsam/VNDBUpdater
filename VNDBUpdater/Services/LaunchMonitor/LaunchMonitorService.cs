@@ -26,7 +26,7 @@ namespace VNDBUpdater.Services.LaunchMonitor
             {
                 try
                 {
-                    var query = new WqlEventQuery("__InstanceCreationEvent", new TimeSpan(0, 0, 1), "TargetInstance isa \"Win32_Process\"");
+                    var query = new WqlEventQuery("__InstanceCreationEvent", new TimeSpan(0, 0, 1), "TargetInstance isa 'Win32_Process'");
 
                     _Watcher = new ManagementEventWatcher(query);
                     _Watcher.EventArrived += new EventArrivedEventHandler(OnProcessLaunched);
@@ -43,16 +43,30 @@ namespace VNDBUpdater.Services.LaunchMonitor
             }
         }
         
-        private void OnProcessLaunched(object sender, EventArrivedEventArgs e)
+        private async void OnProcessLaunched(object sender, EventArrivedEventArgs e)
         {
-            string instanceLaunched = ((ManagementBaseObject)e.NewEvent["TargetInstance"])["Name"].ToString();
+            string instanceLaunched = string.Empty;
+            string path = string.Empty;
 
-            _RelevantProcess = Process.GetProcessesByName(instanceLaunched.Replace(".exe", "")).First();
-
-            if (_VNService.GetLocal().Where(x => !string.IsNullOrEmpty(x.ExePath)).Any(x => string.Equals(x.ExePath, _RelevantProcess.MainModule.FileName, StringComparison.OrdinalIgnoreCase)))
+            try
             {
-                _LaunchedVisualNovel = _VNService.GetLocal().Where(x => !string.IsNullOrEmpty(x.ExePath)).First(x => string.Equals(x.ExePath, _RelevantProcess.MainModule.FileName, StringComparison.OrdinalIgnoreCase));
+                instanceLaunched = ((ManagementBaseObject)e.NewEvent["TargetInstance"])["Name"].ToString();
+                path = ((ManagementBaseObject)e.NewEvent["TargetInstance"])["ExecutablePath"].ToString();
 
+                if (string.IsNullOrEmpty(instanceLaunched) || string.IsNullOrEmpty(path))
+                {
+                    return;
+                }
+            }
+            catch { return; } // Ignore...
+
+            var localVNs = await _VNService.GetLocal();            
+
+            if (localVNs.Where(x => !string.IsNullOrEmpty(x.ExePath)).Any(x => string.Equals(x.ExePath, path, StringComparison.OrdinalIgnoreCase)))
+            {
+                _LaunchedVisualNovel = localVNs.Where(x => !string.IsNullOrEmpty(x.ExePath)).First(x => string.Equals(x.ExePath, path, StringComparison.OrdinalIgnoreCase));
+
+                _RelevantProcess = Process.GetProcessesByName(instanceLaunched.Replace(".exe", "")).First();
                 _RelevantProcess.EnableRaisingEvents = true;
                 _RelevantProcess.Exited += OnProcessEnded;
             }

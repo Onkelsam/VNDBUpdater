@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace CommunicationLib.Redis
 {
@@ -44,7 +45,7 @@ namespace CommunicationLib.Redis
                 Server = ConnectionMultiplexer.Connect(IP + ":" + Port.ToString() + ",allowAdmin=true");
                 DB = Server.GetDatabase();          
             }
-            catch (StackExchange.Redis.RedisConnectionException e)
+            catch (RedisConnectionException e)
             {
                 throw new ConnectionException("Could not connect to RedisDB. Make sure the database is running.", e);
             }
@@ -58,65 +59,65 @@ namespace CommunicationLib.Redis
             _IsConnected = false;
         }
 
-        public void WriteEntity<T>(string key, T entity) where T : class
+        public async Task WriteEntity<T>(string key, T entity) where T : class
         {
             string entry = JsonConvert.SerializeObject(entity);
 
-            DB.StringSet(key, entry, null, When.Always);
+            await DB.StringSetAsync(key, entry, null, When.Always);
         }
 
-        public void WriteEntities<T>(string key, List<T> entities) where T : class
+        public async Task WriteEntities<T>(string key, List<T> entities) where T : class
         {
             string entry = JsonConvert.SerializeObject(entities);
 
-            DB.StringSet(key, entry, null, When.Always);
+            await DB.StringSetAsync(key, entry, null, When.Always);
         }
 
-        public T ReadEntity<T>(string key) where T : class
+        public async Task<T> ReadEntity<T>(string key) where T : class
         {
-            if (KeyExists(key))
-                return JsonConvert.DeserializeObject<T>(DB.StringGet(key));
+            if (await KeyExists(key))
+                return JsonConvert.DeserializeObject<T>(await DB.StringGetAsync(key));
             else
                 return null;
         }
 
-        public List<T> ReadEntities<T>(string key) where T : class, new()
+        public async Task<List<T>> ReadEntities<T>(string key) where T : class, new()
         {
-            if (KeyExists(key))
-                return JsonConvert.DeserializeObject<List<T>>(DB.StringGet(key));
+            if (await KeyExists(key))
+                return JsonConvert.DeserializeObject<List<T>>(await DB.StringGetAsync(key));
             else
                 return new List<T>();
         }
 
-        public void WriteToList<T>(string key, T entity) where T : class
+        public async Task WriteToList<T>(string key, T entity) where T : class
         {
-            DB.ListLeftPush(key, JsonConvert.SerializeObject(entity));
+            await DB.ListLeftPushAsync(key, JsonConvert.SerializeObject(entity));
         }
 
-        public T ReadFromList<T>(string key) where T : class
+        public async Task<T> ReadFromList<T>(string key) where T : class
         {
-            if (KeyExists(key))
-                return JsonConvert.DeserializeObject<T>(DB.ListRightPop(key));
+            if (await KeyExists(key))
+                return JsonConvert.DeserializeObject<T>(await DB.ListRightPopAsync(key));
             else
                 return null;
         }
 
-        public double GetNumberOfItemsOnList(string key)
+        public async Task<double> GetNumberOfItemsOnList(string key)
         {
-            return DB.ListLength(key);
+            return await DB.ListLengthAsync(key);
         }
 
-        public bool KeyExists(string key)
+        public async Task<bool> KeyExists(string key)
         {
-            return DB.KeyExists(key);
+            return await DB.KeyExistsAsync(key);
         }
 
-        public void DeleteKey(string key)
+        public async Task DeleteKey(string key)
         {
-            DB.KeyDelete(key);
+            await DB.KeyDeleteAsync(key);
         }
 
-        public List<string> GetKeys(string pattern)
+        public async Task<List<string>> GetKeys(string pattern)
         {
             var keys = new List<string>();
 
@@ -128,12 +129,12 @@ namespace CommunicationLib.Redis
 
         public void ForceSave()
         {            
-            Server.GetServer(IP, Port).Save(SaveType.BackgroundSave);            
+            Server.GetServer(IP, Port).SaveAsync(SaveType.ForegroundSave);            
         }
 
-        public DateTime GetLastSave()
+        public async Task<DateTime> GetLastSave()
         {
-            return Server.GetServer(IP, Port).LastSave();
+            return await Server.GetServer(IP, Port).LastSaveAsync();
         }
 
         public void Dispose()

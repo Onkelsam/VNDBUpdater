@@ -1,9 +1,10 @@
-﻿using VNDBUpdater.Communication.Database.Entities;
+﻿using System.Threading.Tasks;
+using VNDBUpdater.GUI.Models.VisualNovel;
 
 namespace VNDBUpdater.Communication.Database.Interfaces
 {
-    public interface IVNRepository : IRepository<VisualNovelEntity>
+    public interface IVNRepository : IRepository<VisualNovelModel>
     {
-        bool VisualNovelExists(int ID);
+        Task<bool> VisualNovelExists(int ID);
     }
 }

@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
-using VNDBUpdater.Communication.Database.Entities;
 using VNDBUpdater.Communication.Database.Interfaces;
 using VNDBUpdater.Communication.VNDB.Interfaces;
 using VNDBUpdater.GUI.Models.VisualNovel;
@@ -15,11 +13,11 @@ namespace VNDBUpdater.Services.User
         private IRedis _RedisConnection;
         private IVNDB _VNDBConnection;
 
-        private IUserRepository _UserRepository;        
+        private IUserRepository _UserRepository;
 
-        private event Action<UserModel> _OnUserAdded = delegate { };
-        private event Action<UserModel> _OnUserUpdated = delegate { };
-        private event Action<UserModel> _OnUserDeleted = delegate { };
+        public event EventHandler<UserModel> OnAdded = delegate { };
+        public event EventHandler<UserModel> OnUpdated = delegate { };
+        public event EventHandler<UserModel> OnDeleted = delegate { };
 
         public UserService(IRedis RedisConnection, IUserRepository userRepository, IVNDB VNDBConnection)
         {
@@ -28,36 +26,36 @@ namespace VNDBUpdater.Services.User
             _VNDBConnection = VNDBConnection;
         }
 
-        public void Add(UserModel model)
+        public async Task Add(UserModel model)
         {
-            _UserRepository.Add(new UserEntity(model));
+            await _UserRepository.Add(model);
 
-            _OnUserAdded?.Invoke(model);
+            OnAdded?.Invoke(this, model);
         }
 
-        public void Update(UserModel model)
+        public async Task Update(UserModel model)
         {
-            _UserRepository.Add(new UserEntity(model));
+            await _UserRepository.Add(model);
 
-            _OnUserUpdated?.Invoke(model);
+            OnUpdated?.Invoke(this, model);
         }
 
-        public UserModel Get()
+        public async Task<UserModel> Get()
         {
-            return new UserModel(_UserRepository.Get(0));
+            return await _UserRepository.Get(0);
         }
 
         public async Task<bool> Login(UserModel model)
         {
-            UserModel existingUser = Get();
+            UserModel existingUser = await Get();
 
             if (string.IsNullOrEmpty(existingUser.Username))
             {
-                Add(model);
+                await Add(model);
 
                 await _VNDBConnection.Reconnect();
 
-                _OnUserAdded?.Invoke(model);
+                OnAdded?.Invoke(this, model);
 
                 return _VNDBConnection.LoggedIn;
             }
@@ -68,7 +66,7 @@ namespace VNDBUpdater.Services.User
                     await _VNDBConnection.Reconnect();
                 }
 
-                Add(model);
+                await Add(model);
 
                 return _VNDBConnection.LoggedIn;
             }
@@ -76,38 +74,14 @@ namespace VNDBUpdater.Services.User
             {
                 _RedisConnection.Reconnect();
 
-                Add(model);
+                await Add(model);
 
                 await _VNDBConnection.Reconnect();
 
-                _OnUserAdded?.Invoke(model);
+                OnAdded?.Invoke(this, model);
 
                 return _VNDBConnection.LoggedIn;
             }            
-        }
-
-        public void SubscribeToTAdded(Action<UserModel> onTAdded)
-        {
-            if (!_OnUserAdded.GetInvocationList().Contains(onTAdded))
-            {
-                _OnUserAdded += onTAdded;
-            }
-        }
-
-        public void SubscribeToTDeleted(Action<UserModel> onTDeleted)
-        {
-            if (!_OnUserDeleted.GetInvocationList().Contains(onTDeleted))
-            {
-                _OnUserDeleted += onTDeleted;
-            }
-        }
-
-        public void SubscribeToTUpdated(Action<UserModel> onTUpdated)
-        {
-            if (!_OnUserUpdated.GetInvocationList().Contains(onTUpdated))
-            {
-                _OnUserUpdated += onTUpdated;
-            }
         }
 
         private string Unprotect(byte[] encryptedPassword, string entropy = null, DataProtectionScope scope = DataProtectionScope.CurrentUser)

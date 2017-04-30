@@ -1,7 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using VNDBUpdater.Communication.Database.Entities;
 using VNDBUpdater.Communication.Database.Interfaces;
+using VNDBUpdater.GUI.Models.VisualNovel;
 
 namespace VNDBUpdater.Communication.Database
 {
@@ -18,58 +20,62 @@ namespace VNDBUpdater.Communication.Database
             _CacheService = cacheService;
         }
 
-        public void Add(VisualNovelEntity entity)
+        public async Task Add(VisualNovelModel model)
         {
-            _RedisService.WriteEntity<VisualNovelEntity>(_VisualNovelKey + entity.Basics.ID, entity);
+            await _RedisService.WriteEntity(_VisualNovelKey + model.Basics.ID, new VisualNovelEntity(model));
 
-            var newList = new List<VisualNovelEntity>(_CacheService.GetList<VisualNovelEntity>("VisualNovels", () => GetAll()));
+            var newList = new List<VisualNovelModel>(await _CacheService.GetList("VisualNovels", async () => await GetAll()));
 
-            if (newList.Any(x => x.Basics.ID == entity.Basics.ID))
+            if (newList.Any(x => x.Basics.ID == model.Basics.ID))
             {
-                newList.Remove(newList.First(x => x.Basics.ID == entity.Basics.ID));
+                newList.Remove(newList.First(x => x.Basics.ID == model.Basics.ID));
             }
             
-            newList.Add(entity);
+            newList.Add(model);
 
-            _CacheService.Set<IList<VisualNovelEntity>>("VisualNovels", newList);
+            await _CacheService.Set<IList<VisualNovelModel>>("VisualNovels", newList);
         }
 
-        public void Delete(int ID)
+        public async Task Delete(int ID)
         {
-            _RedisService.DeleteKey(_VisualNovelKey + ID);
+            await _RedisService.DeleteKey(_VisualNovelKey + ID);
 
-            var newList = new List<VisualNovelEntity>(_CacheService.GetList<VisualNovelEntity>("VisualNovels", () => GetAll()));
+            var newList = new List<VisualNovelModel>(await _CacheService.GetList("VisualNovels", async () => await GetAll()));
 
             newList.Remove(newList.First(x => x.Basics.ID == ID));
 
-            _CacheService.Set<IList<VisualNovelEntity>>("VisualNovels", newList);
+            await _CacheService.Set<IList<VisualNovelModel>>("VisualNovels", newList);
         }
 
-        public IList<VisualNovelEntity> Get()
+        public async Task<IList<VisualNovelModel>> Get()
         {
-            return _CacheService.GetList<VisualNovelEntity>("VisualNovels", () => GetAll());
+            return await _CacheService.GetList("VisualNovels", async () => await GetAll());
         }
 
-        public VisualNovelEntity Get(int ID)
+        public async Task<VisualNovelModel> Get(int ID)
         {
-            return _CacheService.GetList<VisualNovelEntity>("VisualNovels", () => GetAll()).First(x => x.Basics.ID == ID);
+            var cache = await _CacheService.GetList("VisualNovels", async () => await GetAll());
+
+            return cache.First(x => x.Basics.ID == ID);
         }
 
-        public bool VisualNovelExists(int ID)
+        public async Task<bool> VisualNovelExists(int ID)
         {
-            return _CacheService.GetList<VisualNovelEntity>("VisualNovels", () => GetAll()).Any(x => x.Basics.ID == ID);
+            var cache = await _CacheService.GetList("VisualNovels", async () => await GetAll());
+
+            return cache.Any(x => x.Basics.ID == ID);
         }
 
-        private IList<VisualNovelEntity> GetAll()
+        private async Task<IList<VisualNovelModel>> GetAll()
         {
             var visualNovels = new List<VisualNovelEntity>();
 
-            foreach (string vn in _RedisService.GetAllKeys(_VisualNovelKey + "*"))
+            foreach (string vn in await _RedisService.GetAllKeys(_VisualNovelKey + "*"))
             {
-                visualNovels.Add(_RedisService.ReadEntity<VisualNovelEntity>(vn));
+                visualNovels.Add(await _RedisService.ReadEntity<VisualNovelEntity>(vn));
             }
 
-            return visualNovels;
+            return visualNovels.Select(x => new VisualNovelModel(x)).ToList();
         }
     }
 }

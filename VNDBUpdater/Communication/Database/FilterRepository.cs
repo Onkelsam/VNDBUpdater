@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using VNDBUpdater.Communication.Database.Entities;
 using VNDBUpdater.Communication.Database.Interfaces;
+using VNDBUpdater.GUI.Models.VisualNovel;
 
 namespace VNDBUpdater.Communication.Database
 {
@@ -17,38 +19,40 @@ namespace VNDBUpdater.Communication.Database
             _RedisService = redisService;
         }
 
-        public void Add(FilterEntity entity)
+        public async Task Add(FilterModel model)
         {
-            _RedisService.WriteEntity<FilterEntity>(_FilterKey + entity.Name, entity);
+            await _RedisService.WriteEntity(_FilterKey + model.Name, new FilterEntity(model));
         }
 
-        public void Delete(string name)
+        public async Task Delete(string name)
         {
-            _RedisService.DeleteKey(_FilterKey + name);
+            await _RedisService.DeleteKey(_FilterKey + name);
         }
 
-        public void Delete(int ID)
+        public async Task Delete(int ID)
         {
         }
 
-        public IList<FilterEntity> Get()
+        public async Task<IList<FilterModel>> Get()
         {
-            var filters = new List<FilterEntity>();
+            var filters = new List<FilterModel>();
 
-            foreach (string key in _RedisService.GetAllKeys(_FilterKey + "*"))
+            foreach (string key in await _RedisService.GetAllKeys(_FilterKey + "*"))
             {
-                filters.Add(Get(key.Replace(_FilterKey, "")));
+                filters.Add(await Get(key.Replace(_FilterKey, "")));
             }
 
             return filters;
         }
 
-        public FilterEntity Get(string name)
+        public async Task<FilterModel> Get(string name)
         {
-            return _RedisService.ReadEntity<FilterEntity>(_FilterKey + name);
+            var entity = await _RedisService.ReadEntity<FilterEntity>(_FilterKey + name);
+
+            return new FilterModel(entity);
         }
 
-        public FilterEntity Get(int ID)
+        public async Task<FilterModel> Get(int ID)
         {
             throw new NotImplementedException();
         }

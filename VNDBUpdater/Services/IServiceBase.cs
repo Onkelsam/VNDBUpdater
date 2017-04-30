@@ -4,8 +4,8 @@ namespace VNDBUpdater.Services
 {
     public interface IServiceBase<T>
     {
-        void SubscribeToTAdded(Action<T> onTAdded);
-        void SubscribeToTUpdated(Action<T> onTUpdated);
-        void SubscribeToTDeleted(Action<T> onTDeleted);
+        event EventHandler<T> OnAdded;
+        event EventHandler<T> OnUpdated;
+        event EventHandler<T> OnDeleted;
     }
 }

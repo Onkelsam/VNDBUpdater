@@ -2,6 +2,8 @@
 using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Practices.Unity;
 using System;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using VNDBUpdater.BackgroundTasks.Factory;
 using VNDBUpdater.BackgroundTasks.Interfaces;
@@ -56,7 +58,7 @@ namespace VNDBUpdater
 
         private void Initialize()
         {
-            Container.RegisterInstance<IUnityContainer>(Container);
+            Container.RegisterInstance(Container);
 
             Container.RegisterType<ILoggerService, LoggerService>(new ContainerControlledLifetimeManager());
 
@@ -77,8 +79,8 @@ namespace VNDBUpdater
             // Service Initialization.
             Container.RegisterType<ITagService, TagService>(new ContainerControlledLifetimeManager());
             Container.RegisterType<ITraitService, TraitService>(new ContainerControlledLifetimeManager());
-            Container.RegisterType<IVNService, VNService>();
-            Container.RegisterType<IFilterService, FilterService>();
+            Container.RegisterType<IVNService, VNService>(new ContainerControlledLifetimeManager());
+            Container.RegisterType<IFilterService, FilterService>(new ContainerControlledLifetimeManager());
             Container.RegisterType<IUserService, UserService>(new ContainerControlledLifetimeManager());
             Container.RegisterType<IStatusService, StatusService>(new ContainerControlledLifetimeManager());
             Container.RegisterType<IDialogService, DialogService>();
@@ -112,15 +114,17 @@ namespace VNDBUpdater
             Container.RegisterInstance(DialogCoordinator.Instance);
         }
 
-        private void OnSplashScreenClosed(object sender, EventArgs e)
+        private async void OnSplashScreenClosed(object sender, EventArgs e)
         {
             if ((sender as Window).DialogResult == true)
             {
                 ShutdownMode = ShutdownMode.OnMainWindowClose;
 
-                var user = Container.Resolve<IUserService>();
+                var userService = Container.Resolve<IUserService>();
 
-                ThemeManager.ChangeAppStyle(Current, ThemeManager.GetAccent(user.Get().GUI.SelectedAppAccent), ThemeManager.GetAppTheme(user.Get().GUI.SelectedAppTheme));
+                var user = await userService.Get();
+
+                ThemeManager.ChangeAppStyle(Current, ThemeManager.GetAccent(user.GUI.SelectedAppAccent), ThemeManager.GetAppTheme(user.GUI.SelectedAppTheme));
 
                 var mainWindow = Container.Resolve<GUI.Views.MainWindow>();
 
@@ -136,15 +140,6 @@ namespace VNDBUpdater
         {
             base.OnExit(e);
 
-            var user = Container.Resolve<IUserRepository>();
-
-            user.Add(user.Get(0));
-
-            var redis = Container.Resolve<IRedis>();
-
-            redis.Save();
-            redis.Dispose();
-
             var vndb = Container.Resolve<IVNDB>();
 
             vndb.Dispose();
@@ -152,6 +147,11 @@ namespace VNDBUpdater
             var monitor = Container.Resolve<ILaunchMonitorService>();
 
             monitor.Dispose();
+
+            var redis = Container.Resolve<IRedis>();
+
+            redis.Save();
+            redis.Dispose();
         }
 
         public App()

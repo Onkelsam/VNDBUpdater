@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace CommunicationLib.Redis
 {
@@ -41,7 +42,7 @@ namespace CommunicationLib.Redis
             }
         }
 
-        public void WriteEntity<T>(string key, T entity) where T : class
+        public async Task WriteEntity<T>(string key, T entity) where T : class
         {
             CheckConnection();
 
@@ -50,10 +51,10 @@ namespace CommunicationLib.Redis
             if (entity == null)
                 throw new ArgumentNullException(nameof(entity) + " is null!");
 
-            Client.WriteEntity<T>(key, entity);
+            await Client.WriteEntity<T>(key, entity);
         }
         
-        public void WriteEntities<T>(string key, List<T> entities) where T : class
+        public async Task WriteEntities<T>(string key, List<T> entities) where T : class
         {
             CheckConnection();
 
@@ -65,10 +66,10 @@ namespace CommunicationLib.Redis
             if (!entities.Any())
                 throw new ArgumentException(nameof(entities) + " is empty!");
 
-            Client.WriteEntities<T>(key, entities);
+            await Client.WriteEntities<T>(key, entities);
         }
         
-        public void WriteToList<T>(string key, T entity) where T : class
+        public async Task WriteToList<T>(string key, T entity) where T : class
         {
             CheckConnection();
 
@@ -77,70 +78,70 @@ namespace CommunicationLib.Redis
             if (entity == null)
                 throw new ArgumentNullException(nameof(entity) + " is null");
 
-            Client.WriteToList<T>(key, entity);
+            await Client.WriteToList<T>(key, entity);
         }
 
-        public T ReadEntity<T>(string key) where T : class
+        public async Task<T> ReadEntity<T>(string key) where T : class
         {
             CheckConnection();
 
             InputSanitization.CheckStringArgument(key);
 
-            return Client.ReadEntity<T>(key);
+            return await Client.ReadEntity<T>(key);
         }
                  
-        public List<T> ReadEntities<T>(string key) where T : class, new()
+        public async Task<List<T>> ReadEntities<T>(string key) where T : class, new()
         {
             CheckConnection();
 
             InputSanitization.CheckStringArgument(key);
 
-            return Client.ReadEntities<T>(key);
+            return await Client.ReadEntities<T>(key);
         }
         
-        public T ReadFromList<T>(string key) where T : class
+        public async Task<T> ReadFromList<T>(string key) where T : class
         {
             CheckConnection();
 
             InputSanitization.CheckStringArgument(key);
 
-            return Client.ReadFromList<T>(key);
+            return await Client.ReadFromList<T>(key);
         }
 
-        public double GetNumberOfItemsOnList(string key)
+        public async Task<double> GetNumberOfItemsOnList(string key)
         {
             CheckConnection();
 
             InputSanitization.CheckStringArgument(key);
 
-            return Client.GetNumberOfItemsOnList(key);
-        }
-        
-        public void DeleteKey(string key)
-        {
-            CheckConnection();
-
-            InputSanitization.CheckStringArgument(key);
-
-            Client.DeleteKey(key);
+            return await Client.GetNumberOfItemsOnList(key);
         }
         
-        public List<string> GetKeys(string pattern)
+        public async Task DeleteKey(string key)
+        {
+            CheckConnection();
+
+            InputSanitization.CheckStringArgument(key);
+
+            await Client.DeleteKey(key);
+        }
+        
+        public async Task<List<string>> GetKeys(string pattern)
         {
             CheckConnection();
 
             InputSanitization.CheckStringArgument(pattern);
 
-            return Client.GetKeys(pattern);
+            return await Client.GetKeys(pattern);
         }
 
-        public bool KeyExists(string key)
+        public async Task<bool> KeyExists(string key)
         {
             CheckConnection();
 
             InputSanitization.CheckStringArgument(key);
 
-            return Client.KeyExists(key);
+            return await Client.KeyExists(key);
         }
 
         public void ForceSave()
@@ -150,11 +151,11 @@ namespace CommunicationLib.Redis
             Client.ForceSave();
         }
 
-        public DateTime GetLastSave()
+        public async Task<DateTime> GetLastSave()
         {
             CheckConnection();
 
-            return Client.GetLastSave();
+            return await Client.GetLastSave();
         }
 
         private void CheckConnection()

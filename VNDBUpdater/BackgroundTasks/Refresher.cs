@@ -46,8 +46,9 @@ namespace VNDBUpdater.BackgroundTasks
                 CurrentStatus = "Tags and Traits have been refreshed...";
 
                 var updatedVNs = new List<VisualNovelModel>();
+                var localVNs = await _VNService.GetLocal();
 
-                var idSplitter = new VNIDsSplitter(_VNService.GetLocal().Select(x => x.Basics.ID).ToArray());
+                var idSplitter = new VNIDsSplitter(localVNs.Select(x => x.Basics.ID).ToArray());
 
                 idSplitter.Split();
 
@@ -85,7 +86,7 @@ namespace VNDBUpdater.BackgroundTasks
 
                 foreach (var vn in updatedVNs)
                 {
-                    VisualNovelModel vnToUpdate = _VNService.GetLocal(vn.Basics.ID);
+                    VisualNovelModel vnToUpdate = await _VNService.GetLocal(vn.Basics.ID);
 
                     if (vnToUpdate != null)
                     {
@@ -96,7 +97,7 @@ namespace VNDBUpdater.BackgroundTasks
                     newVNs.Add(vnToUpdate);
                 }
 
-                _VNService.Add(newVNs);
+                await _VNService.Add(newVNs);
 
                 CurrentStatus = nameof(Refresher) + " finished.";
                 IsRunning = false;

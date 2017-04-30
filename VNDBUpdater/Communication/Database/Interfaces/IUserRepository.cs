@@ -1,8 +1,8 @@
-﻿using VNDBUpdater.Communication.Database.Entities;
+﻿using VNDBUpdater.GUI.Models.VisualNovel;
 
 namespace VNDBUpdater.Communication.Database.Interfaces
 {
-    public interface IUserRepository : IRepository<UserEntity>
+    public interface IUserRepository : IRepository<UserModel>
     {
     }
 }

@@ -5,9 +5,9 @@ namespace VNDBUpdater.Services.User
 {
     public interface IUserService : IServiceBase<UserModel>
     {
-        UserModel Get();
-        void Add(UserModel model);
-        void Update(UserModel model);
+        Task<UserModel> Get();
+        Task Add(UserModel model);
+        Task Update(UserModel model);
 
         Task<bool> Login(UserModel model);
     }

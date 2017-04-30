@@ -25,7 +25,7 @@ namespace VNDBUpdater.BackgroundTasks
             _VNService = VNService;
             _UserService = UserService;
 
-            Settings = _UserService.Get().FileIndexerSetting;
+            Settings = Task.Run(() => _UserService.Get()).Result.FileIndexerSetting;
         }
 
         public override void Start(Action<bool> OnTaskCompleted)
@@ -35,7 +35,7 @@ namespace VNDBUpdater.BackgroundTasks
             Task.Factory.StartNew(() => Indexing(OnTaskCompleted));
         }
 
-        private void Indexing(Action<bool> OnTaskCompleted)
+        private async Task Indexing(Action<bool> OnTaskCompleted)
         {
             try
             {
@@ -49,11 +49,13 @@ namespace VNDBUpdater.BackgroundTasks
                 int successfull = 0;
                 var indexedVNs = new List<VisualNovelModel>();
 
-                _TasksToDo = _VNService.GetLocal().Count(x => string.IsNullOrEmpty(x.ExePath));
+                var localVNs = await _VNService.GetLocal();
 
-                _IndexedVisualNovels = _VNService.GetLocal().Where(x => !string.IsNullOrEmpty(x.ExePath)).OrderBy(x => x.Basics.Title).ToList();
+                _TasksToDo = localVNs.Count(x => string.IsNullOrEmpty(x.ExePath));
 
-                foreach (var vn in _VNService.GetLocal().Where(x => string.IsNullOrEmpty(x.ExePath)).OrderBy(x => x.Basics.Title))
+                _IndexedVisualNovels = localVNs.Where(x => !string.IsNullOrEmpty(x.ExePath)).OrderBy(x => x.Basics.Title).ToList();
+
+                foreach (var vn in localVNs.Where(x => string.IsNullOrEmpty(x.ExePath)).OrderBy(x => x.Basics.Title))
                 {
                     vnFound = CheckForIdenticalMatch(vn, folders);
 
@@ -72,7 +74,7 @@ namespace VNDBUpdater.BackgroundTasks
                     UpdateProgess(1, "Visual Novels have been indexed...");
                 }
 
-                _VNService.Add(indexedVNs);
+                await _VNService.Add(indexedVNs);
 
                 CurrentStatus = nameof(FileIndexer) + " finished. " + successfull + " of " + _TasksToDo + " were successfully indexed...";
                 IsRunning = false;

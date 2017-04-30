@@ -3,6 +3,7 @@ using Microsoft.Practices.Unity;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Windows.Media;
 using VNDBUpdater.BackgroundTasks.Interfaces;
@@ -43,31 +44,35 @@ namespace VNDBUpdater.GUI.ViewModels.MainView
 
             _UnityContainer = UnityContainer;
 
-            _User = _UserService.Get();
+            _FilterService.OnAdded += OnFilterAdded;
+            _FilterService.OnDeleted += OnFilterDeleted;
 
-            _AvailableFilters = new ObservableCollection<FilterModel>(_FilterService.Get().ToList());
+            _UserService.OnUpdated += OnUserUpdated;
 
-            _FilterService.SubscribeToTAdded(OnFilterAdded);
-            _FilterService.SubscribeToTDeleted(OnFilterDeleted);
-
-            _UserService.SubscribeToTUpdated(OnUserUpdated);
+            Task.Factory.StartNew(async () => await Initialize());
         }
 
-        private void OnUserUpdated(UserModel User)
+        private async Task Initialize()
+        {
+            OnUserUpdated(this, await _UserService.Get());
+            _AvailableFilters = new ObservableCollection<FilterModel>(await _FilterService.Get());            
+        }
+
+        private void OnUserUpdated(object sender, UserModel User)
         {
             _User = User;
 
             OnPropertyChanged(nameof(ImageDimension));
         }
 
-        private void OnFilterAdded(FilterModel filter)
+        private void OnFilterAdded(object sender, FilterModel filter)
         {
             _AvailableFilters.Add(filter);
 
             OnPropertyChanged(nameof(AvailableFilters));
         }
 
-        private void OnFilterDeleted(FilterModel filter)
+        private void OnFilterDeleted(object sender, FilterModel filter)
         {
             _AvailableFilters.Remove(filter);
 

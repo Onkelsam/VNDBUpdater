@@ -14,9 +14,10 @@ namespace VNDBUpdater.GUI.ViewModels.CustomClasses.Collections
         {
         }
 
-        public AsyncObservableCollection(IEnumerable<T> list)
+        public AsyncObservableCollection(IEnumerable<T> list, SynchronizationContext context)
             : base(list)
         {
+            _synchronizationContext = context;
         }
 
         protected override void OnCollectionChanged(NotifyCollectionChangedEventArgs e)

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using VNDBUpdater.GUI.Models.VisualNovel;
 using static VNDBUpdater.GUI.Models.VisualNovel.FilterModel;
 
@@ -7,10 +8,10 @@ namespace VNDBUpdater.Services.Filters
 {
     public interface IFilterService : IServiceBase<FilterModel>
     {
-        IList<FilterModel> Get();
-        FilterModel Get(string name);
-        void Add(FilterModel model);
-        void Delete(FilterModel model);
+        Task<IList<FilterModel>> Get();
+        Task<FilterModel> Get(string name);
+        Task Add(FilterModel model);
+        Task Delete(FilterModel model);
 
         void AddTagToFilter(FilterModel model, BooleanOperations operation, TagModel tag);
         void RemoveTagFromFilter(FilterModel model, string tagname);
@@ -19,7 +20,7 @@ namespace VNDBUpdater.Services.Filters
         void ApplyFilter(FilterModel model);
         void ResetFilters();
 
-        void SubscribeToFilterApply(Action<FilterModel> onFilterApply);
-        void SubscribeToFilterReset(Action onFilterReset);
+        event EventHandler<FilterModel> OnApplied;
+        event EventHandler OnReset;
     }
 }

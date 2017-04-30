@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Threading.Tasks;
 using VNDBUpdater.GUI.Models.VisualNovel;
 using VNDBUpdater.GUI.ViewModels.Interfaces;
 using VNDBUpdater.Services.Tags;
@@ -25,12 +26,18 @@ namespace VNDBUpdater.GUI.ViewModels.MainView
 
             _UserService = UserService;
             _TagService = TagService;
-            _User = _UserService.Get();
 
-            _UserService.SubscribeToTUpdated(OnUserUpdated);
+            _UserService.OnUpdated += OnUserUpdated;
+
+            Task.Factory.StartNew(async () => await Initialize());
         }
 
-        private void OnUserUpdated(UserModel User)
+        private async Task Initialize()
+        {
+            OnUserUpdated(this, await _UserService.Get());
+        }
+
+        private void OnUserUpdated(object sender, UserModel User)
         {
             _User = User;
 

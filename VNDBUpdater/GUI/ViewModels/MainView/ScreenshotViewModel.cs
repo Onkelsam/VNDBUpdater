@@ -25,12 +25,18 @@ namespace VNDBUpdater.GUI.ViewModels.MainView
 
             _UserService = UserService;
             _VNService = VNService;
-            _User = _UserService.Get();
 
-            _UserService.SubscribeToTUpdated(OnUserUpdated);
+            _UserService.OnUpdated += OnUserUpdated;
+
+            Task.Factory.StartNew(async () => await Initialize());
         }
 
-        private void OnUserUpdated(UserModel User)
+        private async Task Initialize()
+        {
+            OnUserUpdated(this, await _UserService.Get());
+        }
+
+        private void OnUserUpdated(object sender, UserModel User)
         {
             _User = User;
 
@@ -52,7 +58,7 @@ namespace VNDBUpdater.GUI.ViewModels.MainView
             {
                 if (_VisualNovelsGridModel.SelectedVisualNovel.Basics.Screenshots.Any(x => x.Path.Contains("https://")))
                 {
-                    Task.Factory.StartNew(() => _VNService.DownloadImages(_VisualNovelsGridModel.SelectedVisualNovel)).ContinueWith(_ => OnPropertyChanged(nameof(Screenshots)));
+                    Task.Factory.StartNew(() => _VNService.DownloadImages(_VisualNovelsGridModel.SelectedVisualNovel));
                 }           
                 else
                 {

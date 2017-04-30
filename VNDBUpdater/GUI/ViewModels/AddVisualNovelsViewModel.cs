@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using VNDBUpdater.GUI.CustomClasses.Commands;
@@ -14,6 +15,8 @@ namespace VNDBUpdater.GUI.ViewModels
 {
     class AddVisualNovelsViewModel : ViewModelBase, IAddVisualNovelsWindowModel
     {
+        private SynchronizationContext _Context = SynchronizationContext.Current;
+
         private IVNService _VNService;
 
         public AddVisualNovelsViewModel(IVNService VNService)
@@ -24,13 +27,17 @@ namespace VNDBUpdater.GUI.ViewModels
             _SelectedVisualNovel = new VisualNovelModel();
             _FoundVisualNovels = new AsyncObservableCollection<VisualNovelModel>();                 
 
-            _FoundVisualNovels.CollectionChanged += OnCollectionChanged;            
+            _FoundVisualNovels.CollectionChanged += OnCollectionChanged;
+
+            Task.Factory.StartNew(async () => await Initialize());       
         }
 
-        private List<VisualNovelModel> ExistingVisualNovels
+        private async Task Initialize()
         {
-            get { return _VNService.GetLocal().ToList(); }
+            _ExistingVisualNovels = new List<VisualNovelModel>(await _VNService.GetLocal());
         }
+
+        private List<VisualNovelModel> _ExistingVisualNovels;
 
         private AsyncObservableCollection<VisualNovelModel> _FoundVisualNovels;
 
@@ -117,8 +124,8 @@ namespace VNDBUpdater.GUI.ViewModels
 
             newVN.Category = category;
 
-            _VNService.Add(newVN);
-            _VNService.SetVNList(newVN);
+            await _VNService.Add(newVN);
+            await _VNService.SetVNList(newVN);
 
             FoundVisualNovels.Remove(_SelectedVisualNovel);
         }
@@ -127,7 +134,7 @@ namespace VNDBUpdater.GUI.ViewModels
         {
             var newVNs = await _VNService.Get(_Title);
 
-            FoundVisualNovels = new AsyncObservableCollection<VisualNovelModel>(newVNs.Where(x => !ExistingVisualNovels.Any(y => y.Basics.ID == x.Basics.ID)));
+            FoundVisualNovels = new AsyncObservableCollection<VisualNovelModel>(newVNs.Where(x => !_ExistingVisualNovels.Any(y => y.Basics.ID == x.Basics.ID)), _Context);
         }
     }    
 }

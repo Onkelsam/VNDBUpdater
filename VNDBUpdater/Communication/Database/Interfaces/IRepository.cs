@@ -1,12 +1,13 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace VNDBUpdater.Communication.Database.Interfaces
 {
     public interface IRepository<T>
     {
-        void Add(T entity);
-        IList<T> Get();
-        T Get(int ID);
-        void Delete(int ID);
+        Task Add(T entity);
+        Task<IList<T>> Get();
+        Task<T> Get(int ID);
+        Task Delete(int ID);
     }
 }

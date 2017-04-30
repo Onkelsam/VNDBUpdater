@@ -12,6 +12,6 @@ namespace VNDBUpdater.Services.Status
         bool TaskIsRunning { get; set; }
         int PercentageOfTaskCompleted { get; set; }
 
-        void SubscribeToStatusUpdated(Action onStatusUpdated);
+        event EventHandler OnUpdated;
     }
 }

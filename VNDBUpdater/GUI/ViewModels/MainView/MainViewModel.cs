@@ -1,5 +1,6 @@
 ﻿using Microsoft.Practices.Unity;
 using System;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using VNDBUpdater.GUI.CustomClasses.Commands;
@@ -27,18 +28,24 @@ namespace VNDBUpdater.GUI.ViewModels.MainView
             _StatusService = StatusService;
             _VersionService = VersionService;
 
-            _User = _UserService.Get();
+            _UserService.OnUpdated += OnUserUpdated;
 
-            _UserService.SubscribeToTUpdated(OnUserUpdated);
-            _StatusService.SubscribeToStatusUpdated(OnStatusUpdated);
+            _StatusService.OnUpdated += OnStatusUpdated;
+
+            Task.Factory.StartNew(async () => await Initialize());
         }
 
-        private void OnUserUpdated(UserModel User)
+        private async Task Initialize()
+        {
+            OnUserUpdated(this, await _UserService.Get());
+        }
+
+        private void OnUserUpdated(object sender, UserModel User)
         {
             _User = User;
         }
 
-        private void OnStatusUpdated()
+        private void OnStatusUpdated(object sender, EventArgs e)
         {
             OnPropertyChanged(nameof(CurrentTask));
             OnPropertyChanged(nameof(CurrentUser));

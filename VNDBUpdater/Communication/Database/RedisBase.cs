@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using System.Threading.Tasks;
 using VNDBUpdater.Communication.Database.Interfaces;
 using VNDBUpdater.Services.Logger;
 
@@ -26,7 +27,6 @@ namespace VNDBUpdater.Communication.Database
 
         private int _ConnectionTries = 0;
         private const int _MaxConnectionTries = 4;
-        private bool _IsSaving;
 
         public RedisBase(ILoggerService LoggerService)
         {
@@ -98,11 +98,11 @@ namespace VNDBUpdater.Communication.Database
             }
         }
 
-        public void Reset()
+        public async Task Reset()
         {
-            foreach (var key in GetAllKeys("*"))
+            foreach (var key in await GetAllKeys("*"))
             {
-                DeleteKey(key);
+                await DeleteKey(key);
             }                
 
             if (File.Exists(Path.Combine(_PathToDatabse, _DatabaseName)))
@@ -113,20 +113,9 @@ namespace VNDBUpdater.Communication.Database
 
         public void Save()
         {
-            if (_IsSaving)
-                return;
-
-            _IsSaving = true;
-
             CheckConnection();
 
-            DateTime lastSave = _Connection.GetLastSave();
-
             _Connection.ForceSave();
-
-            while (_Connection.GetLastSave() == lastSave) { }
-
-            _IsSaving = false;     
         }
 
         public void CheckConnection()
@@ -137,37 +126,37 @@ namespace VNDBUpdater.Communication.Database
             }
         }
 
-        public T ReadEntity<T>(string key) where T : class
+        public async Task<T> ReadEntity<T>(string key) where T : class
         {
             CheckConnection();
 
-            return _Connection.ReadEntity<T>(key);
+            return await _Connection.ReadEntity<T>(key);
         }
 
-        public void WriteEntity<T>(string key, T entity) where T : class
+        public async Task WriteEntity<T>(string key, T entity) where T : class
         {
             CheckConnection();
 
-            _Connection.WriteEntity<T>(key, entity);
+            await _Connection.WriteEntity<T>(key, entity);
         }
 
-        public bool KeyExists(string key)
+        public async Task<bool> KeyExists(string key)
         {
-            return _Connection.KeyExists(key);
+            return await _Connection.KeyExists(key);
         }
 
-        public void DeleteKey(string key)
-        {
-            CheckConnection();
-
-            _Connection.DeleteKey(key);
-        }
-
-        public IList<string> GetAllKeys(string pattern)
+        public async Task DeleteKey(string key)
         {
             CheckConnection();
 
-            return _Connection.GetKeys(pattern);
+            await _Connection.DeleteKey(key);
+        }
+
+        public async Task<IList<string>> GetAllKeys(string pattern)
+        {
+            CheckConnection();
+
+            return await _Connection.GetKeys(pattern);
         }
 
         private void BackupUpDatabase()
