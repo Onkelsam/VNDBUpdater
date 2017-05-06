@@ -20,9 +20,6 @@ namespace VNDBUpdater.BackgroundTasks
         {
             _StatusService = StatusService;
             _Logger = LoggerService;
-
-            _TasksToDo = 0;
-            _TasksDone = 0;
         }
 
         protected bool IsRunning
@@ -51,6 +48,9 @@ namespace VNDBUpdater.BackgroundTasks
         {
             try
             {
+                _TasksToDo = 0;
+                _TasksDone = 0;
+
                 PercentageCompleted = 0;
                 IsRunning = true;
                 CurrentTask = GetType().Name;

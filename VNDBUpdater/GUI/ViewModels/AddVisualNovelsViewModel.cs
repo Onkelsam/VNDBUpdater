@@ -17,6 +17,8 @@ namespace VNDBUpdater.GUI.ViewModels
     {
         private SynchronizationContext _Context = SynchronizationContext.Current;
 
+        private List<VisualNovelModel> _ExistingVisualNovels;
+
         private IVNService _VNService;
 
         public AddVisualNovelsViewModel(IVNService VNService)
@@ -35,9 +37,7 @@ namespace VNDBUpdater.GUI.ViewModels
         private async Task Initialize()
         {
             _ExistingVisualNovels = new List<VisualNovelModel>(await _VNService.GetLocal());
-        }
-
-        private List<VisualNovelModel> _ExistingVisualNovels;
+        }        
 
         private AsyncObservableCollection<VisualNovelModel> _FoundVisualNovels;
 
@@ -72,12 +72,7 @@ namespace VNDBUpdater.GUI.ViewModels
         public string Title
         {
             get { return _Title; }
-            set
-            {
-                _Title = value.Trim();
-
-                OnPropertyChanged(nameof(Title));
-            }
+            set { _Title = value.Trim(); OnPropertyChanged(nameof(Title)); }
         }
 
         public string ThumbNail

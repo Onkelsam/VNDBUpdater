@@ -40,7 +40,8 @@
                              x:Name="SettingsFlyout"
                              Theme="Inverse" 
                              IsOpen="False" 
-                             Controls:ControlsHelper.ContentCharacterCasing="Upper">
+                             Controls:ControlsHelper.ContentCharacterCasing="Upper"
+                             Width="300">
                 <Grid Margin="10">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="*" />
@@ -106,7 +107,7 @@
                                             Controls:SliderHelper.EnableMouseWheel="MouseHover"
                                             Controls:SliderHelper.ChangeValueBy="LargeChange"
                                             Style="{DynamicResource FlatSlider}"
-                                            Margin="0,7,0,0"/>
+                                            Margin="0,9,0,0"/>
                                 </StackPanel>
                             </StackPanel>
                         </TabItem>

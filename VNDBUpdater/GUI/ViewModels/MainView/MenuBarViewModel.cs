@@ -82,12 +82,7 @@ namespace VNDBUpdater.GUI.ViewModels.MainView
         public ObservableCollection<FilterModel> AvailableFilters
         {
             get { return _AvailableFilters; }
-            set
-            {
-                _AvailableFilters = value;
-
-                OnPropertyChanged(nameof(AvailableFilters));
-            }
+            set { _AvailableFilters = value; OnPropertyChanged(nameof(AvailableFilters)); }
         }
 
         public List<AccentColorMenuData> AccentColors
@@ -152,7 +147,7 @@ namespace VNDBUpdater.GUI.ViewModels.MainView
             get
             {
                 return _AddFilter ??
-                    (_AddFilter = new RelayCommand(x => _WindowHandler.Open(_UnityContainer.Resolve<CreateFilter>()), x => true));
+                    (_AddFilter = new RelayCommand(x => _WindowHandler.Open(_UnityContainer.Resolve<CreateFilter>())));
             }
         }
 
@@ -165,9 +160,7 @@ namespace VNDBUpdater.GUI.ViewModels.MainView
                 return _ApplyFilter ??
                     (_ApplyFilter = new RelayCommand((parameter) => _FilterService.ApplyFilter(parameter as FilterModel)));
             }
-        }
-
-        private ICommand _RefreshVisualNovels;
+        }        
 
         private ICommand _DeleteFilter;
 
@@ -176,7 +169,7 @@ namespace VNDBUpdater.GUI.ViewModels.MainView
             get
             {
                 return _DeleteFilter ??
-                    (_DeleteFilter = new RelayCommand((parameter) => { _FilterService.Delete(parameter as FilterModel); }));
+                    (_DeleteFilter = new RelayCommand(async (parameter) => { await _FilterService.Delete(parameter as FilterModel); }));
             }
         }
 
@@ -191,15 +184,17 @@ namespace VNDBUpdater.GUI.ViewModels.MainView
             }
         }
 
+        private ICommand _RefreshVisualNovels;
+
         public ICommand RefreshVisualNovels
         {
             get
             {
                 return _RefreshVisualNovels ??
-                    (_RefreshVisualNovels = new RelayCommand(x =>
+                    (_RefreshVisualNovels = new RelayCommand(async x =>
                     {
                         _CurrentTask = _BackgroundTaskFactory.CreateRefresherTask();
-                        _CurrentTask.ExecuteTask((successfull) => { });
+                        await _CurrentTask.ExecuteTask((successfull) => { });
                     }, x => !_StatusService.TaskIsRunning));
             }
         }
@@ -211,10 +206,10 @@ namespace VNDBUpdater.GUI.ViewModels.MainView
             get
             {
                 return _SynchronizeWithVNDB ??
-                    (_SynchronizeWithVNDB = new RelayCommand(x =>
+                    (_SynchronizeWithVNDB = new RelayCommand(async x =>
                     {
                         _CurrentTask = _BackgroundTaskFactory.CreateSynchronizerTask();
-                        _CurrentTask.ExecuteTask((successfull) => { });
+                        await _CurrentTask.ExecuteTask((successfull) => { });
                     }, x => !_StatusService.TaskIsRunning));
             }
         }

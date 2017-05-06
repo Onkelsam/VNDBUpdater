@@ -18,6 +18,7 @@ namespace VNDBUpdater.GUI.ViewModels
         private ITagService _TagService;
 
         private FilterModel _Filter;
+        private IList<FilterModel> _ExistingFilters;
         private Dictionary<FilterModel.BooleanOperations, ObservableCollection<TagModel>> _BoolToTagMapper;
 
         public CreateFilterViewModel(IFilterService FilterService, ITagService TagService) 
@@ -30,9 +31,11 @@ namespace VNDBUpdater.GUI.ViewModels
             Task.Factory.StartNew(() => Initialize());
         }
 
-        private void Initialize()
+        private async Task Initialize()
         {
             _Filter = new FilterModel();
+            _ExistingFilters = await _FilterService.Get();
+
             _Tags = _TagService.Get().Select(x => x).OrderBy(x => x.Name).ToList();
 
             _BoolToTagMapper = new Dictionary<FilterModel.BooleanOperations, ObservableCollection<TagModel>>();
@@ -59,12 +62,7 @@ namespace VNDBUpdater.GUI.ViewModels
         public TagModel SelectedTag
         {
             get { return _SelectedTag; }
-            set
-            {
-                _SelectedTag = value;
-
-                OnPropertyChanged(nameof(SelectedTag));
-            }
+            set { _SelectedTag = value;  OnPropertyChanged(nameof(SelectedTag)); }
         }
 
         public ObservableCollection<TagModel> IncludedWithAnd
@@ -87,12 +85,7 @@ namespace VNDBUpdater.GUI.ViewModels
         public string FilterName
         {
             get { return _FilterName; }
-            set
-            {
-                _FilterName = value;
-
-                OnPropertyChanged(nameof(FilterName));
-            }
+            set { _FilterName = value; OnPropertyChanged(nameof(FilterName)); }
         }
 
         private ICommand _AddToFilter;
@@ -129,6 +122,33 @@ namespace VNDBUpdater.GUI.ViewModels
             }
         }
 
+        private ICommand _Save;
+
+        public ICommand Save
+        {
+            get
+            {
+                return _Save ??
+                    (_Save = new RelayCommand(async
+                        x => { _Filter.Name = _FilterName; await _FilterService.Add(_Filter); _ExistingFilters.Add(_Filter); Clear.Execute(null); },
+                        x =>
+                        {
+                            bool allEmpty = true;
+
+                            foreach (var entry in _BoolToTagMapper)
+                            {
+                                if (entry.Value.Any())
+                                {
+                                    allEmpty = false;
+                                }
+                            }
+
+                            return !string.IsNullOrEmpty(_FilterName) && !allEmpty && !_ExistingFilters.Any(y => y.Name == _FilterName);
+                        }
+                    ));
+            }
+        }
+
         private ICommand _Clear;
 
         public ICommand Clear
@@ -145,33 +165,8 @@ namespace VNDBUpdater.GUI.ViewModels
                             {
                                 entry.Value.Clear();
                             }
-                        }
-                    ));
-            }
-        }
 
-        private ICommand _Save;
-
-        public ICommand Save
-        {
-            get
-            {
-                return _Save ??
-                    (_Save = new RelayCommand(
-                        x => { _Filter.Name = _FilterName; _FilterService.Add(_Filter); _Filter = new FilterModel(); }, 
-                        x => 
-                        {
-                            bool allEmpty = true;
-
-                            foreach (var entry in _BoolToTagMapper)
-                            {
-                                if (entry.Value.Any())
-                                {
-                                    allEmpty = false;
-                                }
-                            }
-
-                            return !string.IsNullOrEmpty(_FilterName) && !allEmpty;
+                            _FilterName = string.Empty;
                         }
                     ));
             }

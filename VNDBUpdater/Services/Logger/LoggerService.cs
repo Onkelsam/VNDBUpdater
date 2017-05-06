@@ -71,7 +71,7 @@ namespace VNDBUpdater.Services.Logger
                     }
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 // Ignore.
             }

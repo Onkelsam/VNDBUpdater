@@ -29,11 +29,8 @@ namespace VNDBUpdater.BackgroundTasks
 
         private async Task Synchronize()
         {
-            var vns = await _VNService.GetVNList();
-            var votes = await _VNService.GetVoteList();
-
-            var VNList = new List<VN>(vns);
-            var VoteList = new List<Vote>(votes);
+            var VNList = new List<VN>(await _VNService.GetVNList());
+            var VoteList = new List<Vote>(await _VNService.GetVoteList());
 
             _TasksToDo = VNList.Count + VoteList.Count;
 
@@ -116,8 +113,7 @@ namespace VNDBUpdater.BackgroundTasks
 
         private async Task AddVNs(int[] ids, List<VN> VNs)
         {
-            var newVNs = await _VNService.Get(ids.ToList());
-            var newVisualNovels = new List<VisualNovelModel>(newVNs);
+            var newVisualNovels = new List<VisualNovelModel>(await _VNService.Get(ids.ToList()));
 
             newVisualNovels.ForEach(x => x.Category = (VisualNovelModel.VisualNovelCatergory)VNs.First(y => y.vn == x.Basics.ID).status);
             newVisualNovels.ForEach(x => x.Score = 0);

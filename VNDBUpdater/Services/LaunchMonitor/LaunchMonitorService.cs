@@ -33,7 +33,7 @@ namespace VNDBUpdater.Services.LaunchMonitor
 
                     _Watcher.Start();
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                 }
                 finally

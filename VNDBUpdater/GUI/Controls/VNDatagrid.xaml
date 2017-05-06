@@ -47,7 +47,7 @@
             <Separator />
             <MenuItem Header="View on VNDB" Command="{Binding Path=ViewOnVNDB}" />
             <MenuItem Header="Update" Command="{Binding Path=UpdateVisualNovel}" />
-            <MenuItem Header="Delete Visual Novel" Command="{Binding Path=DeleteVisualNovel}" />
+            <MenuItem Header="Delete" Command="{Binding Path=DeleteVisualNovel}" />
             <MenuItem Header="Set as" ItemsSource="{Binding Path=Categories}">
                 <MenuItem.ItemContainerStyle>
                     <Style TargetType="{x:Type MenuItem}">

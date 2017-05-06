@@ -57,11 +57,11 @@ namespace VNDBUpdater.BackgroundTasks
 
             foreach (var vn in localVNs.Where(x => string.IsNullOrEmpty(x.ExePath)).OrderBy(x => x.Basics.Title))
             {
-                vnFound = UseIdenticalMatch(vn, folders);
+                vnFound = await UseIdenticalMatch(vn, folders);
 
                 if (!vnFound)
                 {
-                    vnFound = UseDistanceAlgorithm(vn, folders);
+                    vnFound = await UseDistanceAlgorithm(vn, folders);
                 }
 
                 if (vnFound)
@@ -78,20 +78,20 @@ namespace VNDBUpdater.BackgroundTasks
             await _VNService.Add(indexedVNs);
         }
 
-        private bool UseIdenticalMatch(VisualNovelModel vn, List<DirectoryInfo> folders)
+        private async Task<bool> UseIdenticalMatch(VisualNovelModel vn, List<DirectoryInfo> folders)
         {
             foreach (var folder in folders)
             {
                 if (string.Equals(folder.Name, vn.Basics.Title, StringComparison.OrdinalIgnoreCase))
                 {
-                    return CheckForMatch(vn, folder);
+                    return await CheckForMatch(vn, folder);
                 }
             }
 
             return false;
         }
 
-        private bool UseDistanceAlgorithm(VisualNovelModel vn, List<DirectoryInfo> folders)
+        private async Task<bool> UseDistanceAlgorithm(VisualNovelModel vn, List<DirectoryInfo> folders)
         {
             for (int maxDistance = 2; maxDistance <= _Settings.MaxDeviation; maxDistance++)
             {
@@ -99,7 +99,7 @@ namespace VNDBUpdater.BackgroundTasks
                 {
                     if (ComputeLevenshteinDistance(folder.Name.ToLower().Trim(), vn.Basics.Title.ToLower().Trim()) <= maxDistance)
                     {
-                        return CheckForMatch(vn, folder);
+                        return await CheckForMatch(vn, folder);
                     }
                 }
             }
@@ -107,7 +107,7 @@ namespace VNDBUpdater.BackgroundTasks
             return false;
         }
 
-        private bool CheckForMatch(VisualNovelModel vn, DirectoryInfo folder)
+        private async Task<bool> CheckForMatch(VisualNovelModel vn, DirectoryInfo folder)
         {
             var executeable = GetExecuteable(folder);
 
@@ -117,7 +117,7 @@ namespace VNDBUpdater.BackgroundTasks
             }
             else
             {
-                _VNService.SetExePath(vn, executeable);
+                await _VNService.SetExePath(vn, executeable);
                 _IndexedVisualNovels.Add(vn);
 
                 return true;

@@ -101,9 +101,9 @@ namespace VNDBUpdater.GUI.ViewModels
             get
             {
                 return _Login ?? (_Login = new RelayCommand(
-                     x =>
+                     async x =>
                      {
-                         _DialogCoordinator
+                         await _DialogCoordinator
                             .ShowLoginAsync(this, "Login needed", "Please login using you VNDB login data...", new LoginDialogSettings() { RememberCheckBoxVisibility = Visibility.Visible })
                             .ContinueWith(async y => await ExecuteLogin(y.Result));
                      }));

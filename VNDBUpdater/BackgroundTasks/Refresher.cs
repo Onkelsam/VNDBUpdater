@@ -29,8 +29,26 @@ namespace VNDBUpdater.BackgroundTasks
         private async Task Refresh()
         {
             var updatedVNs = new List<VisualNovelModel>();
-            var localVNs = await _VNService.GetLocal();
 
+            foreach (var vn in await GetUpdatedVNs(await _VNService.GetLocal()))
+            {
+                VisualNovelModel vnToUpdate = await _VNService.GetLocal(vn.Basics.ID);
+
+                if (vnToUpdate != null)
+                {
+                    vnToUpdate.Basics = vn.Basics;
+                    vnToUpdate.Characters = vn.Characters;
+
+                    updatedVNs.Add(vnToUpdate);
+                }
+            }
+
+            await _VNService.Add(updatedVNs);
+        }
+
+        private async Task<List<VisualNovelModel>> GetUpdatedVNs(IEnumerable<VisualNovelModel> localVNs)
+        {
+            var updatedVNs = new List<VisualNovelModel>();
             var idSplitter = new VNIDsSplitter(localVNs.Select(x => x.Basics.ID).ToArray());
 
             idSplitter.Split();
@@ -65,22 +83,7 @@ namespace VNDBUpdater.BackgroundTasks
                 UpdateProgess(idSplitter.IDs.Length, "Visual Novels have been updated...");
             }
 
-            var newVNs = new List<VisualNovelModel>();
-
-            foreach (var vn in updatedVNs)
-            {
-                VisualNovelModel vnToUpdate = await _VNService.GetLocal(vn.Basics.ID);
-
-                if (vnToUpdate != null)
-                {
-                    vnToUpdate.Basics = vn.Basics;
-                    vnToUpdate.Characters = vn.Characters;
-                }
-
-                newVNs.Add(vnToUpdate);
-            }
-
-            await _VNService.Add(newVNs);
+            return updatedVNs;
         }
     }
 }

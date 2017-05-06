@@ -54,16 +54,6 @@ namespace VNDBUpdater.GUI.ViewModels.MainView
         private void OnUserUpdated(object sender, UserModel User)
         {
             _User = User;
-
-            _SaveLogin = _User.SaveLogin;
-            _SpoilerLevel = _User.Settings.SpoilerSetting;
-            _ShowNSFWImages = _User.Settings.ShowNSFWImages;
-            _MinimizeToTray = _User.Settings.MinimizeToTray;
-
-            OnPropertyChanged(nameof(SaveLogin));
-            OnPropertyChanged(nameof(SpoilerLevel));
-            OnPropertyChanged(nameof(ShowNSFWImages));
-            OnPropertyChanged(nameof(MinimizeToTray));
         }
 
         private IVisualNovelsGridWindowModel _VisualNovelsGrid;
@@ -141,6 +131,12 @@ namespace VNDBUpdater.GUI.ViewModels.MainView
             set { _User.GUI.Width = value; _UserService.Update(_User); }
         }
 
+        public int ImageDimension
+        {
+            get { return _User.GUI.ImageDimension; }
+            set { _User.GUI.ImageDimension = value; _UserService.Update(_User); }
+        }
+
         public bool NewVersionAvailable
         {
             get { return _VersionService.NewVersionAvailable; }
@@ -156,17 +152,14 @@ namespace VNDBUpdater.GUI.ViewModels.MainView
         public bool SaveLogin
         {
             get { return _SaveLogin; }
-            set
-            {
-                _SaveLogin = value;
-
-                OnPropertyChanged(nameof(SaveLogin));
-            }
+            set { _SaveLogin = value; OnPropertyChanged(nameof(SaveLogin)); }
         }
 
         public List<string> SpoilerLevels
         {
-            get { return Enum.GetNames(typeof(SpoilerSetting)).Select(x => ExtensionMethods.GetAttributeOfType<DescriptionAttribute>((SpoilerSetting)Enum.Parse(typeof(SpoilerSetting), x))).Select(x => x.Description).ToList(); }
+            get { return Enum.GetNames(typeof(SpoilerSetting))
+                    .Select(x => ExtensionMethods.GetAttributeOfType<DescriptionAttribute>((SpoilerSetting)Enum.Parse(typeof(SpoilerSetting), x)))
+                    .Select(x => x.Description).ToList(); }
         }
 
         private SpoilerSetting _SpoilerLevel;
@@ -187,12 +180,7 @@ namespace VNDBUpdater.GUI.ViewModels.MainView
         public bool ShowNSFWImages
         {
             get { return _ShowNSFWImages; }
-            set
-            {
-                _ShowNSFWImages = value;
-
-                OnPropertyChanged(nameof(ShowNSFWImages));
-            }
+            set { _ShowNSFWImages = value; OnPropertyChanged(nameof(ShowNSFWImages)); }
         }
 
         private bool _MinimizeToTray;
@@ -200,12 +188,7 @@ namespace VNDBUpdater.GUI.ViewModels.MainView
         public bool MinimizeToTray
         {
             get { return _MinimizeToTray; }
-            set
-            {
-                _MinimizeToTray = value;
-
-                OnPropertyChanged(nameof(MinimizeToTray));
-            }
+            set { _MinimizeToTray = value; OnPropertyChanged(nameof(MinimizeToTray)); }
         }
 
         private string _Status;
@@ -213,23 +196,7 @@ namespace VNDBUpdater.GUI.ViewModels.MainView
         public string Status
         {
             get { return _Status; }
-            set
-            {
-                _Status = value;
-
-                OnPropertyChanged(nameof(Status));
-            }
-        }
-
-        public int ImageDimension
-        {
-            get { return _User.GUI.ImageDimension; }
-            set
-            {
-                _User.GUI.ImageDimension = value;
-
-                _UserService.Update(_User);
-            }
+            set { _Status = value; OnPropertyChanged(nameof(Status)); }
         }
 
         private ICommand _CloseWindow;
@@ -272,9 +239,9 @@ namespace VNDBUpdater.GUI.ViewModels.MainView
             get
             {
                 return _Login ?? (_Login = new RelayCommand(
-                     x =>
+                     async x =>
                      {
-                         _DialogCoordinator.ShowLoginAsync(this, "Warning", "This will delete all local data! Are you sure you want to procede? Press ESC to cancel.", new LoginDialogSettings() { RememberCheckBoxVisibility = System.Windows.Visibility.Visible })
+                         await _DialogCoordinator.ShowLoginAsync(this, "Warning", "This will delete all local data! Are you sure you want to procede? Press ESC to cancel.", new LoginDialogSettings() { RememberCheckBoxVisibility = System.Windows.Visibility.Visible })
                             .ContinueWith(async y => await ExecuteLogin(y.Result));
                      }));
             }
@@ -298,18 +265,18 @@ namespace VNDBUpdater.GUI.ViewModels.MainView
             get
             {
                 return _SaveSettings ??
-                  (_SaveSettings = new RelayCommand(ExecuteSaveSettings));
+                  (_SaveSettings = new RelayCommand(async x => await ExecuteSaveSettings(null)));
             }
         }
 
-        public void ExecuteSaveSettings(object parameter)
-        {
+        public async Task ExecuteSaveSettings(object parameter)
+        {            
             _User.Settings.MinimizeToTray = _MinimizeToTray;
             _User.Settings.SpoilerSetting = _SpoilerLevel;
             _User.Settings.ShowNSFWImages = _ShowNSFWImages;
             _User.SaveLogin = _SaveLogin;
 
-            _UserService.Update(_User);
+            await _UserService.Update(_User);
         }
 
         public void ExecuteCloseWindow(object parameter)
@@ -319,7 +286,7 @@ namespace VNDBUpdater.GUI.ViewModels.MainView
                 _WindowHandler.CloseAll();
                 Application.Current.Shutdown();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
             }
             finally
@@ -342,7 +309,7 @@ namespace VNDBUpdater.GUI.ViewModels.MainView
             }
             else
             {
-                Status = "Login failed...";
+                Status = "Login failed or aborted...";
             }
         }
 

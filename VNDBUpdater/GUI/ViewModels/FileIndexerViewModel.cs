@@ -3,11 +3,13 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using VNDBUpdater.BackgroundTasks.Interfaces;
 using VNDBUpdater.GUI.CustomClasses.Commands;
 using VNDBUpdater.GUI.Models.VisualNovel;
+using VNDBUpdater.GUI.ViewModels.CustomClasses.Collections;
 using VNDBUpdater.GUI.ViewModels.Interfaces;
 using VNDBUpdater.Services.Dialogs;
 using VNDBUpdater.Services.Status;
@@ -19,6 +21,7 @@ namespace VNDBUpdater.GUI.ViewModels
     public class FileIndexerViewModel : ViewModelBase, IFileIndexerWindowModel
     {
         private UserModel _User;
+        private SynchronizationContext _Context = SynchronizationContext.Current;
 
         private ITaskFactory _BackgroundTaskFactory;
 
@@ -38,6 +41,11 @@ namespace VNDBUpdater.GUI.ViewModels
             _StatusService = StatusService;
             _DialogService = DialogService;
 
+            _VNService.OnAdded += OnVisualNovelAdded;
+            _VNService.OnDeleted += OnVisualNovelDeleted;
+            _VNService.OnUpdated += OnVisualNovelUpdated;
+            _VNService.OnRefreshed += OnVisualNovelsRefreshed;            
+
             Task.Factory.StartNew(async () => await Initialize());
         }
 
@@ -53,7 +61,42 @@ namespace VNDBUpdater.GUI.ViewModels
 
             var vns = await _VNService.GetLocal();
 
-            NonIndexedVisualNovels = new ObservableCollection<VisualNovelModel>(vns.Where(x => string.IsNullOrEmpty(x.ExePath)).OrderBy(x => x.Basics.Title));
+            NonIndexedVisualNovels = new AsyncObservableCollection<VisualNovelModel>(vns.Where(x => string.IsNullOrEmpty(x.ExePath)).OrderBy(x => x.Basics.Title), _Context);
+        }
+
+        private void OnVisualNovelAdded(object sender, VisualNovelModel model)
+        {
+            if (!_VNService.InstallationPathExists(model) && !NonIndexedVisualNovels.Any(x => x.Basics.ID == model.Basics.ID))
+            {
+                NonIndexedVisualNovels.Add(model);
+            }
+        }
+
+        private void OnVisualNovelDeleted(object sender, VisualNovelModel model)
+        {
+            if (NonIndexedVisualNovels.Any(x => x.Basics.ID == model.Basics.ID))
+            {
+                NonIndexedVisualNovels.Remove(model);
+            }
+        }
+
+        private void OnVisualNovelUpdated(object sender, VisualNovelModel model)
+        {
+            if (_VNService.InstallationPathExists(model) && NonIndexedVisualNovels.Any(x => x.Basics.ID == model.Basics.ID))
+            {
+                NonIndexedVisualNovels.Remove(model);
+            }
+            else if (!_VNService.InstallationPathExists(model) && !NonIndexedVisualNovels.Any(x => x.Basics.ID == model.Basics.ID))
+            {
+                NonIndexedVisualNovels.Add(model);
+            }
+        }
+
+        private async void OnVisualNovelsRefreshed(object sender, EventArgs e)
+        {
+            var vns = await _VNService.GetLocal();
+
+            NonIndexedVisualNovels = new AsyncObservableCollection<VisualNovelModel>(vns.Where(x => string.IsNullOrEmpty(x.ExePath)).OrderBy(x => x.Basics.Title), _Context);
         }
 
         private bool _AdvancedModeActivated = false;
@@ -61,12 +104,7 @@ namespace VNDBUpdater.GUI.ViewModels
         public bool AdvancedModeActivated
         {
             get { return _AdvancedModeActivated; }
-            set
-            {
-                _AdvancedModeActivated = value;
-
-                OnPropertyChanged(nameof(AdvancedModeActivated));
-            }
+            set { AdvancedModeActivated = value;  OnPropertyChanged(nameof(AdvancedModeActivated)); }
         }
 
         public ObservableCollection<string> Folders
@@ -84,9 +122,9 @@ namespace VNDBUpdater.GUI.ViewModels
             get { return new ObservableCollection<string>(_User.FileIndexerSetting.ExcludedExes.OrderBy(x => x)); }
         }
 
-        private ObservableCollection<VisualNovelModel> _NonIndexedVisualNovels;
+        private AsyncObservableCollection<VisualNovelModel> _NonIndexedVisualNovels;
 
-        public ObservableCollection<VisualNovelModel> NonIndexedVisualNovels
+        public AsyncObservableCollection<VisualNovelModel> NonIndexedVisualNovels
         {
             get { return _NonIndexedVisualNovels; }
             private set { _NonIndexedVisualNovels = value;  OnPropertyChanged(nameof(NonIndexedVisualNovels)); }
@@ -97,12 +135,7 @@ namespace VNDBUpdater.GUI.ViewModels
         public VisualNovelModel SelectedVisualNovel
         {
             get { return _SelectedVisualNovel; }
-            set
-            {
-                _SelectedVisualNovel = value;
-
-                OnPropertyChanged(nameof(SelectedVisualNovel));
-            }
+            set { _SelectedVisualNovel = value;  OnPropertyChanged(nameof(SelectedVisualNovel)); }
         }
 
         private string _SelectedItem;
@@ -110,12 +143,7 @@ namespace VNDBUpdater.GUI.ViewModels
         public string SelectedItem
         {
             get { return _SelectedItem; }
-            set
-            {
-                _SelectedItem = value;
-
-                OnPropertyChanged(nameof(SelectedItem));
-            }
+            set { _SelectedItem = value; OnPropertyChanged(nameof(SelectedItem)); }
         }
 
         public string MinimalFolderLength
@@ -165,20 +193,20 @@ namespace VNDBUpdater.GUI.ViewModels
             get
             {
                 return _Add ??
-                    (_Add = new RelayCommand((parameter) =>
+                    (_Add = new RelayCommand(async (parameter) =>
                     {
                         switch (parameter.ToString())
                         {
                             case ("FoldersToSearch"):
                                 _User.FileIndexerSetting.Folders.Add(_DialogService.GetPathToFolder());
-                                _UserService.Update(_User);
+                                await _UserService.Update(_User);
                                 break;
                             case ("Excluded"):
                                 _User.FileIndexerSetting.ExcludedFolders.Add(_DialogService.GetPathToFolder());
-                                _UserService.Update(_User);
+                                await _UserService.Update(_User);
                                 break;
                             default:
-                                _DialogCoordinator.ShowInputAsync(this, "Select Exe", "Enter exe without extension.").ContinueWith(y => AddExe(y.Result));
+                                await _DialogCoordinator.ShowInputAsync(this, "Select Exe", "Enter exe without extension.").ContinueWith(y => AddExe(y.Result));
                                 break;
                         }
                         OnPropertyChanged("");
@@ -186,12 +214,12 @@ namespace VNDBUpdater.GUI.ViewModels
             }
         }
 
-        private void AddExe(string exe)
+        private async Task AddExe(string exe)
         {
             if (!string.IsNullOrEmpty(exe))
             {
                 _User.FileIndexerSetting.ExcludedExes.Add(exe);
-                _UserService.Update(_User);
+                await _UserService.Update(_User);
             }
         }
 
@@ -202,21 +230,21 @@ namespace VNDBUpdater.GUI.ViewModels
             get
             {
                 return _Remove ??
-                    (_Remove = new RelayCommand((parameter) =>
+                    (_Remove = new RelayCommand(async (parameter) =>
                     {
                         switch (parameter.ToString())
                         {
                             case ("FoldersToSearch"):
                                 _User.FileIndexerSetting.Folders.Remove(_SelectedItem);
-                                _UserService.Update(_User);
+                                await _UserService.Update(_User);
                                 break;
                             case ("Excluded"):
                                 _User.FileIndexerSetting.ExcludedFolders.Remove(_SelectedItem);
-                                _UserService.Update(_User);
+                                await _UserService.Update(_User);
                                 break;
                             default:
                                 _User.FileIndexerSetting.ExcludedExes.Remove(_SelectedItem);
-                                _UserService.Update(_User);
+                                await _UserService.Update(_User);
                                 break;
                         }
                         OnPropertyChanged("");
@@ -231,10 +259,10 @@ namespace VNDBUpdater.GUI.ViewModels
             get
             {
                 return _StartIndexing ??
-                    (_StartIndexing = new RelayCommand(x =>
+                    (_StartIndexing = new RelayCommand(async x =>
                     {
                         IBackgroundTask task = _BackgroundTaskFactory.CreateFileIndexerTask();
-                        task.ExecuteTask((successfull) => {; });
+                        await task.ExecuteTask((successfull) => {; });
                     }, x => !_StatusService.TaskIsRunning));                    
             }
         }
@@ -246,7 +274,11 @@ namespace VNDBUpdater.GUI.ViewModels
             get
             {
                 return _SetExePath ??
-                    (_SetExePath = new RelayCommand(x => _VNService.SetExePath(_SelectedVisualNovel, _DialogService.GetPathToExecuteable()), x => _SelectedVisualNovel != null));
+                    (_SetExePath = new RelayCommand(async x => 
+                    {
+                        await _VNService.SetExePath(_SelectedVisualNovel, _DialogService.GetPathToExecuteable());
+                        NonIndexedVisualNovels.Remove(_SelectedVisualNovel);
+                    }, x => _SelectedVisualNovel != null));
             }
         }
 
@@ -257,10 +289,10 @@ namespace VNDBUpdater.GUI.ViewModels
             get
             {
                 return _SetToDefaulSettings ??
-                    (_SetToDefaulSettings = new RelayCommand(x =>
+                    (_SetToDefaulSettings = new RelayCommand(async x =>
                     {
                         _User.FileIndexerSetting.SetDefault();
-                        _UserService.Update(_User);
+                        await _UserService.Update(_User);
 
                         OnPropertyChanged(nameof(ExcludedExeNames));
                         OnPropertyChanged(nameof(MinimalFolderLength));
@@ -289,20 +321,18 @@ namespace VNDBUpdater.GUI.ViewModels
                         }
 
                         await _VNService.Add(vnsToReset);
-
-                        OnPropertyChanged(nameof(NonIndexedVisualNovels));
                     }));
             }
         }
 
-        private void ExecuteAddExecludedExe(string exe)
+        private async Task ExecuteAddExecludedExe(string exe)
         {
             if (!string.IsNullOrEmpty(exe))
             {
                 if (!_User.FileIndexerSetting.ExcludedExes.Any(x => string.Equals(x, exe)))
                 {
                     _User.FileIndexerSetting.ExcludedExes.Insert(0, exe);
-                    _UserService.Update(_User);
+                    await _UserService.Update(_User);
 
                     OnPropertyChanged(nameof(ExcludedExeNames));
                 }

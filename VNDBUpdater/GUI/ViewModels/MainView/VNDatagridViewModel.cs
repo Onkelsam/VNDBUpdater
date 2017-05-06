@@ -105,6 +105,7 @@ namespace VNDBUpdater.GUI.ViewModels.MainView
 
             _VisualNovels = new AsyncObservableCollection<VisualNovelModel>(await _VNService.GetLocal(), _Context);
             _VisualNovels.CollectionChanged += OnCollectionChanged;
+
             BindingOperations.EnableCollectionSynchronization(_VisualNovels, _SyncLock);
 
             SetupVisualNovels();
@@ -384,7 +385,7 @@ namespace VNDBUpdater.GUI.ViewModels.MainView
             get
             {
                 return _SetExePath ??
-                    (_SetExePath = new RelayCommand(x => _VNService.SetExePath(_SelectedVisualNovel, _DialogService.GetPathToExecuteable())));
+                    (_SetExePath = new RelayCommand(async x => await _VNService.SetExePath(_SelectedVisualNovel, _DialogService.GetPathToExecuteable())));
             }
         }
 
@@ -406,7 +407,7 @@ namespace VNDBUpdater.GUI.ViewModels.MainView
             get
             {
                 return _CreateWalkthrough ??
-                    (_CreateWalkthrough = new RelayCommand(x => _VNService.CreateWalkthrough(_SelectedVisualNovel), x => _SelectedVisualNovel != null && _VNService.InstallationPathExists(_SelectedVisualNovel) && !_VNService.WalkthroughAvailable(_SelectedVisualNovel)));
+                    (_CreateWalkthrough = new RelayCommand(async x => await _VNService.CreateWalkthrough(_SelectedVisualNovel), x => _SelectedVisualNovel != null && _VNService.InstallationPathExists(_SelectedVisualNovel) && !_VNService.WalkthroughAvailable(_SelectedVisualNovel)));
             }
         }
 
@@ -439,7 +440,7 @@ namespace VNDBUpdater.GUI.ViewModels.MainView
             get
             {
                 return _DeleteVisualNovel ??
-                    (_DeleteVisualNovel = new RelayCommand(x => { _VNService.Delete(_SelectedVisualNovel); }, x => _SelectedVisualNovel != null));
+                    (_DeleteVisualNovel = new RelayCommand(async x => { await _VNService.Delete(_SelectedVisualNovel); }, x => _SelectedVisualNovel != null));
             }
         }
 
@@ -461,9 +462,9 @@ namespace VNDBUpdater.GUI.ViewModels.MainView
             get
             {
                 return _SetScore ?? (_SetScore = new RelayCommand(
-                     x =>
+                     async x =>
                     {
-                        _DialogCoordinator.ShowInputAsync(this, "Set Score", "Enter your score:").ContinueWith(y => ExecuteSetScore(y.Result));
+                        await _DialogCoordinator.ShowInputAsync(this, "Set Score", "Enter your score:").ContinueWith(async y => await ExecuteSetScore(y.Result));
                     },
                     x => _SelectedVisualNovel != null));
             }
@@ -504,12 +505,12 @@ namespace VNDBUpdater.GUI.ViewModels.MainView
 
         private async Task ExecuteSetCategory(object parameter)
         {
-            await Task.Factory.StartNew(() =>
+            await Task.Factory.StartNew(async () =>
             {
                 var category = (VisualNovelModel.VisualNovelCatergory)Enum.Parse(typeof(VisualNovelModel.VisualNovelCatergory), parameter.ToString(), true);
                 var oldCategory = _SelectedVisualNovel.Category;
 
-                _VNService.SetCategory(_SelectedVisualNovel, category);
+                await _VNService.SetCategory(_SelectedVisualNovel, category);
 
                 _TabMapper[oldCategory].Remove(_SelectedVisualNovel);
 
@@ -518,7 +519,7 @@ namespace VNDBUpdater.GUI.ViewModels.MainView
             });
         }
 
-        private void ExecuteSetScore(string score)
+        private async Task ExecuteSetScore(string score)
         {
             if (string.IsNullOrEmpty(score))
             {
@@ -533,7 +534,7 @@ namespace VNDBUpdater.GUI.ViewModels.MainView
 
                 if (double.TryParse(score, NumberStyles.Any, CultureInfo.InvariantCulture, out convertedScore))
                 {
-                    _VNService.SetScore(_SelectedVisualNovel, Convert.ToInt32(10 * convertedScore));
+                    await _VNService.SetScore(_SelectedVisualNovel, Convert.ToInt32(10 * convertedScore));
                 }
             }
             else
@@ -542,7 +543,7 @@ namespace VNDBUpdater.GUI.ViewModels.MainView
 
                 if (int.TryParse(score, NumberStyles.Any, CultureInfo.InvariantCulture, out convertedScore))
                 {
-                    _VNService.SetScore(_SelectedVisualNovel, 10 * convertedScore);
+                    await _VNService.SetScore(_SelectedVisualNovel, 10 * convertedScore);
                 }
             }
 
