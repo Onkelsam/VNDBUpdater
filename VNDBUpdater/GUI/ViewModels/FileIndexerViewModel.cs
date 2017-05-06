@@ -233,8 +233,8 @@ namespace VNDBUpdater.GUI.ViewModels
                 return _StartIndexing ??
                     (_StartIndexing = new RelayCommand(x =>
                     {
-                        ITask task = _BackgroundTaskFactory.CreateFileIndexerTask();
-                        task.Start((successfull) => {; });
+                        IBackgroundTask task = _BackgroundTaskFactory.CreateFileIndexerTask();
+                        task.ExecuteTask((successfull) => {; });
                     }, x => !_StatusService.TaskIsRunning));                    
             }
         }

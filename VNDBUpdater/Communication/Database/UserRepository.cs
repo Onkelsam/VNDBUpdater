@@ -1,5 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using VNDBUpdater.Communication.Database.Entities;
 using VNDBUpdater.Communication.Database.Interfaces;
@@ -25,12 +25,19 @@ namespace VNDBUpdater.Communication.Database
 
         public async Task Delete(int ID)
         {
-            throw new NotImplementedException();
+            await _RedisService.DeleteKey(_UserKey + ID);
         }
 
         public async Task<IList<UserModel>> Get()
         {
-            throw new NotImplementedException();
+            var users = new List<UserEntity>();
+
+            foreach (var user in await _RedisService.GetAllKeys(_UserKey))
+            {
+                users.Add(await _RedisService.ReadEntity<UserEntity>(user));
+            }
+
+            return users.Select(x => new UserModel(x)).ToList();
         }
 
         public async Task<UserModel> Get(int ID)

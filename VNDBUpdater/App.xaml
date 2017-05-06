@@ -1,6 +1,7 @@
 ﻿<Application x:Class="VNDBUpdater.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro">
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -33,7 +34,7 @@
             </Style>
 
             <Style TargetType="{x:Type Button}" BasedOn="{StaticResource SquareButtonStyle}">
-                
+                <Setter Property="Controls:ControlsHelper.ContentCharacterCasing" Value="Normal" />
             </Style>
 
             <Style TargetType="{x:Type DataGrid}" BasedOn="{StaticResource MetroDataGrid}">

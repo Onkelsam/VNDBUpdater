@@ -46,20 +46,27 @@ namespace VNDBUpdater.Services.Login
 
         public async Task<bool> Login(LoginDialogData loginData)
         {
-            if (loginData != null && !string.IsNullOrEmpty(loginData.Username) && !string.IsNullOrEmpty(loginData.Password))
-            {                
-                _User.Username = loginData.Username;
-                _User.SaveLogin = loginData.ShouldRemember;
-                _User.EncryptedPassword = ProtectedData.Protect(Encoding.UTF8.GetBytes(loginData.Password), null, DataProtectionScope.CurrentUser);
+            _User = await _UserService.Get();
 
-                if (await _UserService.Login(_User))
+            if (loginData != null && !string.IsNullOrEmpty(loginData.Username) && !string.IsNullOrEmpty(loginData.Password))
+            {
+                var newUser = new UserModel();
+
+                newUser.Username = loginData.Username;
+                newUser.SaveLogin = loginData.ShouldRemember;
+                newUser.EncryptedPassword = ProtectedData.Protect(Encoding.UTF8.GetBytes(loginData.Password), null, DataProtectionScope.CurrentUser);
+
+                if (await _UserService.Login(newUser))
                 {
+                    _User = newUser;
                     _StatusService.CurrentUser = _User.Username;
 
                     return true;
                 }
                 else
                 {
+                    await _UserService.Add(_User);
+
                     return false;
                 }
             }

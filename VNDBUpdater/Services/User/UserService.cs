@@ -78,8 +78,6 @@ namespace VNDBUpdater.Services.User
 
                 await _VNDBConnection.Reconnect();
 
-                OnAdded?.Invoke(this, model);
-
                 return _VNDBConnection.LoggedIn;
             }            
         }

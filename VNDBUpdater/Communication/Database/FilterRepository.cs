@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using VNDBUpdater.Communication.Database.Entities;
 using VNDBUpdater.Communication.Database.Interfaces;
@@ -31,6 +30,7 @@ namespace VNDBUpdater.Communication.Database
 
         public async Task Delete(int ID)
         {
+            await _RedisService.DeleteKey(_FilterKey + ID);
         }
 
         public async Task<IList<FilterModel>> Get()
@@ -54,7 +54,9 @@ namespace VNDBUpdater.Communication.Database
 
         public async Task<FilterModel> Get(int ID)
         {
-            throw new NotImplementedException();
+            var entity = await _RedisService.ReadEntity<FilterEntity>(_FilterKey + ID);
+
+            return new FilterModel(entity);
         }
     }
 }

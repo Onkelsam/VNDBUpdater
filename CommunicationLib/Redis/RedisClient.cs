@@ -119,12 +119,17 @@ namespace CommunicationLib.Redis
 
         public async Task<List<string>> GetKeys(string pattern)
         {
-            var keys = new List<string>();
+            return await Task.Run(() =>
+            {
+                var keys = new List<string>();
 
-            foreach (var key in Server.GetServer(IP, Port).Keys(pattern: pattern))
-                keys.Add(key.ToString());
+                foreach (var key in Server.GetServer(IP, Port).Keys(pattern: pattern))
+                {
+                    keys.Add(key.ToString());
+                }                    
 
-            return keys;
+                return keys;
+            });
         }
 
         public void ForceSave()

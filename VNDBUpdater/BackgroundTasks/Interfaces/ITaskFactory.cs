@@ -2,9 +2,9 @@
 {
     public interface ITaskFactory
     {
-        ITask CreateStartUpTask();
-        ITask CreateSynchronizerTask();
-        ITask CreateRefresherTask();
-        ITask CreateFileIndexerTask();
+        IBackgroundTask CreateStartUpTask();
+        IBackgroundTask CreateSynchronizerTask();
+        IBackgroundTask CreateRefresherTask();
+        IBackgroundTask CreateFileIndexerTask();
     }
 }

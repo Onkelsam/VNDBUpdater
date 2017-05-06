@@ -3,7 +3,9 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:local="clr-namespace:VNDBUpdater.GUI.ViewModels"
         xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
-        Title="VNDBUpdater - Create Filters" Height="409.036" Width="370" ResizeMode="NoResize">
+        Title="Create Filters" Height="409.036" Width="370" ResizeMode="NoResize"
+        GlowBrush="{DynamicResource AccentColorBrush}"
+        Topmost="True">
 
     <Window.Resources>
         <Thickness x:Key="ControlMargin">0 5 0 0</Thickness>

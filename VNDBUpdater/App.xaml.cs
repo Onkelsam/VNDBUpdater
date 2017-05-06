@@ -2,8 +2,6 @@
 using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Practices.Unity;
 using System;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using VNDBUpdater.BackgroundTasks.Factory;
 using VNDBUpdater.BackgroundTasks.Interfaces;
@@ -37,6 +35,8 @@ namespace VNDBUpdater
     public partial class App : Application
     {
         private static IUnityContainer Container = new UnityContainer();
+
+        // TODO: Make Windows topmost maybe?
 
         protected override void OnStartup(StartupEventArgs e)
         {
@@ -99,15 +99,15 @@ namespace VNDBUpdater
             Container.RegisterType<IScreenshotTabWindowModel, ScreenshotViewModel>(new ContainerControlledLifetimeManager());
             Container.RegisterType<ITagTabWIndowModel, TagTabViewModel>(new ContainerControlledLifetimeManager());
             Container.RegisterType<IVisualNovelInfoWindowModel, VNInfoViewModel>(new ContainerControlledLifetimeManager());
+            Container.RegisterType<IStatusBarViewModel, StatusBarViewModel>(new ContainerControlledLifetimeManager());
 
 
             // Sub Views Initialization.
-            Container.RegisterType<ISplashScreenWindowModel, SplashScreenViewModel>();
-            Container.RegisterType<IOptionsWindowModel, OptionsViewModel>();
-            Container.RegisterType<IFileIndexerWindowModel, FileIndexerViewModel>();
+            Container.RegisterType<ISplashScreenWindowModel, SplashScreenViewModel>(new ContainerControlledLifetimeManager());
+            Container.RegisterType<IFileIndexerWindowModel, FileIndexerViewModel>(new ContainerControlledLifetimeManager());
             Container.RegisterType<ICreateFilterWindowModel, CreateFilterViewModel>(new ContainerControlledLifetimeManager());
             Container.RegisterType<IAddVisualNovelsWindowModel, AddVisualNovelsViewModel>(new ContainerControlledLifetimeManager());
-            Container.RegisterType<IAboutViewModel, AboutViewModel>();
+            Container.RegisterType<IAboutViewModel, AboutViewModel>(new ContainerControlledLifetimeManager());
 
             // Other.
             Container.RegisterType<ITaskFactory, BackgroundTaskFactory>();

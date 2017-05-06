@@ -19,44 +19,24 @@ namespace VNDBUpdater.BackgroundTasks
             _TraitService = TraitService;
         }
 
-        public override void Start(Action<bool> OnTaskCompleted)
+        public override async Task ExecuteTask(Action<bool> OnTaskCompleted)
         {
-            CurrentTask = nameof(StartUp);
+            _OnTaskCompleted = OnTaskCompleted;
 
-            Task.Factory.StartNew(() => StartUpProgram(OnTaskCompleted));
+            await Task.Factory.StartNew(async () => await Start(StartUpProgram));
         }
 
-        private void StartUpProgram(Action<bool> OnTaskCompleted)
+        private async Task StartUpProgram()
         {
-            try
-            {
-                IsRunning = true;
-                CurrentStatus = nameof(StartUp) + " running.";
+            PercentageCompleted = 0;
 
-                PercentageCompleted = 0;
+            await _TagService.Refresh();
 
-                _TagService.Refresh();
+            PercentageCompleted = 40;
 
-                PercentageCompleted = 40;
+            await _TraitService.Refresh();
 
-                _TraitService.Refresh();
-                                                                    
-                PercentageCompleted = 100;
-
-                CurrentStatus = nameof(StartUp) + " finished.";
-                IsRunning = false;
-
-                OnTaskCompleted(true);                
-            }
-            catch (Exception ex)
-            {
-                _Logger.Log(ex);
-
-                CurrentStatus = nameof(StartUp) + " faulted.";
-                IsRunning = false;
-
-                OnTaskCompleted(false);
-            }
+            PercentageCompleted = 100;
         }
     }
 }

@@ -38,12 +38,18 @@ namespace VNDBUpdater.Communication.Database.Caching
 
         public async Task Set<T> (string key, T item)
         {
-            MemoryCache.Default.Set(key, item, null);
+            await Task.Run(() =>
+            {
+                MemoryCache.Default.Set(key, item, null);
+            });          
         }
 
         public async Task SetList<T>(string key, IList<T> items)
         {
-            MemoryCache.Default.Set(key, items, null);
+            await Task.Run(() =>
+            {
+                MemoryCache.Default.Set(key, items, null);
+            });            
         }
     }
 }

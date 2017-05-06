@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using VNDBUpdater.Data;
 
 namespace VNDBUpdater.Services
@@ -7,6 +8,6 @@ namespace VNDBUpdater.Services
     {
         IList<T> Get();
         bool Show(SpoilerSetting UserSetting, SpoilerLevel TSpoiler);
-        void Refresh();
+        Task Refresh();
     }
 }

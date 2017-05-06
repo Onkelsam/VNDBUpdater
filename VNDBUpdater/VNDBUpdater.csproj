@@ -145,7 +145,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="BackgroundTasks\FileIndexer.cs" />
-    <Compile Include="BackgroundTasks\Interfaces\ITask.cs" />
+    <Compile Include="BackgroundTasks\Interfaces\IBackgroundTask.cs" />
     <Compile Include="BackgroundTasks\Interfaces\ITaskFactory.cs" />
     <Compile Include="BackgroundTasks\Refresher.cs" />
     <Compile Include="BackgroundTasks\StartUp.cs" />
@@ -197,6 +197,9 @@
     <Compile Include="Communication\VNDB\Interfaces\IVNDBSetter.cs" />
     <Compile Include="Communication\VNDB\VNDBGetter.cs" />
     <Compile Include="Communication\VNDB\VNDBSetter.cs" />
+    <Compile Include="GUI\Controls\StatusBar.xaml.cs">
+      <DependentUpon>StatusBar.xaml</DependentUpon>
+    </Compile>
     <Compile Include="GUI\CustomClasses\Commands\RelayCommand.cs" />
     <Compile Include="GUI\Controls\CharacterTab.xaml.cs">
       <DependentUpon>CharacterTab.xaml</DependentUpon>
@@ -228,15 +231,16 @@
     <Compile Include="GUI\ViewModels\Interfaces\IFileIndexerWindowModel.cs" />
     <Compile Include="GUI\ViewModels\Interfaces\IMainWindowModel.cs" />
     <Compile Include="GUI\ViewModels\Interfaces\IMenuBarWindowModel.cs" />
-    <Compile Include="GUI\ViewModels\Interfaces\IOptionsWindowModel.cs" />
     <Compile Include="GUI\ViewModels\Interfaces\IScreenshotTabWindowModel.cs" />
     <Compile Include="GUI\ViewModels\Interfaces\ISplashScreenWindowModel.cs" />
+    <Compile Include="GUI\ViewModels\Interfaces\IStatusBarViewModel.cs" />
     <Compile Include="GUI\ViewModels\Interfaces\ITagTabWIndowModel.cs" />
     <Compile Include="GUI\ViewModels\Interfaces\IVisualNovelInfoWindowModel.cs" />
     <Compile Include="GUI\ViewModels\Interfaces\IVisualNovelsGridWindowModel.cs" />
     <Compile Include="GUI\ViewModels\MainView\CharacterTabViewModel.cs" />
     <Compile Include="GUI\ViewModels\MainView\MenuBarViewModel.cs" />
     <Compile Include="GUI\ViewModels\MainView\ScreenshotViewModel.cs" />
+    <Compile Include="GUI\ViewModels\MainView\StatusBarViewModel.cs" />
     <Compile Include="GUI\ViewModels\SplashScreenViewModel.cs" />
     <Compile Include="GUI\ViewModels\MainView\TagTabViewModel.cs" />
     <Compile Include="GUI\ViewModels\MainView\VNDatagridViewModel.cs" />
@@ -260,7 +264,6 @@
     </Compile>
     <Compile Include="GUI\ViewModels\AboutViewModel.cs" />
     <Compile Include="GUI\ViewModels\FileIndexerViewModel.cs" />
-    <Compile Include="GUI\ViewModels\OptionsViewModel.cs" />
     <Compile Include="GUI\CustomClasses\Collections\ThreadSafeObservableCollection.cs" />
     <Compile Include="GUI\Views\About.xaml.cs">
       <DependentUpon>About.xaml</DependentUpon>
@@ -282,9 +285,6 @@
     <Compile Include="GUI\ViewModels\ViewModelBase.cs" />
     <Compile Include="GUI\Views\FileIndexer.xaml.cs">
       <DependentUpon>FileIndexer.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="GUI\Views\Options.xaml.cs">
-      <DependentUpon>Options.xaml</DependentUpon>
     </Compile>
     <Compile Include="Services\Dialogs\DialogService.cs" />
     <Compile Include="Services\Dialogs\IDialogService.cs" />
@@ -324,6 +324,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="GUI\Controls\ScreenshotTab.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="GUI\Controls\StatusBar.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -369,10 +373,6 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="GUI\Views\Options.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="GUI\Views\SplashScreen.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

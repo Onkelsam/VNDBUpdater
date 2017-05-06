@@ -6,7 +6,9 @@
         xmlns:local="clr-namespace:VNDBUpdater.GUI.ViewModels"
         mc:Ignorable="d"
         xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
-        Title="VNDBUpdater" Height="150" Width="300" ResizeMode="NoResize" WindowStartupLocation="CenterScreen">
+        Title="VNDBUpdater" Height="150" Width="300" ResizeMode="NoResize" WindowStartupLocation="CenterScreen"
+        GlowBrush="{DynamicResource AccentColorBrush}"
+        Topmost="True">
 
     <Window.Resources>
         <Style TargetType="{x:Type Label}">

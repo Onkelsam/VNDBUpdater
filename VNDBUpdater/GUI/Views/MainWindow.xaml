@@ -8,11 +8,21 @@
         xmlns:tb="http://www.hardcodet.net/taskbar"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+        xmlns:Dialog="clr-namespace:MahApps.Metro.Controls.Dialogs;assembly=MahApps.Metro"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         x:Name="MainView"
-        Title="{Binding Path=Title}" Height="{Binding Height, Mode=TwoWay}" Width="{Binding Width, Mode=TwoWay}" WindowStartupLocation="CenterScreen"
+        Title="VNDB Updater" 
+        Height="{Binding Height, Mode=TwoWay}"
+        Width="{Binding Width, Mode=TwoWay}" 
+        WindowStartupLocation="CenterScreen"
         mc:Ignorable="d"
-        d:DataContext="{d:DesignInstance local:MainViewModel}">
+        d:DataContext="{d:DesignInstance local:MainViewModel}"
+        GlowBrush="{DynamicResource AccentColorBrush}"
+        Dialog:DialogParticipation.Register="{Binding}">
+
+    <Window.Resources>
+        <Thickness x:Key="ControlMargin">0 5 0 0</Thickness>
+    </Window.Resources>
 
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="Closing">
@@ -23,6 +33,109 @@
         </i:EventTrigger>
     </i:Interaction.Triggers>
 
+    <Controls:MetroWindow.Flyouts>
+        <Controls:FlyoutsControl>
+            <Controls:Flyout Header="Settings" 
+                             Position="Right" 
+                             x:Name="SettingsFlyout"
+                             Theme="Inverse" 
+                             IsOpen="False" 
+                             Controls:ControlsHelper.ContentCharacterCasing="Upper">
+                <Grid Margin="10">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <TabControl Controls:TabControlHelper.Underlined="TabPanel">
+                        <TabItem Header="User">
+                            <StackPanel Margin="{StaticResource ControlMargin}">
+                                <StackPanel Orientation="Horizontal">
+                                    <Label Content="Current User:" />
+                                    <Label Content="{Binding Path=Username, Mode=OneWay}" />
+                                    <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
+                                    <CheckBox IsChecked="{Binding Path=SaveLogin}" 
+                                              Margin="5,0,0,0">
+                                        <CheckBox.Content>
+                                            <Label Content="Save Login" Margin="0" />
+                                        </CheckBox.Content>
+                                    </CheckBox>
+                                </StackPanel>
+                                <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
+                                <Button Content="Login as other User" 
+                                        Command="{Binding Path=Login}" 
+                                        Margin="{StaticResource ControlMargin}"/>
+                                <Label  Content="{Binding Path=Status}" />
+                            </StackPanel>
+                        </TabItem>
+                        <TabItem Header="VNDB">
+                            <StackPanel Margin="{StaticResource ControlMargin}">
+                                <StackPanel Orientation="Horizontal">
+                                    <Label Content="Spoiler Setting:" Margin="{StaticResource ControlMargin}" />
+                                    <ComboBox ItemsSource="{Binding Path=SpoilerLevels}" 
+                                              SelectedItem="{Binding Path=SpoilerLevel}" 
+                                              Margin="{StaticResource ControlMargin}" />    
+                                </StackPanel>
+                                <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
+                                <CheckBox IsChecked="{Binding Path=ShowNSFWImages}" 
+                                          Margin="5,5,0,0" >
+                                    <CheckBox.Content>
+                                        <Label Content="Show NSFW Images" Margin="0" />
+                                    </CheckBox.Content>
+                                </CheckBox>
+                                <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
+                            </StackPanel>
+                        </TabItem>
+                        <TabItem Header="GUI">
+                            <StackPanel Margin="{StaticResource ControlMargin}">
+                                <CheckBox IsChecked="{Binding Path=MinimizeToTray}" 
+                                          Margin="5,5,0,0">
+                                    <CheckBox.Content>
+                                        <Label Content="Minimize to System Tray" Margin="0" />
+                                    </CheckBox.Content>
+                                </CheckBox>
+                                <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
+                                <StackPanel Orientation="Horizontal">
+                                    <Label Content="Adjust image size:" Margin="{StaticResource ControlMargin}" />
+                                    <Slider Maximum="360" 
+                                            Minimum="100" 
+                                            SmallChange="1" 
+                                            LargeChange="10" 
+                                            Orientation="Horizontal"
+                                            Value="{Binding Path=ImageDimension}" 
+                                            Width="200" 
+                                            Controls:SliderHelper.EnableMouseWheel="MouseHover"
+                                            Controls:SliderHelper.ChangeValueBy="LargeChange"
+                                            Style="{DynamicResource FlatSlider}"
+                                            Margin="0,7,0,0"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </TabItem>
+                    </TabControl>
+                    <Button Content="Save" 
+                            Margin="10" 
+                            Grid.Row="1" 
+                            Command="{Binding Path=SaveSettings}" />
+                </Grid>
+            </Controls:Flyout>
+            <Controls:Flyout Header="New Version available" 
+                             IsOpen="{Binding Path=NewVersionAvailable, Mode=OneWay}" 
+                             Position="Bottom" 
+                             Theme="Inverse" 
+                             Controls:ControlsHelper.ContentCharacterCasing="Upper">
+                <Button Content="Open GitHub Link" 
+                        Command="{Binding Path=OpenGitHubLink}" 
+                        HorizontalAlignment="Center" 
+                        VerticalAlignment="Center" />
+            </Controls:Flyout>
+        </Controls:FlyoutsControl>
+    </Controls:MetroWindow.Flyouts>
+
+    <Controls:MetroWindow.RightWindowCommands>
+        <Controls:WindowCommands ShowSeparators="True">
+            <ToggleButton Content="Settings" IsChecked="{Binding ElementName=SettingsFlyout, Path=IsOpen}" Cursor="Hand" />
+        </Controls:WindowCommands>
+    </Controls:MetroWindow.RightWindowCommands>
+    
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="250*" />
@@ -69,27 +182,6 @@
             </TabItem>
         </Controls:MetroAnimatedSingleRowTabControl>
 
-        <StatusBar Grid.Row="6" Grid.ColumnSpan="3" Margin="0,2,0,0">
-            <StackPanel Orientation="Horizontal">
-                <TextBlock Text="Logged in as: " />
-                <TextBlock Text="{Binding Path=CurrentUser, Mode=OneWay}" />
-            </StackPanel>
-            <TextBlock Text="{Binding Path=ErrorMessage}" Foreground="Red"/>
-            <Separator Visibility="{Binding Path=TaskIsRunning, Converter={StaticResource Bool2Vis}, Mode=OneWay}"/>
-            <StackPanel Orientation="Horizontal" Visibility="{Binding Path=TaskIsRunning, Converter={StaticResource Bool2Vis}, Mode=OneWay}">
-                <TextBlock Text="Current Task: " />
-                <TextBlock Text="{Binding Path=CurrentTask, Mode=OneWay}" />
-            </StackPanel>
-            <Separator Visibility="{Binding Path=TaskIsRunning, Converter={StaticResource Bool2Vis}, Mode=OneWay}"/>
-            <StackPanel Orientation="Horizontal" Visibility="{Binding Path=TaskIsRunning, Converter={StaticResource Bool2Vis}, Mode=OneWay}">
-                <TextBlock Text="Current Status: " />
-                <TextBlock Text="{Binding Path=Message, Mode=OneWay}" />
-            </StackPanel>
-            <Separator Visibility="{Binding Path=TaskIsRunning, Converter={StaticResource Bool2Vis}, Mode=OneWay}"/>
-            <StatusBarItem Grid.Column="3" Visibility="{Binding Path=TaskIsRunning, Converter={StaticResource Bool2Vis}, Mode=OneWay}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch">
-                <Controls:MetroProgressBar Minimum="0" Maximum="100" Value="{Binding Path=PercentageTaskCompleted, Mode=OneWay}" Height="15" HorizontalAlignment="Stretch" 
-                                           Visibility="{Binding Path=TaskIsRunning, Converter={StaticResource Bool2Vis}, Mode=OneWay}"/>
-            </StatusBarItem>
-        </StatusBar>
+        <usercontrols:StatusBar Grid.Row="6" Grid.ColumnSpan="3" Margin="0,2,0,0" DataContext="{Binding StatusBar}"/>
     </Grid>
 </Controls:MetroWindow>

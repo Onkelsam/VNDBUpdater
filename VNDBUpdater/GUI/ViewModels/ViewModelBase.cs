@@ -18,9 +18,7 @@ namespace VNDBUpdater.GUI.ViewModels
         public event PropertyChangedEventHandler PropertyChanged;
         public event NotifyCollectionChangedEventHandler CollectionChanged;        
 
-        public ViewModelBase()
-        {
-        }
+        public ViewModelBase() { }
 
         public void OnPropertyChanged(string property)
         {

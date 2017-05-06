@@ -23,7 +23,7 @@ namespace VNDBUpdater.GUI.ViewModels.MainView
     {
         private UserModel _User;
 
-        private ITask _CurrentTask;
+        private IBackgroundTask _CurrentTask;
         private ITaskFactory _BackgroundTaskFactory;
         
         private IFilterService _FilterService;
@@ -61,8 +61,6 @@ namespace VNDBUpdater.GUI.ViewModels.MainView
         private void OnUserUpdated(object sender, UserModel User)
         {
             _User = User;
-
-            OnPropertyChanged(nameof(ImageDimension));
         }
 
         private void OnFilterAdded(object sender, FilterModel filter)
@@ -89,17 +87,6 @@ namespace VNDBUpdater.GUI.ViewModels.MainView
                 _AvailableFilters = value;
 
                 OnPropertyChanged(nameof(AvailableFilters));
-            }
-        }
-
-        public int ImageDimension
-        {
-            get { return _User.GUI.ImageDimension; }
-            set
-            {
-                _User.GUI.ImageDimension = value;
-
-                _UserService.Update(_User);
             }
         }
 
@@ -133,17 +120,6 @@ namespace VNDBUpdater.GUI.ViewModels.MainView
             {
                 return _AddVisualNovels ??
                     (_AddVisualNovels = new RelayCommand(x => _WindowHandler.Open(_UnityContainer.Resolve<AddVisualNovels>()), x => true));
-            }
-        }
-
-        private ICommand _OpenOptions;
-
-        public ICommand OpenOptions
-        {
-            get
-            {
-                return _OpenOptions ??
-                    (_OpenOptions = new RelayCommand(x => _WindowHandler.Open(_UnityContainer.Resolve<Options>())));
             }
         }
 
@@ -223,7 +199,7 @@ namespace VNDBUpdater.GUI.ViewModels.MainView
                     (_RefreshVisualNovels = new RelayCommand(x =>
                     {
                         _CurrentTask = _BackgroundTaskFactory.CreateRefresherTask();
-                        _CurrentTask.Start((successfull) => { });
+                        _CurrentTask.ExecuteTask((successfull) => { });
                     }, x => !_StatusService.TaskIsRunning));
             }
         }
@@ -238,7 +214,7 @@ namespace VNDBUpdater.GUI.ViewModels.MainView
                     (_SynchronizeWithVNDB = new RelayCommand(x =>
                     {
                         _CurrentTask = _BackgroundTaskFactory.CreateSynchronizerTask();
-                        _CurrentTask.Start((successfull) => { });
+                        _CurrentTask.ExecuteTask((successfull) => { });
                     }, x => !_StatusService.TaskIsRunning));
             }
         }

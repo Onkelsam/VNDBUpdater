@@ -23,18 +23,18 @@ namespace VNDBUpdater.Services.Launch
 
         private void StartStartUp()
         {
-            ITask task = _TaskFactory.CreateStartUpTask();
+            IBackgroundTask task = _TaskFactory.CreateStartUpTask();
 
-            task.Start(StartSynchronizer);
+            task.ExecuteTask(StartSynchronizer);
         }
 
         private void StartSynchronizer(bool startUpSuccessfull)
         {
             if (startUpSuccessfull)
             {
-                ITask task = _TaskFactory.CreateSynchronizerTask();
+                IBackgroundTask task = _TaskFactory.CreateSynchronizerTask();
 
-                task.Start(_OnLaunchFinished);
+                task.ExecuteTask(_OnLaunchFinished);
             }
             else
             {

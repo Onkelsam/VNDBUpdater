@@ -1,16 +1,19 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.IO.Compression;
 using System.Net;
+using System.Threading.Tasks;
 
 namespace VNDBUpdater.Services
 {
     public abstract class TagsAndTraitsBase
     {
-        public virtual void Refresh(string downloadLink, string fileName)
+        public virtual async Task Refresh(string downloadLink, string fileName)
         {
             using (var client = new WebClient())
             {
-                client.DownloadFile(downloadLink, fileName);
+                await client.DownloadFileTaskAsync(new Uri(downloadLink), fileName);
+
                 Decompress(new FileInfo(fileName));
             }
 

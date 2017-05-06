@@ -45,31 +45,28 @@ namespace VNDBUpdater.Services.LaunchMonitor
         
         private async void OnProcessLaunched(object sender, EventArrivedEventArgs e)
         {
-            string instanceLaunched = string.Empty;
-            string path = string.Empty;
-
             try
             {
-                instanceLaunched = ((ManagementBaseObject)e.NewEvent["TargetInstance"])["Name"].ToString();
-                path = ((ManagementBaseObject)e.NewEvent["TargetInstance"])["ExecutablePath"].ToString();
+                string instanceLaunched = ((ManagementBaseObject)e.NewEvent["TargetInstance"])["Name"].ToString();
+                string path = ((ManagementBaseObject)e.NewEvent["TargetInstance"])["ExecutablePath"].ToString();
 
                 if (string.IsNullOrEmpty(instanceLaunched) || string.IsNullOrEmpty(path))
                 {
                     return;
                 }
+
+                var localVNs = await _VNService.GetLocal();
+
+                if (localVNs.Where(x => !string.IsNullOrEmpty(x.ExePath)).Any(x => string.Equals(x.ExePath, path, StringComparison.OrdinalIgnoreCase)))
+                {
+                    _LaunchedVisualNovel = localVNs.Where(x => !string.IsNullOrEmpty(x.ExePath)).First(x => string.Equals(x.ExePath, path, StringComparison.OrdinalIgnoreCase));
+
+                    _RelevantProcess = Process.GetProcessesByName(instanceLaunched.Replace(".exe", "")).First();
+                    _RelevantProcess.EnableRaisingEvents = true;
+                    _RelevantProcess.Exited += OnProcessEnded;
+                }
             }
             catch { return; } // Ignore...
-
-            var localVNs = await _VNService.GetLocal();            
-
-            if (localVNs.Where(x => !string.IsNullOrEmpty(x.ExePath)).Any(x => string.Equals(x.ExePath, path, StringComparison.OrdinalIgnoreCase)))
-            {
-                _LaunchedVisualNovel = localVNs.Where(x => !string.IsNullOrEmpty(x.ExePath)).First(x => string.Equals(x.ExePath, path, StringComparison.OrdinalIgnoreCase));
-
-                _RelevantProcess = Process.GetProcessesByName(instanceLaunched.Replace(".exe", "")).First();
-                _RelevantProcess.EnableRaisingEvents = true;
-                _RelevantProcess.Exited += OnProcessEnded;
-            }
         }
 
         private void OnProcessEnded(object sender, EventArgs e)

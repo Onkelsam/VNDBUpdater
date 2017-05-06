@@ -27,22 +27,22 @@ namespace VNDBUpdater.BackgroundTasks.Factory
             _LoggerService = LoggerService;
         }
 
-        public ITask CreateStartUpTask()
+        public IBackgroundTask CreateStartUpTask()
         {
             return new StartUp(_StatusService, _TagService, _TraitService, _LoggerService);
         }
 
-        public ITask CreateSynchronizerTask()
+        public IBackgroundTask CreateSynchronizerTask()
         {
             return new Synchronizer(_StatusService, _VNService, _LoggerService);
         }
 
-        public ITask CreateRefresherTask()
+        public IBackgroundTask CreateRefresherTask()
         {
-            return new Refresher(_StatusService, _VNService, _TagService, _TraitService, _LoggerService);
+            return new Refresher(_StatusService, _VNService, _LoggerService);
         }
 
-        public ITask CreateFileIndexerTask()
+        public IBackgroundTask CreateFileIndexerTask()
         {
             return new FileIndexer(_StatusService, _VNService, _UserService, _LoggerService);
         }

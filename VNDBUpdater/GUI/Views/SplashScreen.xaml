@@ -17,7 +17,8 @@
         WindowStartupLocation="CenterScreen" 
         AllowsTransparency="True" 
         Background="{DynamicResource {x:Static SystemColors.WindowFrameBrushKey}}"               
-        Dialog:DialogParticipation.Register="{Binding}">
+        Dialog:DialogParticipation.Register="{Binding}"
+        GlowBrush="{DynamicResource AccentColorBrush}">
 
     <Controls:MetroWindow.Resources>
         <ResourceDictionary>

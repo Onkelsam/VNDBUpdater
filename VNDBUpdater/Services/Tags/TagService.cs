@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 using VNDBUpdater.Communication.VNDB.Entities;
 using VNDBUpdater.Data;
 using VNDBUpdater.GUI.Models.VisualNovel;
@@ -27,9 +28,9 @@ namespace VNDBUpdater.Services.Tags
             return _Tags;
         }
 
-        public void Refresh()
+        public async Task Refresh()
         {
-            base.Refresh(_TagsDownloadLink, _TagsZipFileName);
+            await base.Refresh(_TagsDownloadLink, _TagsZipFileName);
 
             _Tags = new List<TagModel>();
 

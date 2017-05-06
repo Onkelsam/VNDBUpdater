@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Input;
 using VNDBUpdater.GUI.CustomClasses.Commands;
 using VNDBUpdater.GUI.Models.VisualNovel;
@@ -24,8 +25,14 @@ namespace VNDBUpdater.GUI.ViewModels
         {
             _FilterService = FilterService;
 
-            _Filter = new FilterModel();
             _TagService = TagService;
+
+            Task.Factory.StartNew(() => Initialize());
+        }
+
+        private void Initialize()
+        {
+            _Filter = new FilterModel();
             _Tags = _TagService.Get().Select(x => x).OrderBy(x => x.Name).ToList();
 
             _BoolToTagMapper = new Dictionary<FilterModel.BooleanOperations, ObservableCollection<TagModel>>();
@@ -192,6 +199,7 @@ namespace VNDBUpdater.GUI.ViewModels
                 if (entry.Value.Any(x => x.Name == tagName))
                 {
                     entry.Value.Remove(entry.Value.First(x => x.Name == tagName));
+
                     return;
                 }
             }

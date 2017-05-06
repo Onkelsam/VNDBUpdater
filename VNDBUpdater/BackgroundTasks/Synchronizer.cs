@@ -20,48 +20,27 @@ namespace VNDBUpdater.BackgroundTasks
             _VNService = VNService;
         }
 
-        public override void Start(Action<bool> OnTaskCompleted)
+        public override async Task ExecuteTask(Action<bool> OnTaskCompleted)
         {
-            CurrentTask = nameof(Synchronizer);
+            _OnTaskCompleted = OnTaskCompleted;
 
-            Task.Factory.StartNew(() => Synchronize(OnTaskCompleted));
+            await Task.Factory.StartNew(async () => await Start(Synchronize));
         }
 
-        private async Task Synchronize(Action<bool> OnTaskCompleted)
+        private async Task Synchronize()
         {
-            try
-            {
-                PercentageCompleted = 0;
-                IsRunning = true;
-                CurrentStatus = nameof(Synchronizer) + " running.";
+            var vns = await _VNService.GetVNList();
+            var votes = await _VNService.GetVoteList();
 
-                var vns = await _VNService.GetVNList();
-                var votes = await _VNService.GetVoteList();
+            var VNList = new List<VN>(vns);
+            var VoteList = new List<Vote>(votes);
 
-                var VNList = new List<VN>(vns);
-                var VoteList = new List<Vote>(votes);
+            _TasksToDo = VNList.Count + VoteList.Count;
 
-                _TasksToDo = VNList.Count + VoteList.Count;
+            CurrentStatus = _TasksDone + " Visual Novels of " + _TasksToDo + " synchronized";
 
-                CurrentStatus = _TasksDone + " Visual Novels of " + _TasksToDo + " synchronized";                
-
-                await SynchronizeVNs(VNList);
-                await SynchronizeVotes(VoteList);
-
-                CurrentStatus = nameof(Synchronizer) + " finished.";
-                IsRunning = false;
-
-                OnTaskCompleted(true);
-            }
-            catch (Exception ex)
-            {
-                _Logger.Log(ex);
-
-                CurrentStatus = nameof(Synchronize) + " ran into error.";
-                IsRunning = false;
-
-                OnTaskCompleted(false);
-            }
+            await SynchronizeVNs(VNList);
+            await SynchronizeVotes(VoteList);
         }
 
         private async Task SynchronizeVNs(List<VN> VNsToSynchronize)

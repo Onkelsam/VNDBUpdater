@@ -29,6 +29,8 @@ namespace VNDBUpdater.Services.Logger
                 .AppendLine(ex.GetType().Name)
                 .AppendLine()
                 .AppendLine(ex.Message)
+                .AppendLine()
+                .AppendLine(ex.StackTrace != null ? ex.StackTrace : string.Empty)
                 .ToString();
 
             return ex.InnerException != null

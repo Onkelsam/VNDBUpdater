@@ -100,7 +100,7 @@ namespace VNDBUpdater.GUI.ViewModels.MainView
         }
 
         private async Task Initialize()
-        {            
+        {
             OnUserUpdated(this, await _UserService.Get());
 
             _VisualNovels = new AsyncObservableCollection<VisualNovelModel>(await _VNService.GetLocal(), _Context);
@@ -151,7 +151,7 @@ namespace VNDBUpdater.GUI.ViewModels.MainView
         private void OnVisualNovelAdded(object sender, VisualNovelModel model)
         {
             _VisualNovels.Add(model);
-            _TabMapper[model.Category].Add(model);            
+            _TabMapper[model.Category].Add(model);
 
             OnPropertyChanged(_CategoryToPropertyMapper[model.Category]);
         }
@@ -168,12 +168,12 @@ namespace VNDBUpdater.GUI.ViewModels.MainView
         {
             _VisualNovels.Remove(model);
             _VisualNovels.Add(model);
-                        
+
             if (_TabMapper[model.Category].Any(x => x.Basics.ID == model.Basics.ID))
             {
                 _TabMapper[model.Category].Remove(_TabMapper[model.Category].First(x => x.Basics.ID == model.Basics.ID));
             }
-            
+
             _TabMapper[model.Category].Add(model);
 
             OnPropertyChanged(_CategoryToPropertyMapper[model.Category]);
@@ -200,7 +200,7 @@ namespace VNDBUpdater.GUI.ViewModels.MainView
 
         public AsyncObservableCollection<VisualNovelModel> VisualNovelsInUnknownGroup
         {
-            get { return GetOrderedVisualNovels(VisualNovelModel.VisualNovelCatergory.Unknown); }               
+            get { return GetOrderedVisualNovels(VisualNovelModel.VisualNovelCatergory.Unknown); }
         }
 
         public AsyncObservableCollection<VisualNovelModel> VisualNovelsInPlayingGroup
@@ -321,12 +321,18 @@ namespace VNDBUpdater.GUI.ViewModels.MainView
         {
             if (_SelectedSortingDirection == SortingDirection.Ascending)
             {
-                return new AsyncObservableCollection<VisualNovelModel>(_TabMapper[category].OrderBy(x => x.FollowPropertyPath(_SortToPropertyMapper[_SelectedSortingMethod]).FollowPropertyPathAndGetValue(x, _SortToPropertyMapper[_SelectedSortingMethod])), _Context);
+                return new AsyncObservableCollection<VisualNovelModel>(_TabMapper[category]
+                    .OrderBy(x => x.FollowPropertyPath(_SortToPropertyMapper[_SelectedSortingMethod]).FollowPropertyPathAndGetValue(x, _SortToPropertyMapper[_SelectedSortingMethod]))
+                    .ThenBy(x => x.Basics.Title), 
+                    _Context);
             }
             else
             {
-                return new AsyncObservableCollection<VisualNovelModel>(_TabMapper[category].OrderByDescending(x => x.FollowPropertyPath(_SortToPropertyMapper[_SelectedSortingMethod]).FollowPropertyPathAndGetValue(x, _SortToPropertyMapper[_SelectedSortingMethod])), _Context);
-            }            
+                return new AsyncObservableCollection<VisualNovelModel>(_TabMapper[category]
+                    .OrderByDescending(x => x.FollowPropertyPath(_SortToPropertyMapper[_SelectedSortingMethod]).FollowPropertyPathAndGetValue(x, _SortToPropertyMapper[_SelectedSortingMethod]))
+                    .ThenByDescending(x => x.Basics.Title), 
+                    _Context);
+            }
         }
 
         private void SetupVisualNovels()
@@ -457,7 +463,7 @@ namespace VNDBUpdater.GUI.ViewModels.MainView
                 return _SetScore ?? (_SetScore = new RelayCommand(
                      x =>
                     {
-                         _DialogCoordinator.ShowInputAsync(this, "Set Score", "Enter your score:").ContinueWith(y => ExecuteSetScore(y.Result));
+                        _DialogCoordinator.ShowInputAsync(this, "Set Score", "Enter your score:").ContinueWith(y => ExecuteSetScore(y.Result));
                     },
                     x => _SelectedVisualNovel != null));
             }
@@ -527,7 +533,7 @@ namespace VNDBUpdater.GUI.ViewModels.MainView
 
                 if (double.TryParse(score, NumberStyles.Any, CultureInfo.InvariantCulture, out convertedScore))
                 {
-                    _VNService.SetScore(_SelectedVisualNovel, Convert.ToInt32(10 * convertedScore)); 
+                    _VNService.SetScore(_SelectedVisualNovel, Convert.ToInt32(10 * convertedScore));
                 }
             }
             else

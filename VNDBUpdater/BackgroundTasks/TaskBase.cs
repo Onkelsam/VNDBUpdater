@@ -1,11 +1,12 @@
 ﻿using System;
+using System.Threading.Tasks;
 using VNDBUpdater.BackgroundTasks.Interfaces;
 using VNDBUpdater.Services.Logger;
 using VNDBUpdater.Services.Status;
 
 namespace VNDBUpdater.BackgroundTasks
 {
-    public abstract class TaskBase : ITask
+    public abstract class TaskBase : IBackgroundTask
     {
         protected IStatusService _StatusService;
         protected ILoggerService _Logger;
@@ -13,7 +14,9 @@ namespace VNDBUpdater.BackgroundTasks
         protected int _TasksToDo;
         protected int _TasksDone;
 
-        public TaskBase(IStatusService StatusService, ILoggerService LoggerService)
+        protected Action<bool> _OnTaskCompleted;
+
+        protected TaskBase(IStatusService StatusService, ILoggerService LoggerService)
         {
             _StatusService = StatusService;
             _Logger = LoggerService;
@@ -42,7 +45,35 @@ namespace VNDBUpdater.BackgroundTasks
             set { _StatusService.CurrentTask = value; }
         }
 
-        public abstract void Start(Action<bool> OnTaskCompleted);
+        public abstract Task ExecuteTask(Action<bool> OnTaskCompleted);
+
+        protected async Task Start(Func<Task> TaskToExecute)
+        {
+            try
+            {
+                PercentageCompleted = 0;
+                IsRunning = true;
+                CurrentTask = GetType().Name;
+                CurrentStatus = GetType().Name + " running.";
+
+                await TaskToExecute();
+
+                CurrentStatus = GetType().Name + " successfully completed.";
+                PercentageCompleted = 100;
+                IsRunning = false;
+
+                _OnTaskCompleted(true);
+            }
+            catch (Exception ex)
+            {
+                _Logger.Log(ex);
+
+                CurrentStatus = GetType().Name + " ran into error.";
+                IsRunning = false;
+
+                _OnTaskCompleted(false);
+            }
+        }
 
         protected void UpdateProgess(int amountdone, string message)
         {

@@ -56,14 +56,17 @@ namespace VNDBUpdater.GUI.ViewModels.MainView
         {
             if (e.PropertyName == nameof(_VisualNovelsGridModel.SelectedVisualNovel))
             {
-                if (_VisualNovelsGridModel.SelectedVisualNovel.Basics.Screenshots.Any(x => x.Path.Contains("https://")))
+                if (_VisualNovelsGridModel.SelectedVisualNovel?.Basics?.Screenshots != null)
                 {
-                    Task.Factory.StartNew(() => _VNService.DownloadImages(_VisualNovelsGridModel.SelectedVisualNovel));
-                }           
-                else
-                {
-                    OnPropertyChanged(nameof(Screenshots));
-                }     
+                    if (_VisualNovelsGridModel.SelectedVisualNovel.Basics.Screenshots.Any(x => x.Path.Contains("https://")))
+                    {
+                        Task.Factory.StartNew(() => _VNService.DownloadImages(_VisualNovelsGridModel.SelectedVisualNovel));
+                    }
+                    else
+                    {
+                        OnPropertyChanged(nameof(Screenshots));
+                    }
+                }
             }
         }
     }

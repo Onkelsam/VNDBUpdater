@@ -71,21 +71,6 @@
                 </MenuItem>
                 <MenuItem Header="Reset Filters" Command="{Binding ResetFilters}" />
             </MenuItem>
-            <MenuItem Header="Options">
-                <MenuItem Header="Open Options Menu" Command="{Binding OpenOptions}" />
-                <MenuItem Header="Adjust image size">
-                    <Slider Maximum="360" 
-                            Minimum="100" 
-                            SmallChange="1" 
-                            LargeChange="10" 
-                            Orientation="Horizontal"
-                            Value="{Binding Path=ImageDimension}" 
-                            Width="200" 
-                            Controls:SliderHelper.EnableMouseWheel="MouseHover"
-                            Controls:SliderHelper.ChangeValueBy="LargeChange"
-                            Style="{DynamicResource FlatSlider}"/>
-                </MenuItem>
-            </MenuItem>
             <MenuItem Header="File Indexer" Command="{Binding OpenFileIndexer}"/>
             <MenuItem Header="Theme"
                       ItemContainerStyle="{StaticResource AppThemeMenuItemStyle}"

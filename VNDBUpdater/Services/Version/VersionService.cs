@@ -50,6 +50,7 @@ namespace VNDBUpdater.Services.Version
                 return CurrentVersion != NewVersion;
             }
         }
+
         public string Copyright
         {
             get

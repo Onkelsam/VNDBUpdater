@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using VNDBUpdater.Communication.VNDB.Entities;
 using VNDBUpdater.Data;
 using VNDBUpdater.GUI.Models.VisualNovel;
@@ -28,9 +29,9 @@ namespace VNDBUpdater.Services.Traits
             return _Traits;
         }
 
-        public void Refresh()
+        public async Task Refresh()
         {
-            base.Refresh(_TraitsDownloadLink, _TraitsZipFileName);
+            await base.Refresh(_TraitsDownloadLink, _TraitsZipFileName);
 
             _Traits = new List<TraitModel>();
 

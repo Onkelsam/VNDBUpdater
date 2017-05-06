@@ -42,7 +42,10 @@ namespace VNDBUpdater.Services.VN
 
         public async Task Add(IList<VisualNovelModel> models)
         {
-            models.ToList().ForEach(async x => await _VNRepository.Add(x));
+            foreach (var model in models)
+            {
+                await _VNRepository.Add(model);
+            }
 
             OnRefreshed?.Invoke(this, null);
         }
@@ -257,11 +260,11 @@ namespace VNDBUpdater.Services.VN
 
             foreach (var screenshot in newScreenshots)
             {
-                model.Basics.Screenshots.Add(UpdateImages(screenshot, model.Basics.ID, "Screenshots"));
+                model.Basics.Screenshots.Add(await UpdateImages(screenshot, model.Basics.ID, "Screenshots"));
             }
             foreach (var character in model.Characters)
             {
-                character.Image = UpdateImages(character.Image, model.Basics.ID, "CharacterImages");
+                character.Image = await UpdateImages(character.Image, model.Basics.ID, "CharacterImages");
             }
 
             await _VNRepository.Add(model);
@@ -269,7 +272,7 @@ namespace VNDBUpdater.Services.VN
             OnUpdated?.Invoke(this, model);
         }
 
-        private ScreenshotModel UpdateImages(ScreenshotModel screenshot, int visualNovelId, string path)
+        private async Task<ScreenshotModel> UpdateImages(ScreenshotModel screenshot, int visualNovelId, string path)
         {
             string ImageFolder = @"Resources\" + path;
             string CurrentFolder = AppDomain.CurrentDomain.BaseDirectory;
@@ -290,7 +293,7 @@ namespace VNDBUpdater.Services.VN
 
                 using (var client = new WebClient())
                 {
-                    File.WriteAllBytes(newImageFile, client.DownloadData(screenshot.Path));
+                    File.WriteAllBytes(newImageFile, await client.DownloadDataTaskAsync(screenshot.Path));
 
                     return new ScreenshotModel(newImageFile, screenshot.NSFW, screenshot.Height, screenshot.Width);
                 }

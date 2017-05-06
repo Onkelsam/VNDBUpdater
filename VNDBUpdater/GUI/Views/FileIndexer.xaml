@@ -7,8 +7,10 @@
         xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
         xmlns:Dialog="clr-namespace:MahApps.Metro.Controls.Dialogs;assembly=MahApps.Metro"
         mc:Ignorable="d"
-        Title="VNDBUpdater - FileIndexer" Height="600" Width="820" ResizeMode="NoResize" WindowStartupLocation="CenterScreen"
-        Dialog:DialogParticipation.Register="{Binding}">
+        Title="FileIndexer" Height="600" Width="820" ResizeMode="NoResize" WindowStartupLocation="CenterScreen"
+        Dialog:DialogParticipation.Register="{Binding}"
+        GlowBrush="{DynamicResource AccentColorBrush}"
+        Topmost="True">
     
     <Grid>
         <Grid.ColumnDefinitions>
