@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Management;
 using VNDBUpdater.GUI.Models.VisualNovel;
@@ -48,7 +49,7 @@ namespace VNDBUpdater.Services.LaunchMonitor
             try
             {
                 string instanceLaunched = ((ManagementBaseObject)e.NewEvent["TargetInstance"])["Name"].ToString();
-                string path = ((ManagementBaseObject)e.NewEvent["TargetInstance"])["ExecutablePath"].ToString();
+                string path = Path.GetDirectoryName(((ManagementBaseObject)e.NewEvent["TargetInstance"])["ExecutablePath"].ToString()) + "\\";
 
                 if (string.IsNullOrEmpty(instanceLaunched) || string.IsNullOrEmpty(path))
                 {
@@ -57,9 +58,9 @@ namespace VNDBUpdater.Services.LaunchMonitor
 
                 var localVNs = await _VNService.GetLocal();
 
-                if (localVNs.Where(x => !string.IsNullOrEmpty(x.ExePath)).Any(x => string.Equals(x.ExePath, path, StringComparison.OrdinalIgnoreCase)))
+                if (localVNs.Where(x => !string.IsNullOrEmpty(x.FolderPath)).Any(x => string.Equals(x.FolderPath, path, StringComparison.OrdinalIgnoreCase)))
                 {
-                    _LaunchedVisualNovel = localVNs.Where(x => !string.IsNullOrEmpty(x.ExePath)).First(x => string.Equals(x.ExePath, path, StringComparison.OrdinalIgnoreCase));
+                    _LaunchedVisualNovel = localVNs.Where(x => !string.IsNullOrEmpty(x.FolderPath)).First(x => string.Equals(x.FolderPath, path, StringComparison.OrdinalIgnoreCase));
 
                     _RelevantProcess = Process.GetProcessesByName(instanceLaunched.Replace(".exe", "")).First();
                     _RelevantProcess.EnableRaisingEvents = true;
