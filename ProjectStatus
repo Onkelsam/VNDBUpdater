@@ -1,62 +1,14 @@
-Implementation planned:
+Implementation planned (maybe):
   
   Minor tasks:
     - Make character information scroll with the character image.
     - Add option to show images in a horizontal/vertical row.
     - Gallery mode for screenshots.
-    - Filter box for tags so you can pre-filter them before selecting one.
     - User option to set tags as favourite, so it brings them on the top of the list.
     - Color code tags
     
   Medium tasks:
-    - Wishlist implementation. Propably in a new window.
-    - Cache images locally.
-    - Filter by developer, artist, scenario creator, language etc.
     - Set exe paths and create walkthroughs while not connected to vndb.
     
   Major tasks:
     - Implement themes offered by vndb.
-    - Add vns with vn name. Propably in conjunction with the changes to the file indexer. Will be a pain...
-  
-  On Hold:
-    - Remember user column reordering and resizing. -> Pretty difficult.
-    - Display related visual novels as link, so you can click on them to get to the VNDB page 
-      or select the vn if it is already on your list.
-    - Change file indexer so it can find VNs by directory name and fetch the info from VNDB.org. -> Was halfway done, but I wasn't happy with it.
-    
-Current tasks:
-
-  Currently doing:
-    My semester has just begun and I don't have time to work on this, so work is onhold probably until I'm finished with my bachelor thesis 
-    next year (somewhere in june hopefully...).
-      
-
-Done (and not yet released):
-
-    - Fixed a crash that occured if you browsed through the vn list with your arrow keys.
-
-Done (and released):
-
-  Minor:
-    - Add scrollbar to vn description window.
-    - Remember user tabs so they will be the same when starting the program again.
-    - Fixed bug that could crash the program if you had a vn selected and a property was null and you changed the category tab.
-    - Fixed problem with the indexer.
-    - Make it clear if no character information is found.
-    - Added 'No image available' and 'Image is NSFW' images.
-    - Images fixed.
-    - Window size will be remembered...    
-  
-  Medium:
-    - Parse description text etc. correctly (implement a parser for the VNDB markdown text).
-      ->  this is now implemented, it first parses from bbcode to html and then to xaml.
-          it just doesn't work very well, as hyperlinks can't be clicked in WPF richtextboxes...
-    - Change file indexer so multiple paths to VN directories can be added (e.g. Steam).
-    
-  Major:
-  
-    - Emulate VNDB style to characters, on the left side the character image on the right the description.
-      ->  Implemented. Works well. Looks better now.
-    - Add navigation buttons to screenshots and a number (current picture is X of Y available pictures).
-      ->  Not needed anymore.
-      
