@@ -14,7 +14,7 @@ That is, of course, not 100% accurate. In my testing 50 of 360 VNs could not be 
 
 <b> Version </b>
 
-1.2.6066.41824
+1.4.6073.40523
 
 <b> Technologies used </b>
 
