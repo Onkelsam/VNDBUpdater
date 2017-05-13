@@ -35,9 +35,12 @@ namespace VNDBUpdater.Services.VN
 
         public async Task Add(VisualNovelModel model)
         {
-            await _VNRepository.Add(model);
+            if (!await _VNRepository.VisualNovelExists(model.Basics.ID))
+            {
+                await _VNRepository.Add(model);
 
-            OnAdded?.Invoke(this, model);
+                OnAdded?.Invoke(this, model);
+            }
         }
 
         public async Task Add(IList<VisualNovelModel> models)
