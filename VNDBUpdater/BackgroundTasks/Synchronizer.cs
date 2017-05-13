@@ -68,6 +68,19 @@ namespace VNDBUpdater.BackgroundTasks
             {
                 await GetVNs(VNsToAdd);
             }
+
+            await DeleteLocalVNs(VNsToSynchronize);
+        }
+
+        private async Task DeleteLocalVNs(List<VN> VNsSynchronized)
+        {
+            foreach (var localVN in await _VNService.GetLocal())
+            {
+                if (!VNsSynchronized.Any(x => x.vn == localVN.Basics.ID))
+                {
+                    await _VNService.DeleteLocal(localVN);
+                }
+            }
         }
 
         private async Task SynchronizeVotes(List<Vote> VotesToSynchronize)

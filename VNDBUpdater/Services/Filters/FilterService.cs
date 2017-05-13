@@ -72,19 +72,25 @@ namespace VNDBUpdater.Services.Filters
 
         public bool VNShouldBeFilteredOut(FilterModel model, VisualNovelModel vn)
         {
-            if (vn.Basics.Tags.Any(x => model.FilterParameter[FilterModel.BooleanOperations.NOT].Any(y => y.Name == x.Name)))
+            bool containsNOTTags = vn.Basics.Tags.Any(x => model.FilterParameter[FilterModel.BooleanOperations.NOT].Any(y => y.ID == x.ID));
+
+            if (containsNOTTags)
             {
                 return true;
             }
 
-            if (vn.Basics.Tags.Any(x => model.FilterParameter[FilterModel.BooleanOperations.OR].Any(y => y.Name == x.Name)))
+            bool containsORTags = vn.Basics.Tags.Any(x => model.FilterParameter[FilterModel.BooleanOperations.OR].Any(y => y.ID == x.ID));
+
+            if (containsORTags)
             {
                 return false;
             }
 
             if (model.FilterParameter[FilterModel.BooleanOperations.AND].Any())
             {
-                if (model.FilterParameter[FilterModel.BooleanOperations.AND].Select(x => x.Name).Intersect(vn.Basics.Tags.Select(x => x.Name)).Count() == model.FilterParameter[FilterModel.BooleanOperations.AND].Count)
+                bool containsAllANDTags = model.FilterParameter[FilterModel.BooleanOperations.AND].Select(x => x.ID).Intersect(vn.Basics.Tags.Select(x => x.ID)).Count() == model.FilterParameter[FilterModel.BooleanOperations.AND].Count;
+
+                if (containsAllANDTags)
                 {
                     return false;
                 }

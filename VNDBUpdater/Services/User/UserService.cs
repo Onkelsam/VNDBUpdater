@@ -15,7 +15,6 @@ namespace VNDBUpdater.Services.User
 
         private IUserRepository _UserRepository;
 
-        public event EventHandler<UserModel> OnAdded = delegate { };
         public event EventHandler<UserModel> OnUpdated = delegate { };
         public event EventHandler<UserModel> OnDeleted = delegate { };
 
@@ -24,13 +23,6 @@ namespace VNDBUpdater.Services.User
             _RedisConnection = RedisConnection;
             _UserRepository = userRepository;
             _VNDBConnection = VNDBConnection;
-        }
-
-        public async Task Add(UserModel model)
-        {
-            await _UserRepository.Add(model);
-
-            OnAdded?.Invoke(this, model);
         }
 
         public async Task Update(UserModel model)
@@ -51,35 +43,51 @@ namespace VNDBUpdater.Services.User
 
             if (string.IsNullOrEmpty(existingUser.Username))
             {
-                await Add(model);
-
-                await _VNDBConnection.Reconnect();
-
-                OnAdded?.Invoke(this, model);
-
-                return _VNDBConnection.LoggedIn;
+                return await CreateNewUser(model);
             }
             else if (existingUser.Username == model.Username && Unprotect(existingUser.EncryptedPassword, null, DataProtectionScope.CurrentUser) == Unprotect(model.EncryptedPassword, null, DataProtectionScope.CurrentUser))
             {
-                if (!_VNDBConnection.LoggedIn)
-                {
-                    await _VNDBConnection.Reconnect();
-                }
-
-                await Add(model);
-
-                return _VNDBConnection.LoggedIn;
+                return await LoginExistingUser(model);
+            }
+            else if (existingUser.Username == model.Username)
+            {
+                return await CreateNewUser(model);
             }
             else
             {
-                _RedisConnection.Reconnect();
-
-                await Add(model);
-
-                await _VNDBConnection.Reconnect();
-
-                return _VNDBConnection.LoggedIn;
+                return await ReplaceExistingUser(model);
             }            
+        }
+
+        private async Task<bool> CreateNewUser(UserModel model)
+        {
+            await Update(model);
+            await _VNDBConnection.Reconnect();
+
+            return _VNDBConnection.LoggedIn;
+        }
+
+        private async Task<bool> LoginExistingUser(UserModel model)
+        {
+            if (!_VNDBConnection.LoggedIn)
+            {
+                await _VNDBConnection.Reconnect();
+            }
+
+            await Update(model);
+
+            return _VNDBConnection.LoggedIn;
+        }
+
+        private async Task<bool> ReplaceExistingUser(UserModel model)
+        {
+            await _RedisConnection.Reset();
+            _RedisConnection.Reconnect();
+
+            await Update(model);
+            await _VNDBConnection.Reconnect();
+
+            return _VNDBConnection.LoggedIn;
         }
 
         private string Unprotect(byte[] encryptedPassword, string entropy = null, DataProtectionScope scope = DataProtectionScope.CurrentUser)

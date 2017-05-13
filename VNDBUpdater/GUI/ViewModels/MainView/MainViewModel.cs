@@ -147,12 +147,10 @@ namespace VNDBUpdater.GUI.ViewModels.MainView
             get { return _User.Username; }
         }
 
-        private bool _SaveLogin;
-
         public bool SaveLogin
         {
-            get { return _SaveLogin; }
-            set { _SaveLogin = value; OnPropertyChanged(nameof(SaveLogin)); }
+            get { return _User.SaveLogin; }
+            set { _User.SaveLogin = value; OnPropertyChanged(nameof(SaveLogin)); }
         }
 
         public List<string> SpoilerLevels
@@ -162,33 +160,22 @@ namespace VNDBUpdater.GUI.ViewModels.MainView
                     .Select(x => x.Description).ToList(); }
         }
 
-        private SpoilerSetting _SpoilerLevel;
-
         public string SpoilerLevel
         {
-            get { return _SpoilerLevel.GetAttributeOfType<DescriptionAttribute>().Description.ToString(); }
-            set
-            {
-                _SpoilerLevel = value.GetEnumValueFromDescription<SpoilerSetting>();
-
-                OnPropertyChanged(nameof(SpoilerLevel));
-            }
+            get { return _User.Settings.SpoilerSetting.GetAttributeOfType<DescriptionAttribute>().Description.ToString(); }
+            set { _User.Settings.SpoilerSetting = value.GetEnumValueFromDescription<SpoilerSetting>(); OnPropertyChanged(nameof(SpoilerLevel)); }
         }
-
-        private bool _ShowNSFWImages;
 
         public bool ShowNSFWImages
         {
-            get { return _ShowNSFWImages; }
-            set { _ShowNSFWImages = value; OnPropertyChanged(nameof(ShowNSFWImages)); }
+            get { return _User.Settings.ShowNSFWImages; }
+            set { _User.Settings.ShowNSFWImages = value; OnPropertyChanged(nameof(ShowNSFWImages)); }
         }
-
-        private bool _MinimizeToTray;
 
         public bool MinimizeToTray
         {
-            get { return _MinimizeToTray; }
-            set { _MinimizeToTray = value; OnPropertyChanged(nameof(MinimizeToTray)); }
+            get { return _User.Settings.MinimizeToTray; }
+            set { _User.Settings.MinimizeToTray = value; OnPropertyChanged(nameof(MinimizeToTray)); }
         }
 
         private string _Status;
@@ -265,18 +252,8 @@ namespace VNDBUpdater.GUI.ViewModels.MainView
             get
             {
                 return _SaveSettings ??
-                  (_SaveSettings = new RelayCommand(async x => await ExecuteSaveSettings(null)));
+                  (_SaveSettings = new RelayCommand(async x => await _UserService.Update(_User)));
             }
-        }
-
-        public async Task ExecuteSaveSettings(object parameter)
-        {            
-            _User.Settings.MinimizeToTray = _MinimizeToTray;
-            _User.Settings.SpoilerSetting = _SpoilerLevel;
-            _User.Settings.ShowNSFWImages = _ShowNSFWImages;
-            _User.SaveLogin = _SaveLogin;
-
-            await _UserService.Update(_User);
         }
 
         public void ExecuteCloseWindow(object parameter)

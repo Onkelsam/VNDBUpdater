@@ -36,8 +36,6 @@ namespace VNDBUpdater
     {
         private static IUnityContainer Container = new UnityContainer();
 
-        // TODO: Make Windows topmost maybe?
-
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);

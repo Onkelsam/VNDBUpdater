@@ -22,6 +22,7 @@ namespace VNDBUpdater.Services.VN
         Task Add(VisualNovelModel model);
         Task Add(IList<VisualNovelModel> models);
         Task Delete(VisualNovelModel model);
+        Task DeleteLocal(VisualNovelModel model);
 
         Task Update(VisualNovelModel model);
 

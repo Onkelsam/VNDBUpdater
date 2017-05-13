@@ -16,14 +16,12 @@ namespace VNDBUpdater.Communication.Database.Entities
         {
             ID = model.ID;
             Name = model.Name;
-            Description = model.Description;
             Spoiler = model.Spoiler;
             ParentTraits = model.ParentTraits?.Select(x => new TraitEntity(x)).ToList();
         }
 
         public int ID { get; set; }
         public string Name { get; set; }
-        public string Description { get; set; }
         public SpoilerLevel Spoiler { get; set; }
         public List<TraitEntity> ParentTraits { get; set; }
     }

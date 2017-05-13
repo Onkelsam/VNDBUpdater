@@ -104,6 +104,13 @@ namespace VNDBUpdater.Services.VN
             OnDeleted?.Invoke(this, model);
         }
 
+        public async Task DeleteLocal(VisualNovelModel model)
+        {
+            await _VNRepository.Delete(model.Basics.ID);
+
+            OnDeleted?.Invoke(this, model);
+        }
+
         public async Task CreateWalkthrough(VisualNovelModel model)
         {
             if (InstallationPathExists(model) && !WalkthroughAvailable(model))

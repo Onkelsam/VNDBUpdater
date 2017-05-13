@@ -1,14 +1,17 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using VNDBUpdater.GUI.Models.VisualNovel;
 
 namespace VNDBUpdater.Services.User
 {
-    public interface IUserService : IServiceBase<UserModel>
+    public interface IUserService
     {
         Task<UserModel> Get();
-        Task Add(UserModel model);
         Task Update(UserModel model);
 
         Task<bool> Login(UserModel model);
+
+        event EventHandler<UserModel> OnUpdated;
+        event EventHandler<UserModel> OnDeleted;
     }
 }

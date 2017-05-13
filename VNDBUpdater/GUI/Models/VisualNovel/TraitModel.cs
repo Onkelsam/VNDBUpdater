@@ -14,7 +14,6 @@ namespace VNDBUpdater.GUI.Models.VisualNovel
         {
             ID = RawData.id;
             Name = RawData.name;
-            Description = RawData.description;
             ParentTraits = new List<TraitModel>();
         }
 
@@ -22,7 +21,6 @@ namespace VNDBUpdater.GUI.Models.VisualNovel
         {
             ID = entity.ID;
             Name = entity.Name;
-            Description = entity.Description;
 
             ParentTraits = entity.ParentTraits?.Select(x => new TraitModel(x)).ToList();
             Spoiler = entity.Spoiler;
@@ -36,7 +34,6 @@ namespace VNDBUpdater.GUI.Models.VisualNovel
             {
                 ID = foundTrait.ID;
                 Name = foundTrait.Name;
-                Description = foundTrait.Description;
                 Spoiler = (SpoilerLevel)Enum.Parse(typeof(SpoilerLevel), trait[1].ToString(), true);
                 ParentTraits = foundTrait.ParentTraits;
             }
@@ -49,12 +46,6 @@ namespace VNDBUpdater.GUI.Models.VisualNovel
         }
 
         public string Name
-        {
-            get;
-            private set;
-        }
-
-        public string Description
         {
             get;
             private set;

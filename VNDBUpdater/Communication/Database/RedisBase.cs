@@ -104,11 +104,6 @@ namespace VNDBUpdater.Communication.Database
             {
                 await DeleteKey(key);
             }                
-
-            if (File.Exists(Path.Combine(_PathToDatabse, _DatabaseName)))
-            {
-                File.Delete(Path.Combine(_PathToDatabse, _DatabaseName));
-            }
         }        
 
         public void Save()

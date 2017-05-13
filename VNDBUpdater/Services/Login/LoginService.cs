@@ -61,11 +61,13 @@ namespace VNDBUpdater.Services.Login
                     _User = newUser;
                     _StatusService.CurrentUser = _User.Username;
 
+                    await _UserService.Update(_User);
+
                     return true;
                 }
                 else
                 {
-                    await _UserService.Add(_User);
+                    await _UserService.Update(_User);
 
                     return false;
                 }
