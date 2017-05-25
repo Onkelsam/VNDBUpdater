@@ -37,7 +37,18 @@ namespace VNDBUpdater.GUI.Models.VisualNovel
             Length = VNDBEntity.length;
             Description = VNDBEntity.description;
             Aliases = VNDBEntity.aliases;
-            Release = DateTime.Parse(VNDBEntity.released);
+
+            var releaseDate = new DateTime();
+
+            if (DateTime.TryParse(VNDBEntity.released, out releaseDate))
+            {
+                Release = releaseDate;
+            }
+            else
+            {
+                Release = new DateTime();
+            }
+
             Rating = VNDBEntity.rating;
             Popularity = VNDBEntity.popularity;
             Screenshots = VNDBEntity.screens.Select(x => new ScreenshotModel(x.image, x.nsfw, x.height, x.width)).ToList();
