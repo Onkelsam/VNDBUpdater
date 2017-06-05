@@ -3,8 +3,9 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
              xmlns:local="clr-namespace:VNDBUpdater.GUI.Controls"
-             xmlns:converters="clr-namespace:VNDBUpdater.GUI.Converters"
+             xmlns:behaviors="clr-namespace:VNDBUpdater.GUI.Behaviors"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
     <Grid>
@@ -12,40 +13,47 @@
             <RowDefinition Height="*" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-            <ListView ItemsSource="{Binding Path=Characters}"  
+        <ListView ItemsSource="{Binding Path=Characters}"  
                       x:Name="CharacterList" 
                       SelectedItem="{Binding Path=SelectedCharacter}"
                       ScrollViewer.HorizontalScrollBarVisibility="Disabled">
-                <ListView.ItemContainerStyle>
-                    <Style TargetType="ListBoxItem">
-                        <Setter Property="MaxWidth" 
+            <i:Interaction.Behaviors>
+                <behaviors:ScrollIntoViewForListBox />
+            </i:Interaction.Behaviors>
+            <ListView.ItemContainerStyle>
+                <Style TargetType="ListBoxItem" BasedOn="{StaticResource MetroListBoxItem}">
+                    <Setter Property="MaxWidth" 
                                 Value="{Binding ElementName=CharacterList, Path=ActualWidth}"/>
-                        <Setter Property="MaxHeight" 
+                    <Setter Property="MaxHeight" 
                                 Value="{Binding ElementName=CharacterList, Path=ActualHeight}"/>
-                        <Setter Property="HorizontalContentAlignment" 
+                    <Setter Property="HorizontalContentAlignment" 
                                 Value="Center" />
-                    </Style>
-                </ListView.ItemContainerStyle>
-                <ListView.ItemTemplate>
-                    <DataTemplate>
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="{Binding ElementName=CharacterList, Path=ActualWidth}"/>
-                            </Grid.ColumnDefinitions>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="{Binding ElementName=CharacterList, Path=ActualHeight}"/>
-                            </Grid.RowDefinitions>
+                    <Style.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="IsSelected" Value="True" />
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </ListView.ItemContainerStyle>
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="{Binding ElementName=CharacterList, Path=ActualWidth}"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="{Binding ElementName=CharacterList, Path=ActualHeight}"/>
+                        </Grid.RowDefinitions>
                         <Image Source="{Binding Path=Image.Path, IsAsync=True}" 
                                    Stretch="Uniform">
-                                <Image.ToolTip>
-                                <Image Source="{Binding Path=Image.Path, IsAsync=False}" 
-                                           Stretch="Uniform"/>
-                                </Image.ToolTip>
-                            </Image>
-                        </Grid>
-                    </DataTemplate>
-                </ListView.ItemTemplate>
-            </ListView>
+                            <Image.ToolTip>
+                                <Image Source="{Binding Path=Image.Path, IsAsync=False}" Stretch="Uniform"/>
+                            </Image.ToolTip>
+                        </Image>
+                    </Grid>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
 
         <Grid Grid.Row="1">
             <ScrollViewer>
@@ -55,7 +63,6 @@
                                       AlternationCount="2">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-
                                     <Grid x:Name="ItemGrid">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="10*" 
@@ -71,7 +78,6 @@
                                                    Margin="0,6,0,2" 
                                                    TextWrapping="Wrap"/>
                                     </Grid>
-
                                     <DataTemplate.Triggers>
                                         <Trigger Property="ItemsControl.AlternationIndex" Value="1">
                                             <Setter Property="Background" Value="{DynamicResource AccentColorBrush4}" TargetName="ItemGrid"/>
@@ -83,7 +89,7 @@
 
                         <RichTextBox Grid.Column="1" 
                                      Grid.Row="2" 
-                                     converters:HtmlRichTextBoxBehavior.Text="{Binding Path=Description}" 
+                                     behaviors:HtmlRichTextBoxBehavior.Text="{Binding Path=Description}" 
                                      Margin="0, 10, 0, 0" />
                     </StackPanel>
                 </GroupBox>

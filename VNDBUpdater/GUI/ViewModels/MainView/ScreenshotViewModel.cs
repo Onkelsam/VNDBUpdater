@@ -33,7 +33,7 @@ namespace VNDBUpdater.GUI.ViewModels.MainView
 
         private async Task Initialize()
         {
-            OnUserUpdated(this, await _UserService.Get());
+            OnUserUpdated(this, await _UserService.GetAsync());
         }
 
         private void OnUserUpdated(object sender, UserModel User)
@@ -45,11 +45,43 @@ namespace VNDBUpdater.GUI.ViewModels.MainView
 
         public List<ScreenshotModel> Screenshots
         {
-            get { return _VisualNovelsGridModel.SelectedVisualNovel?.Basics != null
-                    ? _User.Settings.ShowNSFWImages 
-                        ? _VisualNovelsGridModel.SelectedVisualNovel.Basics.Screenshots 
-                        : _VisualNovelsGridModel.SelectedVisualNovel.Basics.Screenshots.Where(x => x.NSFW == false).ToList() 
-                    : new List<ScreenshotModel>(); }
+            get
+            {
+                if (_VisualNovelsGridModel.SelectedVisualNovel?.Basics != null)
+                {
+                    if (_VisualNovelsGridModel.SelectedVisualNovel.Basics.Screenshots.Any())
+                    {
+                        return GetScreenshots(_VisualNovelsGridModel.SelectedVisualNovel);
+                    }
+                }
+
+                return new List<ScreenshotModel>();
+            }
+        }
+
+        private ScreenshotModel _SelectedScreenshot;
+
+        public ScreenshotModel SelectedScreenshot
+        {
+            get { return _SelectedScreenshot; }
+            set
+            {
+                if (value != null)
+                {
+                    _SelectedScreenshot = value;
+
+                    OnPropertyChanged(nameof(SelectedScreenshot));
+                }
+            }
+        }
+
+        private List<ScreenshotModel> GetScreenshots(VisualNovelModel vn)
+        {
+            SelectedScreenshot = _User.Settings.ShowNSFWImages ? vn.Basics.Screenshots.First() : vn.Basics.Screenshots.First(x => !x.NSFW);
+
+            return _User.Settings.ShowNSFWImages
+                ? _VisualNovelsGridModel.SelectedVisualNovel.Basics.Screenshots
+                : _VisualNovelsGridModel.SelectedVisualNovel.Basics.Screenshots.Where(x => !x.NSFW).ToList();
         }
 
         private void OnSelectedVisualNovelPropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -66,6 +98,11 @@ namespace VNDBUpdater.GUI.ViewModels.MainView
                     {
                         OnPropertyChanged(nameof(Screenshots));
                     }
+                }
+
+                if (_VisualNovelsGridModel.SelectedVisualNovel == null)
+                {
+                    OnPropertyChanged(nameof(Screenshots));
                 }
             }
         }

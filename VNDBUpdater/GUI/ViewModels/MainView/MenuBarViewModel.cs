@@ -54,7 +54,7 @@ namespace VNDBUpdater.GUI.ViewModels.MainView
 
         private async Task Initialize()
         {
-            OnUserUpdated(this, await _UserService.Get());
+            OnUserUpdated(this, await _UserService.GetAsync());
             _AvailableFilters = new ObservableCollection<FilterModel>(await _FilterService.Get());            
         }
 

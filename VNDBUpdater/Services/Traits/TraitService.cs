@@ -31,7 +31,7 @@ namespace VNDBUpdater.Services.Traits
 
         public async Task Refresh()
         {
-            await base.Refresh(_TraitsDownloadLink, _TraitsZipFileName);
+            await base.RefreshAsync(_TraitsDownloadLink, _TraitsZipFileName);
 
             _Traits = new List<TraitModel>();
 

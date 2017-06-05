@@ -25,21 +25,21 @@ namespace VNDBUpdater.Services.User
             _VNDBConnection = VNDBConnection;
         }
 
-        public async Task Update(UserModel model)
+        public async Task UpdateAsync(UserModel model)
         {
             await _UserRepository.Add(model);
 
             OnUpdated?.Invoke(this, model);
         }
 
-        public async Task<UserModel> Get()
+        public async Task<UserModel> GetAsync()
         {
             return await _UserRepository.Get(0);
         }
 
-        public async Task<bool> Login(UserModel model)
+        public async Task<bool> LoginAsync(UserModel model)
         {
-            UserModel existingUser = await Get();
+            UserModel existingUser = await GetAsync();
 
             if (string.IsNullOrEmpty(existingUser.Username))
             {
@@ -61,7 +61,7 @@ namespace VNDBUpdater.Services.User
 
         private async Task<bool> CreateNewUser(UserModel model)
         {
-            await Update(model);
+            await UpdateAsync(model);
             await _VNDBConnection.Reconnect();
 
             return _VNDBConnection.LoggedIn;
@@ -74,7 +74,7 @@ namespace VNDBUpdater.Services.User
                 await _VNDBConnection.Reconnect();
             }
 
-            await Update(model);
+            await UpdateAsync(model);
 
             return _VNDBConnection.LoggedIn;
         }
@@ -84,7 +84,7 @@ namespace VNDBUpdater.Services.User
             await _RedisConnection.Reset();
             _RedisConnection.Reconnect();
 
-            await Update(model);
+            await UpdateAsync(model);
             await _VNDBConnection.Reconnect();
 
             return _VNDBConnection.LoggedIn;

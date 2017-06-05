@@ -25,15 +25,15 @@ namespace VNDBUpdater.GUI.ViewModels.MainView
         private UserModel _User;
         private SynchronizationContext _Context = SynchronizationContext.Current;
 
-        private IDialogCoordinator _DialogCoordinator;
-        private IVNService _VNService;
-        private IUserService _UserService;
-        private IFilterService _FilterService;
-        private IDialogService _DialogService;
+        private readonly IDialogCoordinator _DialogCoordinator;
+        private readonly IVNService _VNService;
+        private readonly IUserService _UserService;
+        private readonly IFilterService _FilterService;
+        private readonly IDialogService _DialogService;
 
         private Dictionary<VisualNovelModel.VisualNovelCatergory, AsyncObservableCollection<VisualNovelModel>> _TabMapper;
 
-        private Dictionary<SortingMethod, string> _SortToPropertyMapper = new Dictionary<SortingMethod, string>()
+        private readonly Dictionary<SortingMethod, string> _SortToPropertyMapper = new Dictionary<SortingMethod, string>
         {
             { SortingMethod.Playtime, "PlayTime" },
             { SortingMethod.Title, "Basics.Title" },
@@ -42,34 +42,34 @@ namespace VNDBUpdater.GUI.ViewModels.MainView
             { SortingMethod.Rating, "Basics.Rating" },
         };
 
-        private Dictionary<VisualNovelModel.VisualNovelCatergory, string> _CategoryToPropertyMapper = new Dictionary<VisualNovelModel.VisualNovelCatergory, string>()
+        private readonly Dictionary<VisualNovelModel.VisualNovelCatergory, string> _CategoryToPropertyMapper = new Dictionary<VisualNovelModel.VisualNovelCatergory, string>
         {
-            { VisualNovelModel.VisualNovelCatergory.Unknown, "VisualNovelsInUnknownGroup" },
-            { VisualNovelModel.VisualNovelCatergory.Dropped, "VisualNovelsInDroppedGroup" },
-            { VisualNovelModel.VisualNovelCatergory.Finished, "VisualNovelsInFinishedGroup" },
-            { VisualNovelModel.VisualNovelCatergory.Stalled, "VisualNovelsInStalledGroup" },
-            { VisualNovelModel.VisualNovelCatergory.Playing, "VisualNovelsInPlayingGroup" },
+            { VisualNovelModel.VisualNovelCatergory.Unknown, nameof(VisualNovelsInUnknownGroup) },
+            { VisualNovelModel.VisualNovelCatergory.Dropped, nameof(VisualNovelsInDroppedGroup) },
+            { VisualNovelModel.VisualNovelCatergory.Finished, nameof(VisualNovelsInFinishedGroup) },
+            { VisualNovelModel.VisualNovelCatergory.Stalled, nameof(VisualNovelsInStalledGroup) },
+            { VisualNovelModel.VisualNovelCatergory.Playing, nameof(VisualNovelsInPlayingGroup) },
         };
 
         public enum SortingMethod
         {
-            [Description("Playtime")]
+            [Description(nameof(Playtime))]
             Playtime = 0,
-            [Description("Title")]
+            [Description(nameof(Title))]
             Title,
             [Description("Release Date")]
             Release,
-            [Description("Rating")]
+            [Description(nameof(Rating))]
             Rating,
-            [Description("Popularity")]
+            [Description(nameof(Popularity))]
             Popularity,
         };
 
         public enum SortingDirection
         {
-            [Description("Ascending")]
+            [Description(nameof(Ascending))]
             Ascending = 0,
-            [Description("Descending")]
+            [Description(nameof(Descending))]
             Descending,
         }
 
@@ -89,19 +89,19 @@ namespace VNDBUpdater.GUI.ViewModels.MainView
             _VNService.OnAdded += OnVisualNovelAdded;
             _VNService.OnUpdated += OnVisualNovelUpdated;
             _VNService.OnDeleted += OnVisualNovelDeleted;
-            _VNService.OnRefreshed += OnAllVisualNovelsRefreshed;
+            _VNService.OnRefreshed += OnAllVisualNovelsRefreshedAsync;
 
             _UserService.OnUpdated += OnUserUpdated;
 
             _FilterService.OnApplied += OnFilterApplied;
-            _FilterService.OnReset += OnAllVisualNovelsRefreshed;
+            _FilterService.OnReset += OnAllVisualNovelsRefreshedAsync;
 
-            Task.Factory.StartNew(async () => await Initialize());
+            Task.Factory.StartNew(async () => await InitializeAsync());
         }
 
-        private async Task Initialize()
+        private async Task InitializeAsync()
         {
-            OnUserUpdated(this, await _UserService.Get());
+            OnUserUpdated(this, await _UserService.GetAsync());
 
             _VisualNovels = new AsyncObservableCollection<VisualNovelModel>(await _VNService.GetLocal(), _Context);
             _VisualNovels.CollectionChanged += OnCollectionChanged;
@@ -142,7 +142,7 @@ namespace VNDBUpdater.GUI.ViewModels.MainView
             OnPropertyChanged(nameof(StackPanelDimension));
         }
 
-        private async void OnAllVisualNovelsRefreshed(object sender, EventArgs e)
+        private async void OnAllVisualNovelsRefreshedAsync(object sender, EventArgs e)
         {
             _VisualNovels = new AsyncObservableCollection<VisualNovelModel>(await _VNService.GetLocal(), _Context);
 
@@ -201,27 +201,27 @@ namespace VNDBUpdater.GUI.ViewModels.MainView
 
         public AsyncObservableCollection<VisualNovelModel> VisualNovelsInUnknownGroup
         {
-            get { return GetOrderedVisualNovels(VisualNovelModel.VisualNovelCatergory.Unknown); }
+            get { return GetOrderedAndFilteredVisualNovels(VisualNovelModel.VisualNovelCatergory.Unknown); }
         }
 
         public AsyncObservableCollection<VisualNovelModel> VisualNovelsInPlayingGroup
         {
-            get { return GetOrderedVisualNovels(VisualNovelModel.VisualNovelCatergory.Playing); }
+            get { return GetOrderedAndFilteredVisualNovels(VisualNovelModel.VisualNovelCatergory.Playing); }
         }
 
         public AsyncObservableCollection<VisualNovelModel> VisualNovelsInFinishedGroup
         {
-            get { return GetOrderedVisualNovels(VisualNovelModel.VisualNovelCatergory.Finished); }
+            get { return GetOrderedAndFilteredVisualNovels(VisualNovelModel.VisualNovelCatergory.Finished); }
         }
 
         public AsyncObservableCollection<VisualNovelModel> VisualNovelsInStalledGroup
         {
-            get { return GetOrderedVisualNovels(VisualNovelModel.VisualNovelCatergory.Stalled); }
+            get { return GetOrderedAndFilteredVisualNovels(VisualNovelModel.VisualNovelCatergory.Stalled); }
         }
 
         public AsyncObservableCollection<VisualNovelModel> VisualNovelsInDroppedGroup
         {
-            get { return GetOrderedVisualNovels(VisualNovelModel.VisualNovelCatergory.Dropped); }
+            get { return GetOrderedAndFilteredVisualNovels(VisualNovelModel.VisualNovelCatergory.Dropped); }
         }
 
         private VisualNovelModel _SelectedVisualNovel;
@@ -286,7 +286,7 @@ namespace VNDBUpdater.GUI.ViewModels.MainView
                 OnPropertyChanged(nameof(VisualNovelsInStalledGroup));
 
                 _User.GUI.SelectedSortingMethod = value.GetEnumValueFromDescription<SortingMethod>();
-                _UserService.Update(_User);
+                _UserService.UpdateAsync(_User);
             }
         }
 
@@ -302,7 +302,7 @@ namespace VNDBUpdater.GUI.ViewModels.MainView
             get { return _SelectedSortingDirection.GetAttributeOfType<DescriptionAttribute>().Description.ToString(); }
             set
             {
-                SortingDirection direction = value.GetEnumValueFromDescription<SortingDirection>();
+                var direction = value.GetEnumValueFromDescription<SortingDirection>();
 
                 _SelectedSortingDirection = direction;
 
@@ -314,26 +314,55 @@ namespace VNDBUpdater.GUI.ViewModels.MainView
                 OnPropertyChanged(nameof(VisualNovelsInStalledGroup));
 
                 _User.GUI.SelectedSortingDirection = direction;
-                _UserService.Update(_User);
+                _UserService.UpdateAsync(_User);
             }
         }
 
-        private AsyncObservableCollection<VisualNovelModel> GetOrderedVisualNovels(VisualNovelModel.VisualNovelCatergory category)
+        private string _SearchString;
+
+        public string SearchString
         {
-            if (_SelectedSortingDirection == SortingDirection.Ascending)
+            get { return _SearchString; }
+            set
             {
-                return new AsyncObservableCollection<VisualNovelModel>(_TabMapper[category]
-                    .OrderBy(x => x.FollowPropertyPath(_SortToPropertyMapper[_SelectedSortingMethod]).FollowPropertyPathAndGetValue(x, _SortToPropertyMapper[_SelectedSortingMethod]))
-                    .ThenBy(x => x.Basics.Title), 
-                    _Context);
+                _SearchString = value;
+
+                OnPropertyChanged(nameof(VisualNovelsInUnknownGroup));
+                OnPropertyChanged(nameof(VisualNovelsInDroppedGroup));
+                OnPropertyChanged(nameof(VisualNovelsInFinishedGroup));
+                OnPropertyChanged(nameof(VisualNovelsInPlayingGroup));
+                OnPropertyChanged(nameof(VisualNovelsInStalledGroup));
+            }
+        }
+
+        public string SelectedTab
+        {
+            set { SelectedVisualNovel = null; }
+        }
+
+        private AsyncObservableCollection<VisualNovelModel> GetOrderedAndFilteredVisualNovels(VisualNovelModel.VisualNovelCatergory category)
+        {
+            IEnumerable<VisualNovelModel> visualNovels;
+            IOrderedEnumerable<VisualNovelModel> orderedVisualNovels;
+
+            if (!string.IsNullOrEmpty(_SearchString))
+            {
+                visualNovels = _TabMapper[category].Where(x => x.Basics.Title.ToLower().Contains(_SearchString.ToLower()));
             }
             else
             {
-                return new AsyncObservableCollection<VisualNovelModel>(_TabMapper[category]
-                    .OrderByDescending(x => x.FollowPropertyPath(_SortToPropertyMapper[_SelectedSortingMethod]).FollowPropertyPathAndGetValue(x, _SortToPropertyMapper[_SelectedSortingMethod]))
-                    .ThenByDescending(x => x.Basics.Title), 
-                    _Context);
+                visualNovels = _TabMapper[category];
             }
+
+            orderedVisualNovels = _SelectedSortingDirection == SortingDirection.Ascending
+                    ? visualNovels
+                        .OrderBy(x => x.FollowPropertyPath(_SortToPropertyMapper[_SelectedSortingMethod]).FollowPropertyPathAndGetValue(x, _SortToPropertyMapper[_SelectedSortingMethod]))
+                        .ThenBy(x => x.Basics.Title)
+                    : visualNovels
+                        .OrderByDescending(x => x.FollowPropertyPath(_SortToPropertyMapper[_SelectedSortingMethod]).FollowPropertyPathAndGetValue(x, _SortToPropertyMapper[_SelectedSortingMethod]))
+                        .ThenByDescending(x => x.Basics.Title);
+
+            return new AsyncObservableCollection<VisualNovelModel>(orderedVisualNovels, _Context);
         }
 
         private void SetupVisualNovels()
@@ -464,7 +493,7 @@ namespace VNDBUpdater.GUI.ViewModels.MainView
                 return _SetScore ?? (_SetScore = new RelayCommand(
                      async x =>
                     {
-                        await _DialogCoordinator.ShowInputAsync(this, "Set Score", "Enter your score:").ContinueWith(async y => await ExecuteSetScore(y.Result));
+                        await _DialogCoordinator.ShowInputAsync(this, "Set Score", "Enter your score:").ContinueWith(async y => await ExecuteSetScoreAsync(y.Result));
                     },
                     x => _SelectedVisualNovel != null));
             }
@@ -477,7 +506,7 @@ namespace VNDBUpdater.GUI.ViewModels.MainView
             get
             {
                 return _SetCategory ??
-                    (_SetCategory = new RelayCommand(async (parameter) => await ExecuteSetCategory(parameter), x => _SelectedVisualNovel != null));
+                    (_SetCategory = new RelayCommand(async (parameter) => await ExecuteSetCategoryAsync(parameter), x => _SelectedVisualNovel != null));
             }
         }
 
@@ -503,7 +532,7 @@ namespace VNDBUpdater.GUI.ViewModels.MainView
             }
         }
 
-        private async Task ExecuteSetCategory(object parameter)
+        private async Task ExecuteSetCategoryAsync(object parameter)
         {
             await Task.Factory.StartNew(async () =>
             {
@@ -519,7 +548,7 @@ namespace VNDBUpdater.GUI.ViewModels.MainView
             });
         }
 
-        private async Task ExecuteSetScore(string score)
+        private async Task ExecuteSetScoreAsync(string score)
         {
             if (string.IsNullOrEmpty(score))
             {

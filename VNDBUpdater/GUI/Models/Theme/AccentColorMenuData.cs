@@ -24,7 +24,7 @@ namespace VNDBUpdater.GUI.Models.Theme
 
         private async Task Initialize()
         {
-            OnUserUpdated(this, await _UserService.Get());
+            OnUserUpdated(this, await _UserService.GetAsync());
         }
 
         private void OnUserUpdated(object sender, UserModel User)
@@ -57,7 +57,7 @@ namespace VNDBUpdater.GUI.Models.Theme
             _User.GUI.SelectedAppTheme = theme.Item1.Name;
             _User.GUI.SelectedAppAccent = accent.Name;
 
-            _UserService.Update(_User);
+            _UserService.UpdateAsync(_User);
         }
     }
 }

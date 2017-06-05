@@ -51,7 +51,7 @@ namespace VNDBUpdater.GUI.ViewModels
 
         private async Task Initialize()
         {
-            _User = await _UserService.Get();
+            _User = await _UserService.GetAsync();
 
             OnPropertyChanged(nameof(Folders));
             OnPropertyChanged(nameof(ExcludedFolders));
@@ -158,7 +158,7 @@ namespace VNDBUpdater.GUI.ViewModels
                     if (result >= 0)
                     {
                         _User.FileIndexerSetting.MinFolderLength = result;
-                        _UserService.Update(_User);
+                        _UserService.UpdateAsync(_User);
 
                         OnPropertyChanged(nameof(MinimalFolderLength));
                     }                        
@@ -178,7 +178,7 @@ namespace VNDBUpdater.GUI.ViewModels
                     if (result >= 0)
                     {
                         _User.FileIndexerSetting.MaxDeviation = result;
-                        _UserService.Update(_User);
+                        _UserService.UpdateAsync(_User);
 
                         OnPropertyChanged(nameof(MaxDeviation));
                     }                        
@@ -199,11 +199,11 @@ namespace VNDBUpdater.GUI.ViewModels
                         {
                             case ("FoldersToSearch"):
                                 _User.FileIndexerSetting.Folders.Add(_DialogService.GetPathToFolder());
-                                await _UserService.Update(_User);
+                                await _UserService.UpdateAsync(_User);
                                 break;
                             case ("Excluded"):
                                 _User.FileIndexerSetting.ExcludedFolders.Add(_DialogService.GetPathToFolder());
-                                await _UserService.Update(_User);
+                                await _UserService.UpdateAsync(_User);
                                 break;
                             default:
                                 await _DialogCoordinator.ShowInputAsync(this, "Select Exe", "Enter exe without extension.").ContinueWith(y => AddExe(y.Result));
@@ -219,7 +219,7 @@ namespace VNDBUpdater.GUI.ViewModels
             if (!string.IsNullOrEmpty(exe))
             {
                 _User.FileIndexerSetting.ExcludedExes.Add(exe);
-                await _UserService.Update(_User);
+                await _UserService.UpdateAsync(_User);
             }
         }
 
@@ -236,15 +236,15 @@ namespace VNDBUpdater.GUI.ViewModels
                         {
                             case ("FoldersToSearch"):
                                 _User.FileIndexerSetting.Folders.Remove(_SelectedItem);
-                                await _UserService.Update(_User);
+                                await _UserService.UpdateAsync(_User);
                                 break;
                             case ("Excluded"):
                                 _User.FileIndexerSetting.ExcludedFolders.Remove(_SelectedItem);
-                                await _UserService.Update(_User);
+                                await _UserService.UpdateAsync(_User);
                                 break;
                             default:
                                 _User.FileIndexerSetting.ExcludedExes.Remove(_SelectedItem);
-                                await _UserService.Update(_User);
+                                await _UserService.UpdateAsync(_User);
                                 break;
                         }
                         OnPropertyChanged("");
@@ -292,7 +292,7 @@ namespace VNDBUpdater.GUI.ViewModels
                     (_SetToDefaulSettings = new RelayCommand(async x =>
                     {
                         _User.FileIndexerSetting.SetDefault();
-                        await _UserService.Update(_User);
+                        await _UserService.UpdateAsync(_User);
 
                         OnPropertyChanged(nameof(ExcludedExeNames));
                         OnPropertyChanged(nameof(MinimalFolderLength));
@@ -332,7 +332,7 @@ namespace VNDBUpdater.GUI.ViewModels
                 if (!_User.FileIndexerSetting.ExcludedExes.Any(x => string.Equals(x, exe)))
                 {
                     _User.FileIndexerSetting.ExcludedExes.Insert(0, exe);
-                    await _UserService.Update(_User);
+                    await _UserService.UpdateAsync(_User);
 
                     OnPropertyChanged(nameof(ExcludedExeNames));
                 }

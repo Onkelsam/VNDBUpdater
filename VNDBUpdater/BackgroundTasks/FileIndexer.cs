@@ -30,7 +30,7 @@ namespace VNDBUpdater.BackgroundTasks
 
         private async Task Initialize()
         {
-            var user = await _UserService.Get();
+            var user = await _UserService.GetAsync();
 
             _Settings = user.FileIndexerSetting;
         }

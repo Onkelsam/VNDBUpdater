@@ -87,15 +87,17 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
                 <ComboBox ItemsSource="{Binding Path=SortingMethods}" SelectedItem="{Binding Path=SelectedSortingMethod}" Controls:TextBoxHelper.Watermark="Order By..." IsReadOnly="True" />
                 <ComboBox ItemsSource="{Binding Path=SortingDirections}" SelectedItem="{Binding Path=SelectedSortingDirection}" Controls:TextBoxHelper.Watermark="Set Order Direction..." Grid.Column="1" IsReadOnly="True"/>
+                <TextBox Controls:TextBoxHelper.Watermark="Search..." Grid.Column="2" Text="{Binding Path=SearchString, UpdateSourceTrigger=PropertyChanged}" />
             </Grid>
         </DataTemplate>
     </UserControl.Resources>
 
     <Grid>
-        <Controls:MetroAnimatedSingleRowTabControl>
+        <Controls:MetroAnimatedSingleRowTabControl SelectedItem="{Binding Path=SelectedTab, Mode=OneWayToSource}" >
             <TabItem Header="Unknown">
                 <Grid>
                     <Grid.RowDefinitions>

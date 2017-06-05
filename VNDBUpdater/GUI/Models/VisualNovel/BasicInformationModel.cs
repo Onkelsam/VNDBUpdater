@@ -29,7 +29,7 @@ namespace VNDBUpdater.GUI.Models.VisualNovel
             Tags = entity.Tags.Select(x => new TagModel(x)).ToList();
         }
 
-        public BasicInformationModel(VNInformation VNDBEntity, ITagService TagService, bool getScreenshots = true)
+        public BasicInformationModel(VNInformation VNDBEntity, ITagService TagService)
         {
             ID = VNDBEntity.id;
             Title = VNDBEntity.title;

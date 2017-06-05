@@ -30,7 +30,7 @@ namespace VNDBUpdater.Services.Tags
 
         public async Task Refresh()
         {
-            await base.Refresh(_TagsDownloadLink, _TagsZipFileName);
+            await base.RefreshAsync(_TagsDownloadLink, _TagsZipFileName);
 
             _Tags = new List<TagModel>();
 

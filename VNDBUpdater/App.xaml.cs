@@ -120,7 +120,7 @@ namespace VNDBUpdater
 
                 var userService = Container.Resolve<IUserService>();
 
-                var user = await userService.Get();
+                var user = await userService.GetAsync();
 
                 ThemeManager.ChangeAppStyle(Current, ThemeManager.GetAccent(user.GUI.SelectedAppAccent), ThemeManager.GetAppTheme(user.GUI.SelectedAppTheme));
 

@@ -4,7 +4,7 @@
         xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
         xmlns:local="clr-namespace:VNDBUpdater.GUI.ViewModels.MainView"
         xmlns:usercontrols="clr-namespace:VNDBUpdater.GUI.Controls"
-        xmlns:converters="clr-namespace:VNDBUpdater.GUI.Converters"
+        xmlns:converters="clr-namespace:VNDBUpdater.GUI.Behaviors"
         xmlns:tb="http://www.hardcodet.net/taskbar"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"

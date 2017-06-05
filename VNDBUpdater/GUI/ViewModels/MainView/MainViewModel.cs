@@ -48,7 +48,7 @@ namespace VNDBUpdater.GUI.ViewModels.MainView
 
         private async Task Initialize()
         {
-            OnUserUpdated(this, await _UserService.Get());
+            OnUserUpdated(this, await _UserService.GetAsync());
         }
 
         private void OnUserUpdated(object sender, UserModel User)
@@ -122,19 +122,19 @@ namespace VNDBUpdater.GUI.ViewModels.MainView
         public double Height
         {
             get { return _User.GUI.Height; }
-            set { _User.GUI.Height = value; _UserService.Update(_User); }
+            set { _User.GUI.Height = value; _UserService.UpdateAsync(_User); }
         }
 
         public double Width
         {
             get { return _User.GUI.Width; }
-            set { _User.GUI.Width = value; _UserService.Update(_User); }
+            set { _User.GUI.Width = value; _UserService.UpdateAsync(_User); }
         }
 
         public int ImageDimension
         {
             get { return _User.GUI.ImageDimension; }
-            set { _User.GUI.ImageDimension = value; _UserService.Update(_User); }
+            set { _User.GUI.ImageDimension = value; _UserService.UpdateAsync(_User); }
         }
 
         public bool NewVersionAvailable
@@ -252,7 +252,7 @@ namespace VNDBUpdater.GUI.ViewModels.MainView
             get
             {
                 return _SaveSettings ??
-                  (_SaveSettings = new RelayCommand(async x => await _UserService.Update(_User)));
+                  (_SaveSettings = new RelayCommand(async x => await _UserService.UpdateAsync(_User)));
             }
         }
 

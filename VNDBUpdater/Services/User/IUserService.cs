@@ -6,10 +6,10 @@ namespace VNDBUpdater.Services.User
 {
     public interface IUserService
     {
-        Task<UserModel> Get();
-        Task Update(UserModel model);
+        Task<UserModel> GetAsync();
+        Task UpdateAsync(UserModel model);
 
-        Task<bool> Login(UserModel model);
+        Task<bool> LoginAsync(UserModel model);
 
         event EventHandler<UserModel> OnUpdated;
         event EventHandler<UserModel> OnDeleted;

@@ -36,7 +36,7 @@ namespace VNDBUpdater.GUI.ViewModels.MainView
 
         private async Task Initialize()
         {
-            OnUserUpdated(this, await _UserService.Get());
+            OnUserUpdated(this, await _UserService.GetAsync());
         }
 
         private void OnUserUpdated(object sender, UserModel User)
@@ -48,7 +48,30 @@ namespace VNDBUpdater.GUI.ViewModels.MainView
 
         public List<CharacterInformationModel> Characters
         {
-            get { return _VisualNovelsGridModel.SelectedVisualNovel?.Characters != null ? _VisualNovelsGridModel.SelectedVisualNovel.Characters : new List<CharacterInformationModel>(); }
+            get
+            {
+                if (_VisualNovelsGridModel.SelectedVisualNovel?.Characters != null)
+                {
+                    if (_VisualNovelsGridModel.SelectedVisualNovel.Characters.Any())
+                    {
+                        SelectedCharacter = _VisualNovelsGridModel.SelectedVisualNovel.Characters.First();
+                    }
+                    else
+                    {
+                        _SelectedCharacter = null;
+                        ResetCharacter();
+                    }
+
+                    return _VisualNovelsGridModel.SelectedVisualNovel.Characters;
+                }
+                else
+                {
+                    _SelectedCharacter = null;
+                    ResetCharacter();
+
+                    return new List<CharacterInformationModel>();
+                }
+            }
         }
 
         public CharacterInformationModel SelectedCharacter
@@ -56,12 +79,12 @@ namespace VNDBUpdater.GUI.ViewModels.MainView
             get { return _SelectedCharacter; }
             set
             {
-                _SelectedCharacter = value;
+                if (value != null)
+                {
+                    _SelectedCharacter = value;
 
-                OnPropertyChanged(nameof(SelectedCharacter));
-                OnPropertyChanged(nameof(CharacterName));
-                OnPropertyChanged(nameof(Traits));
-                OnPropertyChanged(nameof(Description));
+                    ResetCharacter();
+                }
             }
         }
 
@@ -104,6 +127,14 @@ namespace VNDBUpdater.GUI.ViewModels.MainView
             return TraitsWithParent
                 .OrderBy(x => x.Key.Name)
                 .ToDictionary(x => x.Key, y => string.Join(", ", y.Value.OrderBy(z => z).ToList()));
+        }
+
+        private void ResetCharacter()
+        {
+            OnPropertyChanged(nameof(SelectedCharacter));
+            OnPropertyChanged(nameof(CharacterName));
+            OnPropertyChanged(nameof(Traits));
+            OnPropertyChanged(nameof(Description));
         }
 
         private void OnSelectedVisualNovelPropertyChanged(object sender, PropertyChangedEventArgs e)

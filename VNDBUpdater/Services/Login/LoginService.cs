@@ -23,11 +23,11 @@ namespace VNDBUpdater.Services.Login
 
         public async Task<bool> CheckLoginStatus()
         {
-            _User = await _UserService.Get();
+            _User = await _UserService.GetAsync();
 
             bool loginRequired = true;
 
-            if (!await _UserService.Login(_User))
+            if (!await _UserService.LoginAsync(_User))
             {
                 loginRequired = true;
             }
@@ -46,7 +46,7 @@ namespace VNDBUpdater.Services.Login
 
         public async Task<bool> Login(LoginDialogData loginData)
         {
-            _User = await _UserService.Get();
+            _User = await _UserService.GetAsync();
 
             if (loginData != null && !string.IsNullOrEmpty(loginData.Username) && !string.IsNullOrEmpty(loginData.Password))
             {
@@ -56,18 +56,18 @@ namespace VNDBUpdater.Services.Login
                 newUser.SaveLogin = loginData.ShouldRemember;
                 newUser.EncryptedPassword = ProtectedData.Protect(Encoding.UTF8.GetBytes(loginData.Password), null, DataProtectionScope.CurrentUser);
 
-                if (await _UserService.Login(newUser))
+                if (await _UserService.LoginAsync(newUser))
                 {
                     _User = newUser;
                     _StatusService.CurrentUser = _User.Username;
 
-                    await _UserService.Update(_User);
+                    await _UserService.UpdateAsync(_User);
 
                     return true;
                 }
                 else
                 {
-                    await _UserService.Update(_User);
+                    await _UserService.UpdateAsync(_User);
 
                     return false;
                 }

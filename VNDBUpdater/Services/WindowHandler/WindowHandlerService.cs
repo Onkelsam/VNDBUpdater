@@ -22,7 +22,7 @@ namespace VNDBUpdater.Services.WindowHandler
             _WindowCollection = new List<Window>();
 
             _UserService = UserService;
-            _User = Task.Run(() => _UserService.Get()).Result;
+            _User = Task.Run(() => _UserService.GetAsync()).Result;
 
             _UserService.OnUpdated += OnUserUpdated;
         }

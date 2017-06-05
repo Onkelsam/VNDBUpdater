@@ -197,6 +197,7 @@
     <Compile Include="Communication\VNDB\Interfaces\IVNDBSetter.cs" />
     <Compile Include="Communication\VNDB\VNDBGetter.cs" />
     <Compile Include="Communication\VNDB\VNDBSetter.cs" />
+    <Compile Include="GUI\Behaviors\ListBoxBehavior.cs" />
     <Compile Include="GUI\Controls\StatusBar.xaml.cs">
       <DependentUpon>StatusBar.xaml</DependentUpon>
     </Compile>
@@ -249,7 +250,7 @@
       <DependentUpon>SplashScreen.xaml</DependentUpon>
     </Compile>
     <Compile Include="GUI\Models\User\FileIndexerSettingsModel.cs" />
-    <Compile Include="GUI\Converters\HtmlRichtTextBoxBehavior.cs" />
+    <Compile Include="GUI\Behaviors\HtmlRichtTextBoxBehavior.cs" />
     <Compile Include="BackgroundTasks\VNIDsSplitter.cs" />
     <Compile Include="GUI\Models\VisualNovel\BasicInformationModel.cs" />
     <Compile Include="GUI\Models\VisualNovel\CharacterInformationModel.cs" />

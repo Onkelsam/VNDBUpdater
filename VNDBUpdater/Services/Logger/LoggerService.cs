@@ -11,7 +11,7 @@ namespace VNDBUpdater.Services.Logger
         private readonly string _LogPath = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location) + @"\Log.txt";
         private readonly int _MaxLogSize = 1000000;
 
-        private static object _Lock = new object();
+        private static readonly object _Lock = new object();
 
         public void Log(Exception ex, [CallerMemberName]string memberName = "")
         {
@@ -54,7 +54,6 @@ namespace VNDBUpdater.Services.Logger
                     sw.WriteLine(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff") + ": " + line + Environment.NewLine);
 
                     sw.Flush();
-                    sw.Close();
                 }
             }
         }

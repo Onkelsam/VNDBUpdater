@@ -45,8 +45,10 @@ namespace VNDBUpdater.Communication.VNDB
 
             foreach (var vn in result)
             {
-                var newVN = new VisualNovelModel();
-                newVN.Basics = new BasicInformationModel(vn, _TagService, false);
+                var newVN = new VisualNovelModel
+                {
+                    Basics = new BasicInformationModel(vn, _TagService)
+                };
 
                 models.Add(newVN);
             }
@@ -65,17 +67,19 @@ namespace VNDBUpdater.Communication.VNDB
 
             foreach (var id in IDs)
             {
-                VNInformation basic = basicInformation.Where(x => x.id == id).SingleOrDefault();
+                VNInformation basic = basicInformation.SingleOrDefault(x => x.id == id);
                 List<VNCharacterInformation> chars = charInformation.FindAll(x => x.vns.Any(y => y.Any(u => u.ToString() == id.ToString()))).ToList();
 
                 // Check if visual novel still exists.
                 if (basic != null)
-                {                    
-                    var newVN = new VisualNovelModel();
+                {
+                    var newVN = new VisualNovelModel
+                    {
 
-                    newVN.Basics = new BasicInformationModel(basic, _TagService);
+                        Basics = new BasicInformationModel(basic, _TagService),
 
-                    newVN.Characters = chars.Select(x => new CharacterInformationModel(x, _TraitService)).ToList();
+                        Characters = chars.Select(x => new CharacterInformationModel(x, _TraitService)).ToList()
+                    };
 
                     vns.Add(newVN);
                 }

@@ -8,7 +8,7 @@ namespace VNDBUpdater.Services
 {
     public abstract class TagsAndTraitsBase
     {
-        public virtual async Task Refresh(string downloadLink, string fileName)
+        public virtual async Task RefreshAsync(string downloadLink, string fileName)
         {
             using (var client = new WebClient())
             {
@@ -24,8 +24,8 @@ namespace VNDBUpdater.Services
         {
             using (var originalFile = file.OpenRead())
             {
-                string currentFileName = file.FullName;
-                string newFileName = currentFileName.Remove(currentFileName.Length - file.Extension.Length);
+                var currentFileName = file.FullName;
+                var newFileName = currentFileName.Remove(currentFileName.Length - file.Extension.Length);
 
                 using (var decompressedFileStream = File.Create(newFileName))
                 using (var decompressionStream = new GZipStream(originalFile, CompressionMode.Decompress))

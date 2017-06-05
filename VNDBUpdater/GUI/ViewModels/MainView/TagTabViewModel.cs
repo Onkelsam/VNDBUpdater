@@ -34,7 +34,7 @@ namespace VNDBUpdater.GUI.ViewModels.MainView
 
         private async Task Initialize()
         {
-            OnUserUpdated(this, await _UserService.Get());
+            OnUserUpdated(this, await _UserService.GetAsync());
         }
 
         private void OnUserUpdated(object sender, UserModel User)

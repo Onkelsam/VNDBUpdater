@@ -7,7 +7,7 @@ using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Markup;
 
-namespace VNDBUpdater.GUI.Converters
+namespace VNDBUpdater.GUI.Behaviors
 {
     public class HtmlRichTextBoxBehavior : DependencyObject
     {
