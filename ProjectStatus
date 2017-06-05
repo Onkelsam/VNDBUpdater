@@ -1,7 +1,6 @@
 Implementation planned (maybe):
   
   Minor tasks:
-    - Make character information scroll with the character image.
     - Add option to show images in a horizontal/vertical row.
     - Gallery mode for screenshots.
     - User option to set tags as favourite, so it brings them on the top of the list.
