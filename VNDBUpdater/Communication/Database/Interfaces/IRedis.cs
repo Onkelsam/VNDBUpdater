@@ -11,14 +11,14 @@ namespace VNDBUpdater.Communication.Database.Interfaces
         void Connect();
         void Reconnect();
         void Disconnect();
-        Task Reset();
+        Task ResetAsync();
         void Save();
         void CheckConnection();
 
-        Task<T> ReadEntity<T>(string key) where T : class;
-        Task WriteEntity<T>(string key, T entity) where T : class;
-        Task<bool> KeyExists(string key);
-        Task DeleteKey(string key);
-        Task<IList<string>> GetAllKeys(string pattern);        
+        Task<T> ReadAsync<T>(string key) where T : class;
+        Task WriteAsync<T>(string key, T entity) where T : class;
+        Task<bool> CheckIfKeyExistsAsync(string key);
+        Task DeleteKeyAsync(string key);
+        Task<IList<string>> GetAllKeysAsync(string pattern);        
     }
 }

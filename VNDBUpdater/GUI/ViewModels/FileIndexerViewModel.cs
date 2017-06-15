@@ -59,14 +59,14 @@ namespace VNDBUpdater.GUI.ViewModels
             OnPropertyChanged(nameof(MinimalFolderLength));
             OnPropertyChanged(nameof(MaxDeviation));
 
-            var vns = await _VNService.GetLocal();
+            var vns = await _VNService.GetLocalAsync();
 
             NonIndexedVisualNovels = new AsyncObservableCollection<VisualNovelModel>(vns.Where(x => string.IsNullOrEmpty(x.ExePath)).OrderBy(x => x.Basics.Title), _Context);
         }
 
         private void OnVisualNovelAdded(object sender, VisualNovelModel model)
         {
-            if (!_VNService.InstallationPathExists(model) && !NonIndexedVisualNovels.Any(x => x.Basics.ID == model.Basics.ID))
+            if (!_VNService.CheckIfInstallationPathExists(model) && !NonIndexedVisualNovels.Any(x => x.Basics.ID == model.Basics.ID))
             {
                 NonIndexedVisualNovels.Add(model);
             }
@@ -82,11 +82,11 @@ namespace VNDBUpdater.GUI.ViewModels
 
         private void OnVisualNovelUpdated(object sender, VisualNovelModel model)
         {
-            if (_VNService.InstallationPathExists(model) && NonIndexedVisualNovels.Any(x => x.Basics.ID == model.Basics.ID))
+            if (_VNService.CheckIfInstallationPathExists(model) && NonIndexedVisualNovels.Any(x => x.Basics.ID == model.Basics.ID))
             {
                 NonIndexedVisualNovels.Remove(model);
             }
-            else if (!_VNService.InstallationPathExists(model) && !NonIndexedVisualNovels.Any(x => x.Basics.ID == model.Basics.ID))
+            else if (!_VNService.CheckIfInstallationPathExists(model) && !NonIndexedVisualNovels.Any(x => x.Basics.ID == model.Basics.ID))
             {
                 NonIndexedVisualNovels.Add(model);
             }
@@ -94,7 +94,7 @@ namespace VNDBUpdater.GUI.ViewModels
 
         private async void OnVisualNovelsRefreshed(object sender, EventArgs e)
         {
-            var vns = await _VNService.GetLocal();
+            var vns = await _VNService.GetLocalAsync();
 
             NonIndexedVisualNovels = new AsyncObservableCollection<VisualNovelModel>(vns.Where(x => string.IsNullOrEmpty(x.ExePath)).OrderBy(x => x.Basics.Title), _Context);
         }
@@ -262,7 +262,7 @@ namespace VNDBUpdater.GUI.ViewModels
                     (_StartIndexing = new RelayCommand(async x =>
                     {
                         IBackgroundTask task = _BackgroundTaskFactory.CreateFileIndexerTask();
-                        await task.ExecuteTask((successfull) => {; });
+                        await task.ExecuteTaskAsync((successfull) => {; });
                     }, x => !_StatusService.TaskIsRunning));                    
             }
         }
@@ -276,7 +276,7 @@ namespace VNDBUpdater.GUI.ViewModels
                 return _SetExePath ??
                     (_SetExePath = new RelayCommand(async x => 
                     {
-                        await _VNService.SetExePath(_SelectedVisualNovel, _DialogService.GetPathToExecuteable());
+                        await _VNService.SetExePathAsync(_SelectedVisualNovel, _DialogService.GetPathToExecuteable());
                         NonIndexedVisualNovels.Remove(_SelectedVisualNovel);
                     }, x => _SelectedVisualNovel != null));
             }
@@ -312,7 +312,7 @@ namespace VNDBUpdater.GUI.ViewModels
                     {
                         var vnsToReset = new List<VisualNovelModel>();
 
-                        foreach (var vn in await _VNService.GetLocal())
+                        foreach (var vn in await _VNService.GetLocalAsync())
                         {
                             vn.ExePath = string.Empty;
                             vn.FolderPath = string.Empty;
@@ -320,7 +320,7 @@ namespace VNDBUpdater.GUI.ViewModels
                             vnsToReset.Add(vn);
                         }
 
-                        await _VNService.Add(vnsToReset);
+                        await _VNService.AddAsync(vnsToReset);
                     }));
             }
         }

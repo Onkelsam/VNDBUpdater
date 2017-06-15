@@ -33,96 +33,96 @@ namespace VNDBUpdater.Services.VN
             _VNDBGetter = VNDBGetter;
         }
 
-        public async Task Add(VisualNovelModel model)
+        public async Task AddAsync(VisualNovelModel model)
         {
-            if (!await _VNRepository.VisualNovelExists(model.Basics.ID))
+            if (!await _VNRepository.CheckIfVisualNovelExistsAsync(model.Basics.ID))
             {
-                await _VNRepository.Add(model);
+                await _VNRepository.AddAsync(model);
 
                 OnAdded?.Invoke(this, model);
             }
         }
 
-        public async Task Add(IList<VisualNovelModel> models)
+        public async Task AddAsync(IList<VisualNovelModel> models)
         {
             foreach (var model in models)
             {
-                await _VNRepository.Add(model);
+                await _VNRepository.AddAsync(model);
             }
 
             OnRefreshed?.Invoke(this, null);
         }
 
-        public async Task<IList<VisualNovelModel>> GetLocal()
+        public async Task<IList<VisualNovelModel>> GetLocalAsync()
         {
-            return await _VNRepository.Get();
+            return await _VNRepository.GetAsync();
         }
 
-        public async Task<VisualNovelModel> GetLocal(int ID)
+        public async Task<VisualNovelModel> GetLocalAsync(int ID)
         {
-            return await _VNRepository.Get(ID);
+            return await _VNRepository.GetAsync(ID);
         }
 
-        public async Task<IList<VisualNovelModel>> Get(string title)
+        public async Task<IList<VisualNovelModel>> GetAsync(string title)
         {
-            return await _VNDBGetter.Get(title);
+            return await _VNDBGetter.GetAsync(title);
         }
 
-        public async Task<IList<VisualNovelModel>> Get(List<int> IDs)
+        public async Task<IList<VisualNovelModel>> GetAsync(List<int> IDs)
         {
-            return await _VNDBGetter.Get(IDs);
+            return await _VNDBGetter.GetAsync(IDs);
         }
 
-        public async Task<VisualNovelModel> Get(int ID)
+        public async Task<VisualNovelModel> GetAsync(int ID)
         {
-            return await _VNDBGetter.Get(ID);
+            return await _VNDBGetter.GetAsync(ID);
         }
 
-        public async Task<IList<Communication.VNDB.Entities.VN>> GetVNList()
+        public async Task<IList<Communication.VNDB.Entities.VN>> GetVNListAsync()
         {
-            return await _VNDBGetter.GetVNList();
+            return await _VNDBGetter.GetVNListAsync();
         }
 
-        public async Task<IList<Communication.VNDB.Entities.Vote>> GetVoteList()
+        public async Task<IList<Communication.VNDB.Entities.Vote>> GetVoteListAsync()
         {
-            return await _VNDBGetter.GetVoteList();
+            return await _VNDBGetter.GetVoteListAsync();
         }
 
-        public async Task SetVNList(VisualNovelModel model)
+        public async Task SetVNListAsync(VisualNovelModel model)
         {
-            await _VNDBSetter.AddToVNList(model);
+            await _VNDBSetter.AddToVNListAsync(model);
         }
 
-        public async Task<bool> VNExists(int ID)
+        public async Task<bool> CheckIfVNExistsAsync(int ID)
         {
-            return await _VNRepository.VisualNovelExists(ID);
+            return await _VNRepository.CheckIfVisualNovelExistsAsync(ID);
         }
 
-        public async Task Delete(VisualNovelModel model)
+        public async Task DeleteAsync(VisualNovelModel model)
         {
-            await _VNRepository.Delete(model.Basics.ID);
-            await _VNDBSetter.RemoveFromVNList(model);
-            await _VNDBSetter.RemoveFromScoreList(model);
+            await _VNRepository.DeleteAsync(model.Basics.ID);
+            await _VNDBSetter.RemoveFromVNListAsync(model);
+            await _VNDBSetter.RemoveFromScoreListAsync(model);
 
             OnDeleted?.Invoke(this, model);
         }
 
-        public async Task DeleteLocal(VisualNovelModel model)
+        public async Task DeleteLocalAsync(VisualNovelModel model)
         {
-            await _VNRepository.Delete(model.Basics.ID);
+            await _VNRepository.DeleteAsync(model.Basics.ID);
 
             OnDeleted?.Invoke(this, model);
         }
 
-        public async Task CreateWalkthrough(VisualNovelModel model)
+        public async Task CreateWalkthroughAsync(VisualNovelModel model)
         {
-            if (InstallationPathExists(model) && !WalkthroughAvailable(model))
+            if (CheckIfInstallationPathExists(model) && !CheckIfWalkthroughExists(model))
             {
                 CreateFile(model.FolderPath + _WalkthroughFileName);
 
                 OpenWalkthrough(model);
 
-                await _VNRepository.Add(model);
+                await _VNRepository.AddAsync(model);
             }
         }
 
@@ -136,7 +136,7 @@ namespace VNDBUpdater.Services.VN
 
         public void OpenFolder(VisualNovelModel model)
         {
-            if (InstallationPathExists(model))
+            if (CheckIfInstallationPathExists(model))
             {
                 Process.Start(model.FolderPath);
             }
@@ -144,7 +144,7 @@ namespace VNDBUpdater.Services.VN
 
         public void OpenWalkthrough(VisualNovelModel model)
         {
-            if (WalkthroughAvailable(model))
+            if (CheckIfWalkthroughExists(model))
             {
                 Process.Start(model.FolderPath + _WalkthroughFileName);
             }
@@ -162,17 +162,17 @@ namespace VNDBUpdater.Services.VN
             }
         }
 
-        public async Task SetCategory(VisualNovelModel model, VisualNovelModel.VisualNovelCatergory category)
+        public async Task SetCategoryAsync(VisualNovelModel model, VisualNovelModel.VisualNovelCatergory category)
         {
             model.Category = category;
 
-            await _VNRepository.Add(model);
-            await _VNDBSetter.AddToVNList(model);
+            await _VNRepository.AddAsync(model);
+            await _VNDBSetter.AddToVNListAsync(model);
 
             OnUpdated?.Invoke(this, model);
         }
 
-        public async Task SetExePath(VisualNovelModel model, string path)
+        public async Task SetExePathAsync(VisualNovelModel model, string path)
         {
             if (!string.IsNullOrEmpty(path))
             {
@@ -187,11 +187,11 @@ namespace VNDBUpdater.Services.VN
                     model.FolderPath = model.ExePath;
                 }
 
-                await _VNRepository.Add(model);
+                await _VNRepository.AddAsync(model);
             }
         }
 
-        public async Task SetScore(VisualNovelModel model, int score)
+        public async Task SetScoreAsync(VisualNovelModel model, int score)
         {
             if (score < 0 || score > 100)
             {
@@ -202,41 +202,41 @@ namespace VNDBUpdater.Services.VN
 
             if (model.Score == 0)
             {
-                await _VNDBSetter.RemoveFromScoreList(model);
+                await _VNDBSetter.RemoveFromScoreListAsync(model);
             }
             else
             {
-                await _VNDBSetter.AddToScoreList(model);
+                await _VNDBSetter.AddToScoreListAsync(model);
             }
 
-            await _VNRepository.Add(model);
+            await _VNRepository.AddAsync(model);
         }
 
         public void Start(VisualNovelModel model)
         {
-            if (InstallationPathExists(model))
+            if (CheckIfInstallationPathExists(model))
             {
                 Process.Start(model.ExePath);
             }
         }
 
-        public async Task AddToPlayTime(VisualNovelModel model, TimeSpan timeToAdd)
+        public async Task AddToPlayTimeAsync(VisualNovelModel model, TimeSpan timeToAdd)
         {
             model.PlayTime += timeToAdd;
 
-            await _VNRepository.Add(model);
+            await _VNRepository.AddAsync(model);
 
             OnUpdated?.Invoke(this, model);
         }
 
-        public async Task Update(VisualNovelModel model)
+        public async Task UpdateAsync(VisualNovelModel model)
         {
-            VisualNovelModel updatedVisualNovel = await _VNDBGetter.Get(model.Basics.ID);
+            VisualNovelModel updatedVisualNovel = await _VNDBGetter.GetAsync(model.Basics.ID);
 
             model.Basics = updatedVisualNovel.Basics;
             model.Characters = updatedVisualNovel.Characters;
 
-            await _VNRepository.Add(model);
+            await _VNRepository.AddAsync(model);
 
             OnUpdated?.Invoke(this, model);
         }
@@ -251,17 +251,17 @@ namespace VNDBUpdater.Services.VN
             Process.Start(_VNDBVNLink + model.Basics.Relations.First(x => x.Title == relationTitle).ID);
         }
 
-        public bool InstallationPathExists(VisualNovelModel model)
+        public bool CheckIfInstallationPathExists(VisualNovelModel model)
         {
             return !string.IsNullOrEmpty(model.ExePath) ? File.Exists(model.ExePath) : false;
         }
 
-        public bool WalkthroughAvailable(VisualNovelModel model)
+        public bool CheckIfWalkthroughExists(VisualNovelModel model)
         {
             return !string.IsNullOrEmpty(model.FolderPath) ? File.Exists(model.FolderPath + _WalkthroughFileName) : false;
         }
 
-        public async Task DownloadImages(VisualNovelModel model)
+        public async Task DownloadImagesAsync(VisualNovelModel model)
         {            
             var newScreenshots = new List<ScreenshotModel>(model.Basics.Screenshots);
             var newCharimages = new List<ScreenshotModel>(model.Characters.Select(x => x.Image));
@@ -270,19 +270,19 @@ namespace VNDBUpdater.Services.VN
 
             foreach (var screenshot in newScreenshots)
             {
-                model.Basics.Screenshots.Add(await UpdateImages(screenshot, model.Basics.ID, "Screenshots"));
+                model.Basics.Screenshots.Add(await UpdateImagesAsync(screenshot, model.Basics.ID, "Screenshots"));
             }
             foreach (var character in model.Characters)
             {
-                character.Image = await UpdateImages(character.Image, model.Basics.ID, "CharacterImages");
+                character.Image = await UpdateImagesAsync(character.Image, model.Basics.ID, "CharacterImages");
             }
 
-            await _VNRepository.Add(model);
+            await _VNRepository.AddAsync(model);
 
             OnUpdated?.Invoke(this, model);
         }
 
-        private async Task<ScreenshotModel> UpdateImages(ScreenshotModel screenshot, int visualNovelId, string path)
+        private async Task<ScreenshotModel> UpdateImagesAsync(ScreenshotModel screenshot, int visualNovelId, string path)
         {
             string ImageFolder = @"Resources\" + path;
             string CurrentFolder = AppDomain.CurrentDomain.BaseDirectory;

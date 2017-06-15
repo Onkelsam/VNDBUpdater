@@ -8,6 +8,6 @@ namespace VNDBUpdater.Services
     {
         IList<T> Get();
         bool Show(SpoilerSetting UserSetting, SpoilerLevel TSpoiler);
-        Task Refresh();
+        Task RefreshAsync();
     }
 }

@@ -29,7 +29,7 @@ namespace VNDBUpdater.Services.Traits
             return _Traits;
         }
 
-        public async Task Refresh()
+        public async Task RefreshAsync()
         {
             await base.RefreshAsync(_TraitsDownloadLink, _TraitsZipFileName);
 

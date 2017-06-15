@@ -16,24 +16,24 @@ namespace VNDBUpdater.Communication.VNDB
             _VNDBService = VNDBService;
         }
 
-        public async Task AddToScoreList(VisualNovelModel model)
+        public async Task AddToScoreListAsync(VisualNovelModel model)
         {
-            await SetList<SetJSONObjects.Vote>(model, new SetJSONObjects.Vote { vote = model.Score }, _VNDBService.SetVote);
+            await SetList<SetJSONObjects.Vote>(model, new SetJSONObjects.Vote { vote = model.Score }, _VNDBService.SetVoteAsync);
         }
 
-        public async Task AddToVNList(VisualNovelModel model)
+        public async Task AddToVNListAsync(VisualNovelModel model)
         {
-            await SetList<SetJSONObjects.State>(model, new SetJSONObjects.State() { status = (int)model.Category }, _VNDBService.SetVNList);
+            await SetList<SetJSONObjects.State>(model, new SetJSONObjects.State() { status = (int)model.Category }, _VNDBService.SetVNListAsync);
         }
 
-        public async Task RemoveFromScoreList(VisualNovelModel model)
+        public async Task RemoveFromScoreListAsync(VisualNovelModel model)
         {
-            await RemoveFromList(model, _VNDBService.DeleteVote);
+            await RemoveFromList(model, _VNDBService.DeleteVoteAsync);
         }
 
-        public async Task RemoveFromVNList(VisualNovelModel model)
+        public async Task RemoveFromVNListAsync(VisualNovelModel model)
         {
-            await RemoveFromList(model, _VNDBService.DeleteVNFromVNList);
+            await RemoveFromList(model, _VNDBService.DeleteVNFromVNListAsync);
         }
 
         private async Task SetList<T>(VisualNovelModel VN, T setObject, Func<int, T, Task<VndbResponse>> SetQuery)

@@ -20,7 +20,7 @@ namespace VNDBUpdater.BackgroundTasks
             _VNService = VNService;
         }
 
-        public override async Task ExecuteTask(Action<bool> OnTaskCompleted)
+        public override async Task ExecuteTaskAsync(Action<bool> OnTaskCompleted)
         {
             _OnTaskCompleted = OnTaskCompleted;
 
@@ -29,8 +29,8 @@ namespace VNDBUpdater.BackgroundTasks
 
         private async Task Synchronize()
         {
-            var VNList = new List<VN>(await _VNService.GetVNList());
-            var VoteList = new List<Vote>(await _VNService.GetVoteList());
+            var VNList = new List<VN>(await _VNService.GetVNListAsync());
+            var VoteList = new List<Vote>(await _VNService.GetVoteListAsync());
 
             _TasksToDo = VNList.Count + VoteList.Count;
 
@@ -46,14 +46,14 @@ namespace VNDBUpdater.BackgroundTasks
 
             foreach (var vn in VNsToSynchronize)
             {
-                if (await _VNService.VNExists(vn.vn))
+                if (await _VNService.CheckIfVNExistsAsync(vn.vn))
                 {
-                    VisualNovelModel LocalVN = await _VNService.GetLocal(vn.vn);
+                    VisualNovelModel LocalVN = await _VNService.GetLocalAsync(vn.vn);
 
                     if (LocalVN.Category != (VisualNovelModel.VisualNovelCatergory)vn.status)
                     {
                         LocalVN.Category = (VisualNovelModel.VisualNovelCatergory)vn.status;
-                        await _VNService.Add(LocalVN);
+                        await _VNService.AddAsync(LocalVN);
                     }
 
                     UpdateProgess(1, "Visual Novels have been synchronized...");
@@ -74,11 +74,11 @@ namespace VNDBUpdater.BackgroundTasks
 
         private async Task DeleteLocalVNs(List<VN> VNsSynchronized)
         {
-            foreach (var localVN in await _VNService.GetLocal())
+            foreach (var localVN in await _VNService.GetLocalAsync())
             {
                 if (!VNsSynchronized.Any(x => x.vn == localVN.Basics.ID))
                 {
-                    await _VNService.DeleteLocal(localVN);
+                    await _VNService.DeleteLocalAsync(localVN);
                 }
             }
         }
@@ -87,14 +87,14 @@ namespace VNDBUpdater.BackgroundTasks
         {
             foreach (var vote in VotesToSynchronize)
             {
-                if (await _VNService.VNExists(vote.vn))
+                if (await _VNService.CheckIfVNExistsAsync(vote.vn))
                 {
-                    VisualNovelModel LocalVN = await _VNService.GetLocal(vote.vn);
+                    VisualNovelModel LocalVN = await _VNService.GetLocalAsync(vote.vn);
 
                     if (LocalVN.Score != vote.vote)
                     {
                         LocalVN.Score = vote.vote;
-                        await _VNService.Add(LocalVN);
+                        await _VNService.AddAsync(LocalVN);
                     }
                 }
             }
@@ -126,12 +126,12 @@ namespace VNDBUpdater.BackgroundTasks
 
         private async Task AddVNs(int[] ids, List<VN> VNs)
         {
-            var newVisualNovels = new List<VisualNovelModel>(await _VNService.Get(ids.ToList()));
+            var newVisualNovels = new List<VisualNovelModel>(await _VNService.GetAsync(ids.ToList()));
 
             newVisualNovels.ForEach(x => x.Category = (VisualNovelModel.VisualNovelCatergory)VNs.First(y => y.vn == x.Basics.ID).status);
             newVisualNovels.ForEach(x => x.Score = 0);
 
-            await _VNService.Add(newVisualNovels);
+            await _VNService.AddAsync(newVisualNovels);
 
             UpdateProgess(ids.Length, " Visual Novels have been synchronized...");
         }

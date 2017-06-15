@@ -75,6 +75,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_2EF5FA1FEAF24C199F73BFE0BAB7715D"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_37D9E3F6C56006077FF814D48DDFF393"
         "OwnerKey" = "8:_0A24BA2BE22D40FCADF58F62DC4C1230"
         "MsmSig" = "8:_UNDEFINED"
@@ -197,6 +203,12 @@
         {
         "MsmKey" = "8:_68CCFF381BF7A6D0933473089307B746"
         "OwnerKey" = "8:_4EA161B836CF63A31B0CA98EB7B3EC6A"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_6DA4D8357D996F3231B9CBF131B66C3A"
+        "OwnerKey" = "8:_0A24BA2BE22D40FCADF58F62DC4C1230"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -412,7 +424,7 @@
         "Entry"
         {
         "MsmKey" = "8:_C1B25DE56C2640D9C035B3DF9AE68DED"
-        "OwnerKey" = "8:_F4393E71B2F94E35EDBB0946EDEC1B04"
+        "OwnerKey" = "8:_6DA4D8357D996F3231B9CBF131B66C3A"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -508,7 +520,7 @@
         "Entry"
         {
         "MsmKey" = "8:_EE04F77B0D422CE1BDA056432449B40B"
-        "OwnerKey" = "8:_F4393E71B2F94E35EDBB0946EDEC1B04"
+        "OwnerKey" = "8:_6DA4D8357D996F3231B9CBF131B66C3A"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -520,12 +532,6 @@
         "Entry"
         {
         "MsmKey" = "8:_EFB63165FD353E42C606DCAA68CB8A55"
-        "OwnerKey" = "8:_0A24BA2BE22D40FCADF58F62DC4C1230"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_F4393E71B2F94E35EDBB0946EDEC1B04"
         "OwnerKey" = "8:_0A24BA2BE22D40FCADF58F62DC4C1230"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -557,6 +563,12 @@
         {
         "MsmKey" = "8:_UNDEFINED"
         "OwnerKey" = "8:_0A24BA2BE22D40FCADF58F62DC4C1230"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_6DA4D8357D996F3231B9CBF131B66C3A"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -611,12 +623,6 @@
         {
         "MsmKey" = "8:_UNDEFINED"
         "OwnerKey" = "8:_ED4962DC760CE4E95FA00A08A2995DF7"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_F4393E71B2F94E35EDBB0946EDEC1B04"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -1261,6 +1267,26 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_2EF5FA1FEAF24C199F73BFE0BAB7715D"
+            {
+            "SourcePath" = "8:..\\VNDBUpdater\\Resources\\NoImage.png"
+            "TargetName" = "8:NoImage.png"
+            "Tag" = "8:"
+            "Folder" = "8:_B14CA04B690F45BF994642E32D74AC3E"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_37D9E3F6C56006077FF814D48DDFF393"
             {
             "AssemblyRegister" = "3:1"
@@ -1743,6 +1769,37 @@
             "PackageAs" = "3:1"
             "Register" = "3:1"
             "Exclude" = "11:TRUE"
+            "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_6DA4D8357D996F3231B9CBF131B66C3A"
+            {
+            "AssemblyRegister" = "3:1"
+            "AssemblyIsInGAC" = "11:FALSE"
+            "AssemblyAsmDisplayName" = "8:CommunicationLib, Version=1.0.6375.26432, Culture=neutral, processorArchitecture=MSIL"
+                "ScatterAssemblies"
+                {
+                    "_6DA4D8357D996F3231B9CBF131B66C3A"
+                    {
+                    "Name" = "8:CommunicationLib.dll"
+                    "Attributes" = "3:512"
+                    }
+                }
+            "SourcePath" = "8:CommunicationLib.dll"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_A54D6D2092E74C098F4843EB575A6FE3"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
@@ -2995,37 +3052,6 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_F4393E71B2F94E35EDBB0946EDEC1B04"
-            {
-            "AssemblyRegister" = "3:1"
-            "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:CommunicationLib, Version=1.0.6330.1651, Culture=neutral, processorArchitecture=MSIL"
-                "ScatterAssemblies"
-                {
-                    "_F4393E71B2F94E35EDBB0946EDEC1B04"
-                    {
-                    "Name" = "8:CommunicationLib.dll"
-                    "Attributes" = "3:512"
-                    }
-                }
-            "SourcePath" = "8:CommunicationLib.dll"
-            "TargetName" = "8:"
-            "Tag" = "8:"
-            "Folder" = "8:_A54D6D2092E74C098F4843EB575A6FE3"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:TRUE"
-            "IsolateTo" = "8:"
-            }
             "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_FDBF54A925181D8534B436CCAE263708"
             {
             "AssemblyRegister" = "3:1"
@@ -3229,7 +3255,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:VNDBUpdaterInstall"
         "ProductCode" = "8:{877BC4A8-DF19-43C2-8550-DB9B6DFD6176}"
-        "PackageCode" = "8:{7689CB2B-1B68-44F9-B06D-032773C73404}"
+        "PackageCode" = "8:{D744FDB5-5B28-4DA0-92DB-71BAB84B86CA}"
         "UpgradeCode" = "8:{FCDAE49C-5B16-4876-929B-761EE174D519}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"

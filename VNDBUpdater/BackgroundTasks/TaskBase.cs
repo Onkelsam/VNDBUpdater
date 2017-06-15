@@ -42,7 +42,7 @@ namespace VNDBUpdater.BackgroundTasks
             set { _StatusService.CurrentTask = value; }
         }
 
-        public abstract Task ExecuteTask(Action<bool> OnTaskCompleted);
+        public abstract Task ExecuteTaskAsync(Action<bool> OnTaskCompleted);
 
         protected async Task Start(Func<Task> TaskToExecute)
         {

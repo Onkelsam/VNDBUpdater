@@ -7,8 +7,8 @@ namespace VNDBUpdater.Communication.VNDB.Interfaces
 {
     public interface IVNDB : IDisposable
     {
-        Task Connect();
-        Task Reconnect();
+        Task ConnectAsync();
+        Task ReconnectAsync();
 
         bool LoggedIn { get; }
         bool Error { get; }
@@ -17,16 +17,16 @@ namespace VNDBUpdater.Communication.VNDB.Interfaces
 
         ErrorResponse HandleError(VndbResponse response);
 
-        Task<VndbResponse> SetVNList(int ID, SetJSONObjects.State state);
-        Task<VndbResponse> SetVote(int ID, SetJSONObjects.Vote vote);
-        Task<VndbResponse> DeleteVote(int ID);
-        Task<VndbResponse> DeleteVNFromVNList(int ID);
-        Task<VndbResponse> QueryCharacterInformation(int[] IDs, int page);
-        Task<VndbResponse> QueryCharacterInformation(int ID);
-        Task<VndbResponse> QueryInformation(int ID);
-        Task<VndbResponse> SearchByTitle(string title, int page);
-        Task<VndbResponse> QueryInformation(int[] IDs);
-        Task<VndbResponse> QueryVNList(int page = 1);
-        Task<VndbResponse> QueryVoteList(int page = 1);
+        Task<VndbResponse> SetVNListAsync(int ID, SetJSONObjects.State state);
+        Task<VndbResponse> SetVoteAsync(int ID, SetJSONObjects.Vote vote);
+        Task<VndbResponse> DeleteVoteAsync(int ID);
+        Task<VndbResponse> DeleteVNFromVNListAsync(int ID);
+        Task<VndbResponse> QueryCharacterInformationAsync(int[] IDs, int page);
+        Task<VndbResponse> QueryCharacterInformationAsync(int ID);
+        Task<VndbResponse> QueryInformationAsync(int ID);
+        Task<VndbResponse> SearchByTitleAsync(string title, int page);
+        Task<VndbResponse> QueryInformationAsync(int[] IDs);
+        Task<VndbResponse> QueryVNListAsync(int page = 1);
+        Task<VndbResponse> QueryVoteListAsync(int page = 1);
     }
 }

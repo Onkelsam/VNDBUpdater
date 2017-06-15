@@ -41,8 +41,9 @@
                 <Setter Property="IsReadOnly" Value="True" />
                 <Setter Property="AutoGenerateColumns" Value="False" />
             </Style>
-            
+
             <BooleanToVisibilityConverter x:Key="Bool2Vis" />
+            <BitmapImage x:Key="DefaultImage" UriSource="pack://siteoforigin:,,,/../Resources/NoImage.png" />
         </ResourceDictionary>
 
     </Application.Resources>

@@ -25,7 +25,7 @@ namespace VNDBUpdater.Communication.VNDB
             _TraitService = TraitService;
         }
 
-        public async Task<VisualNovelModel> Get(int ID)
+        public async Task<VisualNovelModel> GetAsync(int ID)
         {
             var visualNovel = new VisualNovelModel();
 
@@ -38,7 +38,7 @@ namespace VNDBUpdater.Communication.VNDB
             return visualNovel;
         }
 
-        public async Task<IList<VisualNovelModel>> Get(string title)
+        public async Task<IList<VisualNovelModel>> GetAsync(string title)
         {
             List<VNInformation> result = await GetBasicInformation(title);
             var models = new List<VisualNovelModel>();
@@ -56,7 +56,7 @@ namespace VNDBUpdater.Communication.VNDB
             return models;
         }
 
-        public async Task<IList<VisualNovelModel>> Get(List<int> IDs)
+        public async Task<IList<VisualNovelModel>> GetAsync(List<int> IDs)
         {
             var vns = new List<VisualNovelModel>();
 
@@ -110,7 +110,7 @@ namespace VNDBUpdater.Communication.VNDB
 
         private async Task<VNInformationRoot> QueryBasicInformation(string title, int page)
         {
-            VndbResponse result = await _VNDBService.SearchByTitle(title, page);
+            VndbResponse result = await _VNDBService.SearchByTitleAsync(title, page);
 
             if (result.ResponseType == VndbResponseType.Error)
             {
@@ -131,7 +131,7 @@ namespace VNDBUpdater.Communication.VNDB
 
         private async Task<VNInformationRoot> GetBasicInformation(int ID)
         {
-            VndbResponse result = await _VNDBService.QueryInformation(ID);
+            VndbResponse result = await _VNDBService.QueryInformationAsync(ID);
 
             if (result.ResponseType == VndbResponseType.Error)
             {
@@ -152,7 +152,7 @@ namespace VNDBUpdater.Communication.VNDB
 
         private async Task<VNInformationRoot> GetBasicInformation(List<int> IDs)
         {
-            VndbResponse result = await _VNDBService.QueryInformation(IDs.ToArray());
+            VndbResponse result = await _VNDBService.QueryInformationAsync(IDs.ToArray());
 
             if (result.ResponseType == VndbResponseType.Error)
             {
@@ -173,7 +173,7 @@ namespace VNDBUpdater.Communication.VNDB
 
         private async Task<List<VNCharacterInformation>> GetCharInfo(int ID)
         {
-            VndbResponse result = await _VNDBService.QueryCharacterInformation(ID);
+            VndbResponse result = await _VNDBService.QueryCharacterInformationAsync(ID);
 
             if (result.ResponseType == VndbResponseType.Error)
             {
@@ -201,7 +201,7 @@ namespace VNDBUpdater.Communication.VNDB
 
             do
             {
-                var result = await QueryChar(_VNDBService.QueryCharacterInformation, page, IDs.ToArray());
+                var result = await QueryChar(_VNDBService.QueryCharacterInformationAsync, page, IDs.ToArray());
 
                 convertedResult = JsonConvert.DeserializeObject<VNCharacterInformationRoot>(result.Payload);
 
@@ -234,14 +234,14 @@ namespace VNDBUpdater.Communication.VNDB
             }                
         }
 
-        public async Task<IList<VN>> GetVNList()
+        public async Task<IList<VN>> GetVNListAsync()
         {
-            return await GetList<VN, VNListRoot>(_VNDBService.QueryVNList);
+            return await GetList<VN, VNListRoot>(_VNDBService.QueryVNListAsync);
         }
 
-        public async Task<IList<Vote>> GetVoteList()
+        public async Task<IList<Vote>> GetVoteListAsync()
         {
-            return await GetList<Vote, VoteListRoot>(_VNDBService.QueryVoteList);
+            return await GetList<Vote, VoteListRoot>(_VNDBService.QueryVoteListAsync);
         }
 
         private async Task<List<T>> GetList<T, U>(Func<int, Task<VndbResponse>> Query) where U : GetTemplate<T>

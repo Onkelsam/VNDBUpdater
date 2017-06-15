@@ -5,9 +5,9 @@ namespace VNDBUpdater.Communication.Database.Interfaces
 {
     public interface IRepository<T>
     {
-        Task Add(T entity);
-        Task<IList<T>> Get();
-        Task<T> Get(int ID);
-        Task Delete(int ID);
+        Task AddAsync(T entity);
+        Task<IList<T>> GetAsync();
+        Task<T> GetAsync(int ID);
+        Task DeleteAsync(int ID);
     }
 }

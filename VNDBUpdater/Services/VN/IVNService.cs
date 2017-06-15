@@ -7,24 +7,24 @@ namespace VNDBUpdater.Services.VN
 {
     public interface IVNService : IServiceBase<VisualNovelModel>
     {
-        Task<IList<VisualNovelModel>> GetLocal();
-        Task<IList<VisualNovelModel>> Get(string title);
-        Task<IList<VisualNovelModel>> Get(List<int> IDs);
-        Task<VisualNovelModel> Get(int ID);
-        Task<VisualNovelModel> GetLocal(int ID);
+        Task<IList<VisualNovelModel>> GetLocalAsync();
+        Task<IList<VisualNovelModel>> GetAsync(string title);
+        Task<IList<VisualNovelModel>> GetAsync(List<int> IDs);
+        Task<VisualNovelModel> GetAsync(int ID);
+        Task<VisualNovelModel> GetLocalAsync(int ID);
 
-        Task<IList<Communication.VNDB.Entities.VN>> GetVNList();
-        Task<IList<Communication.VNDB.Entities.Vote>> GetVoteList();
-        Task SetVNList(VisualNovelModel model);
+        Task<IList<Communication.VNDB.Entities.VN>> GetVNListAsync();
+        Task<IList<Communication.VNDB.Entities.Vote>> GetVoteListAsync();
+        Task SetVNListAsync(VisualNovelModel model);
 
-        Task<bool> VNExists(int ID);
+        Task<bool> CheckIfVNExistsAsync(int ID);
 
-        Task Add(VisualNovelModel model);
-        Task Add(IList<VisualNovelModel> models);
-        Task Delete(VisualNovelModel model);
-        Task DeleteLocal(VisualNovelModel model);
+        Task AddAsync(VisualNovelModel model);
+        Task AddAsync(IList<VisualNovelModel> models);
+        Task DeleteAsync(VisualNovelModel model);
+        Task DeleteLocalAsync(VisualNovelModel model);
 
-        Task Update(VisualNovelModel model);
+        Task UpdateAsync(VisualNovelModel model);
 
         void Start(VisualNovelModel model);
         void OpenFolder(VisualNovelModel model);
@@ -32,14 +32,14 @@ namespace VNDBUpdater.Services.VN
         void ViewRelationOnVNDB(VisualNovelModel model, string relationTitle);
         void SearchOnGoggle(VisualNovelModel model, string searchParam);
         void OpenWalkthrough(VisualNovelModel model);
-        Task CreateWalkthrough(VisualNovelModel model);
-        Task SetCategory(VisualNovelModel model, VisualNovelModel.VisualNovelCatergory category);
-        Task SetScore(VisualNovelModel model, int score);
-        Task SetExePath(VisualNovelModel model, string path);
-        bool InstallationPathExists(VisualNovelModel model);
-        bool WalkthroughAvailable(VisualNovelModel model);
-        Task DownloadImages(VisualNovelModel model);
-        Task AddToPlayTime(VisualNovelModel model, TimeSpan timeToAdd);
+        Task CreateWalkthroughAsync(VisualNovelModel model);
+        Task SetCategoryAsync(VisualNovelModel model, VisualNovelModel.VisualNovelCatergory category);
+        Task SetScoreAsync(VisualNovelModel model, int score);
+        Task SetExePathAsync(VisualNovelModel model, string path);
+        bool CheckIfInstallationPathExists(VisualNovelModel model);
+        bool CheckIfWalkthroughExists(VisualNovelModel model);
+        Task DownloadImagesAsync(VisualNovelModel model);
+        Task AddToPlayTimeAsync(VisualNovelModel model, TimeSpan timeToAdd);
 
         event EventHandler OnRefreshed;
     }

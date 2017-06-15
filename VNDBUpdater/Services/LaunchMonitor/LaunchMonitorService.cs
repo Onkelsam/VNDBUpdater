@@ -63,7 +63,7 @@ namespace VNDBUpdater.Services.LaunchMonitor
                     return;
                 }
 
-                IList<VisualNovelModel> localVNs = await _VNService.GetLocal();
+                IList<VisualNovelModel> localVNs = await _VNService.GetLocalAsync();
 
                 if (localVNs.Where(x => !string.IsNullOrEmpty(x.FolderPath)).Any(x => string.Equals(x.FolderPath, path, StringComparison.OrdinalIgnoreCase)))
                 {
@@ -88,7 +88,7 @@ namespace VNDBUpdater.Services.LaunchMonitor
         {
             _Logger.Log("Launched vn: " + _LaunchedVisualNovel.Basics.Title + " Playtime: " + _LaunchedVisualNovel.PlayTime.ToString());
 
-            _VNService.AddToPlayTime(_LaunchedVisualNovel, DateTime.Now - (sender as Process).StartTime);
+            _VNService.AddToPlayTimeAsync(_LaunchedVisualNovel, DateTime.Now - (sender as Process).StartTime);
         }
 
         protected virtual void Dispose(bool disposing)

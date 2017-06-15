@@ -5,9 +5,9 @@ namespace VNDBUpdater.Communication.VNDB.Interfaces
 {
     public interface IVNDBSetter
     {
-        Task AddToVNList(VisualNovelModel model);
-        Task AddToScoreList(VisualNovelModel model);
-        Task RemoveFromVNList(VisualNovelModel model);
-        Task RemoveFromScoreList(VisualNovelModel model);
+        Task AddToVNListAsync(VisualNovelModel model);
+        Task AddToScoreListAsync(VisualNovelModel model);
+        Task RemoveFromVNListAsync(VisualNovelModel model);
+        Task RemoveFromScoreListAsync(VisualNovelModel model);
     }
 }

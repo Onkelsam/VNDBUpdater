@@ -69,7 +69,7 @@ namespace VNDBUpdater.GUI.ViewModels.MainView
                     _SelectedCharacter = null;
                     ResetCharacter();
 
-                    return new List<CharacterInformationModel>();
+                    return null;
                 }
             }
         }

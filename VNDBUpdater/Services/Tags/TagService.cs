@@ -28,7 +28,7 @@ namespace VNDBUpdater.Services.Tags
             return _Tags;
         }
 
-        public async Task Refresh()
+        public async Task RefreshAsync()
         {
             await base.RefreshAsync(_TagsDownloadLink, _TagsZipFileName);
 

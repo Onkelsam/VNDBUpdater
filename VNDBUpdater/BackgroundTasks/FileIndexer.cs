@@ -35,7 +35,7 @@ namespace VNDBUpdater.BackgroundTasks
             _Settings = user.FileIndexerSetting;
         }
 
-        public override async Task ExecuteTask(Action<bool> OnTaskCompleted)
+        public override async Task ExecuteTaskAsync(Action<bool> OnTaskCompleted)
         {
             _OnTaskCompleted = OnTaskCompleted;
 
@@ -50,7 +50,7 @@ namespace VNDBUpdater.BackgroundTasks
             int successfull = 0;
             var indexedVNs = new List<VisualNovelModel>();
 
-            IEnumerable<VisualNovelModel> localVNs = await _VNService.GetLocal();
+            IEnumerable<VisualNovelModel> localVNs = await _VNService.GetLocalAsync();
 
             _TasksToDo = localVNs.Count(x => string.IsNullOrEmpty(x.ExePath));
             _IndexedVisualNovels = localVNs.Where(x => !string.IsNullOrEmpty(x.ExePath)).OrderBy(x => x.Basics.Title).ToList();
@@ -75,7 +75,7 @@ namespace VNDBUpdater.BackgroundTasks
                 UpdateProgess(1, "Visual Novels have been indexed...");
             }
 
-            await _VNService.Add(indexedVNs);
+            await _VNService.AddAsync(indexedVNs);
         }
 
         private async Task<bool> UseIdenticalMatch(VisualNovelModel vn, List<DirectoryInfo> folders)
@@ -117,7 +117,7 @@ namespace VNDBUpdater.BackgroundTasks
             }
             else
             {
-                await _VNService.SetExePath(vn, executeable);
+                await _VNService.SetExePathAsync(vn, executeable);
                 _IndexedVisualNovels.Add(vn);
 
                 return true;

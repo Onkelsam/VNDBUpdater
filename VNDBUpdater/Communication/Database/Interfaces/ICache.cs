@@ -6,10 +6,10 @@ namespace VNDBUpdater.Communication.Database.Interfaces
 {
     public interface ICache
     {
-        Task<T> Get<T>(string key, Func<Task<T>> itemCallback) where T : class;
-        Task<IList<T>> GetList<T>(string key, Func<Task<IList<T>>> itemCallback) where T : class;
+        Task<T> GetAsync<T>(string key, Func<Task<T>> itemCallback) where T : class;
+        Task<IList<T>> GetAsync<T>(string key, Func<Task<IList<T>>> itemCallback) where T : class;
 
-        Task Set<T>(string key, T item);
-        Task SetList<T>(string key, IList<T> items);
+        Task SetAsync<T>(string key, T item);
+        Task SetAsync<T>(string key, IList<T> items);
     }
 }

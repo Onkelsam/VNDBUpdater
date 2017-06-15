@@ -19,7 +19,7 @@ namespace VNDBUpdater.BackgroundTasks
             _TraitService = TraitService;
         }
 
-        public override async Task ExecuteTask(Action<bool> OnTaskCompleted)
+        public override async Task ExecuteTaskAsync(Action<bool> OnTaskCompleted)
         {
             _OnTaskCompleted = OnTaskCompleted;
 
@@ -30,11 +30,11 @@ namespace VNDBUpdater.BackgroundTasks
         {
             PercentageCompleted = 0;
 
-            await _TagService.Refresh();
+            await _TagService.RefreshAsync();
 
             PercentageCompleted = 40;
 
-            await _TraitService.Refresh();
+            await _TraitService.RefreshAsync();
 
             PercentageCompleted = 100;
         }

@@ -21,7 +21,7 @@ namespace VNDBUpdater.Services.Login
             _StatusService = StatusService;
         }
 
-        public async Task<bool> CheckLoginStatus()
+        public async Task<bool> GetIsLoggedInAsync()
         {
             _User = await _UserService.GetAsync();
 
@@ -44,7 +44,7 @@ namespace VNDBUpdater.Services.Login
             return loginRequired;
         }
 
-        public async Task<bool> Login(LoginDialogData loginData)
+        public async Task<bool> LoginAsync(LoginDialogData loginData)
         {
             _User = await _UserService.GetAsync();
 

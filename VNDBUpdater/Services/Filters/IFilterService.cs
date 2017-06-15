@@ -8,14 +8,14 @@ namespace VNDBUpdater.Services.Filters
 {
     public interface IFilterService : IServiceBase<FilterModel>
     {
-        Task<IList<FilterModel>> Get();
-        Task<FilterModel> Get(string name);
-        Task Add(FilterModel model);
-        Task Delete(FilterModel model);
+        Task<IList<FilterModel>> GetAsync();
+        Task<FilterModel> GetAsync(string name);
+        Task AddAsync(FilterModel model);
+        Task DeleteAsync(FilterModel model);
 
         void AddTagToFilter(FilterModel model, BooleanOperations operation, TagModel tag);
         void RemoveTagFromFilter(FilterModel model, string tagname);
-        bool VNShouldBeFilteredOut(FilterModel model, VisualNovelModel vn);
+        bool VNShouldBeFilteredOut(Dictionary<BooleanOperations, List<TagModel>> filter, List<int> tagIDs);
 
         void ApplyFilter(FilterModel model);
         void ResetFilters();

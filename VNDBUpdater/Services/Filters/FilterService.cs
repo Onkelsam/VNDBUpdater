@@ -4,12 +4,13 @@ using System.Linq;
 using System.Threading.Tasks;
 using VNDBUpdater.Communication.Database.Interfaces;
 using VNDBUpdater.GUI.Models.VisualNovel;
+using static VNDBUpdater.GUI.Models.VisualNovel.FilterModel;
 
 namespace VNDBUpdater.Services.Filters
 {
     public class FilterService : IFilterService
     {
-        private IFilterRepository _FilterRepository;
+        private readonly IFilterRepository _FilterRepository;
 
         public event EventHandler<FilterModel> OnAdded = delegate { };
         public event EventHandler<FilterModel> OnUpdated = delegate { };
@@ -22,9 +23,9 @@ namespace VNDBUpdater.Services.Filters
             _FilterRepository = filterRepository;
         }
 
-        public async Task Add(FilterModel model)
+        public async Task AddAsync(FilterModel model)
         {
-            await _FilterRepository.Add(model);
+            await _FilterRepository.AddAsync(model);
 
             OnAdded?.Invoke(this, model);
         }
@@ -42,21 +43,21 @@ namespace VNDBUpdater.Services.Filters
             model.FilterParameter[operation].Add(tag);
         }
 
-        public async Task Delete(FilterModel model)
+        public async Task DeleteAsync(FilterModel model)
         {
-            await _FilterRepository.Delete(model.Name);
+            await _FilterRepository.DeleteAsync(model.Name);
 
             OnDeleted?.Invoke(this, model);
         }
 
-        public async Task<IList<FilterModel>> Get()
+        public async Task<IList<FilterModel>> GetAsync()
         {
-            return await _FilterRepository.Get();
+            return await _FilterRepository.GetAsync();
         }
 
-        public async Task<FilterModel> Get(string name)
+        public async Task<FilterModel> GetAsync(string name)
         {
-            return await _FilterRepository.Get(name);
+            return await _FilterRepository.GetAsync(name);
         }
 
         public void RemoveTagFromFilter(FilterModel model, string tagname)
@@ -70,29 +71,39 @@ namespace VNDBUpdater.Services.Filters
             }
         }
 
-        public bool VNShouldBeFilteredOut(FilterModel model, VisualNovelModel vn)
+        public bool VNShouldBeFilteredOut(Dictionary<BooleanOperations, List<TagModel>> filter, List<int> tagIDs)
         {
-            bool containsNOTTags = vn.Basics.Tags.Any(x => model.FilterParameter[FilterModel.BooleanOperations.NOT].Any(y => y.ID == x.ID));
+            var containsNOTTags = filter.ContainsKey(BooleanOperations.NOT) 
+                ? tagIDs.Any(x => filter[BooleanOperations.NOT].Any(y => y.ID == x)) 
+                : false;
 
             if (containsNOTTags)
             {
                 return true;
             }
 
-            bool containsORTags = vn.Basics.Tags.Any(x => model.FilterParameter[FilterModel.BooleanOperations.OR].Any(y => y.ID == x.ID));
+            var containsORTags = filter.ContainsKey(BooleanOperations.OR)
+                ? tagIDs.Any(x => filter[BooleanOperations.OR].Any(y => y.ID == x))
+                : false;
 
             if (containsORTags)
             {
                 return false;
             }
 
-            if (model.FilterParameter[FilterModel.BooleanOperations.AND].Any())
+            if (filter.ContainsKey(BooleanOperations.AND))
             {
-                bool containsAllANDTags = model.FilterParameter[FilterModel.BooleanOperations.AND].Select(x => x.ID).Intersect(vn.Basics.Tags.Select(x => x.ID)).Count() == model.FilterParameter[FilterModel.BooleanOperations.AND].Count;
-
-                if (containsAllANDTags)
+                if (filter[BooleanOperations.AND].Any())
                 {
-                    return false;
+                    var containsAllANDTags = filter[BooleanOperations.AND]
+                        .Select(x => x.ID)
+                        .Intersect(tagIDs.Select(x => x))
+                        .Count() == filter[BooleanOperations.AND].Count;
+
+                    if (containsAllANDTags)
+                    {
+                        return false;
+                    }
                 }
             }
 

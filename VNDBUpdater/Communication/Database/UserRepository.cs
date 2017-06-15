@@ -18,31 +18,31 @@ namespace VNDBUpdater.Communication.Database
             _RedisService = redisService;
         }
 
-        public async Task Add(UserModel model)
+        public async Task AddAsync(UserModel model)
         {
-            await _RedisService.WriteEntity(_UserKey, new UserEntity(model));
+            await _RedisService.WriteAsync(_UserKey, new UserEntity(model));
         }
 
-        public async Task Delete(int ID)
+        public async Task DeleteAsync(int ID)
         {
-            await _RedisService.DeleteKey(_UserKey + ID);
+            await _RedisService.DeleteKeyAsync(_UserKey + ID);
         }
 
-        public async Task<IList<UserModel>> Get()
+        public async Task<IList<UserModel>> GetAsync()
         {
             var users = new List<UserEntity>();
 
-            foreach (var user in await _RedisService.GetAllKeys(_UserKey))
+            foreach (var user in await _RedisService.GetAllKeysAsync(_UserKey))
             {
-                users.Add(await _RedisService.ReadEntity<UserEntity>(user));
+                users.Add(await _RedisService.ReadAsync<UserEntity>(user));
             }
 
             return users.Select(x => new UserModel(x)).ToList();
         }
 
-        public async Task<UserModel> Get(int ID)
+        public async Task<UserModel> GetAsync(int ID)
         {
-            var entity = await _RedisService.ReadEntity<UserEntity>(_UserKey);
+            var entity = await _RedisService.ReadAsync<UserEntity>(_UserKey);
 
             return entity == null 
                 ? new UserModel() 

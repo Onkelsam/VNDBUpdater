@@ -34,6 +34,8 @@ namespace VNDBUpdater
     /// </summary>
     public partial class App : Application
     {
+        // TODO:    Sometimes setting the category doesn't work. Reproduction not possible yet.
+        // TODO:    Revert loading of images/character to old method. Was much faster and less 'laggy'.
         private static IUnityContainer Container = new UnityContainer();
 
         protected override void OnStartup(StartupEventArgs e)

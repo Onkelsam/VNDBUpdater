@@ -55,7 +55,7 @@ namespace VNDBUpdater.GUI.ViewModels.MainView
                     }
                 }
 
-                return new List<ScreenshotModel>();
+                return null;
             }
         }
 
@@ -92,7 +92,7 @@ namespace VNDBUpdater.GUI.ViewModels.MainView
                 {
                     if (_VisualNovelsGridModel.SelectedVisualNovel.Basics.Screenshots.Any(x => x.Path.Contains("https://")))
                     {
-                        Task.Factory.StartNew(async () => await _VNService.DownloadImages(_VisualNovelsGridModel.SelectedVisualNovel));
+                        Task.Factory.StartNew(async () => await _VNService.DownloadImagesAsync(_VisualNovelsGridModel.SelectedVisualNovel));
                     }
                     else
                     {

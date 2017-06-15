@@ -55,7 +55,7 @@ namespace VNDBUpdater.GUI.ViewModels.MainView
         private async Task Initialize()
         {
             OnUserUpdated(this, await _UserService.GetAsync());
-            _AvailableFilters = new ObservableCollection<FilterModel>(await _FilterService.Get());            
+            _AvailableFilters = new ObservableCollection<FilterModel>(await _FilterService.GetAsync());            
         }
 
         private void OnUserUpdated(object sender, UserModel User)
@@ -169,7 +169,7 @@ namespace VNDBUpdater.GUI.ViewModels.MainView
             get
             {
                 return _DeleteFilter ??
-                    (_DeleteFilter = new RelayCommand(async (parameter) => { await _FilterService.Delete(parameter as FilterModel); }));
+                    (_DeleteFilter = new RelayCommand(async (parameter) => { await _FilterService.DeleteAsync(parameter as FilterModel); }));
             }
         }
 
@@ -194,7 +194,7 @@ namespace VNDBUpdater.GUI.ViewModels.MainView
                     (_RefreshVisualNovels = new RelayCommand(async x =>
                     {
                         _CurrentTask = _BackgroundTaskFactory.CreateRefresherTask();
-                        await _CurrentTask.ExecuteTask((successfull) => { });
+                        await _CurrentTask.ExecuteTaskAsync((successfull) => { });
                     }, x => !_StatusService.TaskIsRunning));
             }
         }
@@ -209,7 +209,7 @@ namespace VNDBUpdater.GUI.ViewModels.MainView
                     (_SynchronizeWithVNDB = new RelayCommand(async x =>
                     {
                         _CurrentTask = _BackgroundTaskFactory.CreateSynchronizerTask();
-                        await _CurrentTask.ExecuteTask((successfull) => { });
+                        await _CurrentTask.ExecuteTaskAsync((successfull) => { });
                     }, x => !_StatusService.TaskIsRunning));
             }
         }

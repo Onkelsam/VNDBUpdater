@@ -44,7 +44,7 @@
                         <Grid.RowDefinitions>
                             <RowDefinition Height="{Binding ElementName=CharacterList, Path=ActualHeight}"/>
                         </Grid.RowDefinitions>
-                        <Image Source="{Binding Path=Image.Path, IsAsync=True}" 
+                        <Image Source="{Binding Path=Image.Path, IsAsync=True, TargetNullValue={StaticResource DefaultImage}}" 
                                    Stretch="Uniform">
                             <Image.ToolTip>
                                 <Image Source="{Binding Path=Image.Path, IsAsync=False}" Stretch="Uniform"/>

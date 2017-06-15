@@ -8,7 +8,7 @@ namespace VNDBUpdater.Communication.Database.Caching
 {
     public class CachingLayer : ICache
     {
-        public async Task<T> Get<T>(string key, Func<Task<T>> itemCallback)
+        public async Task<T> GetAsync<T>(string key, Func<Task<T>> itemCallback)
             where T : class
         {
             T item = MemoryCache.Default.Get(key) as T;
@@ -22,7 +22,7 @@ namespace VNDBUpdater.Communication.Database.Caching
             return item;
         }
 
-        public async Task<IList<T>> GetList<T>(string key, Func<Task<IList<T>>> itemCallback)
+        public async Task<IList<T>> GetAsync<T>(string key, Func<Task<IList<T>>> itemCallback)
             where T : class
         {
             IList<T> items = MemoryCache.Default.Get(key) as IList<T>;
@@ -36,7 +36,7 @@ namespace VNDBUpdater.Communication.Database.Caching
             return items;
         }
 
-        public async Task Set<T> (string key, T item)
+        public async Task SetAsync<T> (string key, T item)
         {
             await Task.Run(() =>
             {
@@ -44,7 +44,7 @@ namespace VNDBUpdater.Communication.Database.Caching
             });          
         }
 
-        public async Task SetList<T>(string key, IList<T> items)
+        public async Task SetAsync<T>(string key, IList<T> items)
         {
             await Task.Run(() =>
             {

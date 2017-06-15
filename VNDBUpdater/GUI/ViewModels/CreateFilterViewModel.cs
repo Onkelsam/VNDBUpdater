@@ -34,7 +34,7 @@ namespace VNDBUpdater.GUI.ViewModels
         private async Task Initialize()
         {
             _Filter = new FilterModel();
-            _ExistingFilters = await _FilterService.Get();
+            _ExistingFilters = await _FilterService.GetAsync();
 
             _Tags = _TagService.Get().Select(x => x).OrderBy(x => x.Name).ToList();
 
@@ -130,7 +130,7 @@ namespace VNDBUpdater.GUI.ViewModels
             {
                 return _Save ??
                     (_Save = new RelayCommand(async
-                        x => { _Filter.Name = _FilterName; await _FilterService.Add(_Filter); _ExistingFilters.Add(_Filter); Clear.Execute(null); },
+                        x => { _Filter.Name = _FilterName; await _FilterService.AddAsync(_Filter); _ExistingFilters.Add(_Filter); Clear.Execute(null); },
                         x =>
                         {
                             bool allEmpty = true;

@@ -5,8 +5,8 @@ namespace VNDBUpdater.Services.Login
 {
     public interface ILoginService
     {
-        Task<bool> CheckLoginStatus();
+        Task<bool> GetIsLoggedInAsync();
 
-        Task<bool> Login(LoginDialogData loginData);
+        Task<bool> LoginAsync(LoginDialogData loginData);
     }
 }

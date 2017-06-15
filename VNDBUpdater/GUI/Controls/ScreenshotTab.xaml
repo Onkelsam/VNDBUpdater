@@ -8,6 +8,7 @@
              xmlns:local="clr-namespace:VNDBUpdater.GUI.Controls"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
+    
     <Grid>
         <ListView ItemsSource="{Binding Path=Screenshots}" 
                   x:Name="ScreenshotList"
@@ -40,8 +41,7 @@
                         <Grid.RowDefinitions>
                             <RowDefinition Height="{Binding ElementName=ScreenshotList, Path=ActualHeight}"/>
                         </Grid.RowDefinitions>
-                        <Image Source="{Binding Path=Path, IsAsync=True}" 
-                               Stretch="Uniform">
+                        <Image Source="{Binding Path=Path, IsAsync=True}" Stretch="Uniform">
                             <Image.ToolTip>
                                 <Image Source="{Binding Path=Path, IsAsync=True}" 
                                        Stretch="Uniform" 

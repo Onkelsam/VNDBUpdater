@@ -14,6 +14,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommunicationLib", "Communi
 EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "VNDBUpdaterInstall", "VNDBUpdaterInstall\VNDBUpdaterInstall.vdproj", "{0F6B8F2E-5963-4044-B832-EAD4E7B4A5F0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VNDBUpdater.Test", "VNDBUpdater.Test\VNDBUpdater.Test.csproj", "{CE6BC5E6-047A-4C93-A4AB-1493AA7C2FED}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -44,6 +46,14 @@ Global
 		{0F6B8F2E-5963-4044-B832-EAD4E7B4A5F0}.Release|Any CPU.ActiveCfg = Release
 		{0F6B8F2E-5963-4044-B832-EAD4E7B4A5F0}.Release|x64.ActiveCfg = Release
 		{0F6B8F2E-5963-4044-B832-EAD4E7B4A5F0}.Release|x64.Build.0 = Release
+		{CE6BC5E6-047A-4C93-A4AB-1493AA7C2FED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CE6BC5E6-047A-4C93-A4AB-1493AA7C2FED}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CE6BC5E6-047A-4C93-A4AB-1493AA7C2FED}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{CE6BC5E6-047A-4C93-A4AB-1493AA7C2FED}.Debug|x64.Build.0 = Debug|Any CPU
+		{CE6BC5E6-047A-4C93-A4AB-1493AA7C2FED}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CE6BC5E6-047A-4C93-A4AB-1493AA7C2FED}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CE6BC5E6-047A-4C93-A4AB-1493AA7C2FED}.Release|x64.ActiveCfg = Release|Any CPU
+		{CE6BC5E6-047A-4C93-A4AB-1493AA7C2FED}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

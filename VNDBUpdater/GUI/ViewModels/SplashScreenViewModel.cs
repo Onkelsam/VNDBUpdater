@@ -38,7 +38,7 @@ namespace VNDBUpdater.GUI.ViewModels
 
         private async Task Initialize()
         {
-            LoginRequired = await _LoginService.CheckLoginStatus();
+            LoginRequired = await _LoginService.GetIsLoggedInAsync();
 
             if (!LoginRequired)
             {
@@ -112,7 +112,7 @@ namespace VNDBUpdater.GUI.ViewModels
 
         private async Task ExecuteLogin(LoginDialogData answer)
         {
-            bool loginsuccessfull = await _LoginService.Login(answer);
+            bool loginsuccessfull = await _LoginService.LoginAsync(answer);
 
             if (loginsuccessfull)
             {

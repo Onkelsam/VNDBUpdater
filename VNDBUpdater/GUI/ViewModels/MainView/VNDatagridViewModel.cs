@@ -15,6 +15,7 @@ using VNDBUpdater.GUI.ViewModels.Interfaces;
 using VNDBUpdater.Helper;
 using VNDBUpdater.Services.Dialogs;
 using VNDBUpdater.Services.Filters;
+using VNDBUpdater.Services.Logger;
 using VNDBUpdater.Services.User;
 using VNDBUpdater.Services.VN;
 
@@ -30,6 +31,7 @@ namespace VNDBUpdater.GUI.ViewModels.MainView
         private readonly IUserService _UserService;
         private readonly IFilterService _FilterService;
         private readonly IDialogService _DialogService;
+        private readonly ILoggerService _LoggerService;
 
         private Dictionary<VisualNovelModel.VisualNovelCatergory, AsyncObservableCollection<VisualNovelModel>> _TabMapper;
 
@@ -75,7 +77,7 @@ namespace VNDBUpdater.GUI.ViewModels.MainView
 
         private static object _SyncLock = new object();
 
-        public VNDatagridViewModel(IVNService VNService, IUserService UserService, IDialogCoordinator DialogCoordinator, IFilterService FilterService, IDialogService DialogService)
+        public VNDatagridViewModel(IVNService VNService, IUserService UserService, IDialogCoordinator DialogCoordinator, IFilterService FilterService, IDialogService DialogService, ILoggerService Logger)
             : base()
         {
             _VNService = VNService;
@@ -83,6 +85,7 @@ namespace VNDBUpdater.GUI.ViewModels.MainView
             _FilterService = FilterService;
             _DialogCoordinator = DialogCoordinator;
             _DialogService = DialogService;
+            _LoggerService = Logger;
 
             _SelectedVisualNovel = new VisualNovelModel();
 
@@ -103,7 +106,7 @@ namespace VNDBUpdater.GUI.ViewModels.MainView
         {
             OnUserUpdated(this, await _UserService.GetAsync());
 
-            _VisualNovels = new AsyncObservableCollection<VisualNovelModel>(await _VNService.GetLocal(), _Context);
+            _VisualNovels = new AsyncObservableCollection<VisualNovelModel>(await _VNService.GetLocalAsync(), _Context);
             _VisualNovels.CollectionChanged += OnCollectionChanged;
 
             BindingOperations.EnableCollectionSynchronization(_VisualNovels, _SyncLock);
@@ -123,7 +126,7 @@ namespace VNDBUpdater.GUI.ViewModels.MainView
 
             foreach (var vn in _VisualNovels)
             {
-                if (!_FilterService.VNShouldBeFilteredOut(Filter, vn))
+                if (!_FilterService.VNShouldBeFilteredOut(Filter.FilterParameter, vn.Basics.Tags.Select(x => x.ID).ToList()))
                 {
                     passed.Add(vn);
                 }
@@ -144,7 +147,7 @@ namespace VNDBUpdater.GUI.ViewModels.MainView
 
         private async void OnAllVisualNovelsRefreshedAsync(object sender, EventArgs e)
         {
-            _VisualNovels = new AsyncObservableCollection<VisualNovelModel>(await _VNService.GetLocal(), _Context);
+            _VisualNovels = new AsyncObservableCollection<VisualNovelModel>(await _VNService.GetLocalAsync(), _Context);
 
             SetupVisualNovels();
         }
@@ -392,7 +395,7 @@ namespace VNDBUpdater.GUI.ViewModels.MainView
             get
             {
                 return _StartVisualNovel ??
-                    (_StartVisualNovel = new RelayCommand(x => _VNService.Start(_SelectedVisualNovel), x => _SelectedVisualNovel != null && _VNService.InstallationPathExists(_SelectedVisualNovel)));
+                    (_StartVisualNovel = new RelayCommand(x => _VNService.Start(_SelectedVisualNovel), x => _SelectedVisualNovel != null && _VNService.CheckIfInstallationPathExists(_SelectedVisualNovel)));
             }
         }
 
@@ -403,7 +406,7 @@ namespace VNDBUpdater.GUI.ViewModels.MainView
             get
             {
                 return _OpenVisualNovelFolder ??
-                    (_OpenVisualNovelFolder = new RelayCommand(x => _VNService.OpenFolder(_SelectedVisualNovel), x => _SelectedVisualNovel != null && _VNService.InstallationPathExists(_SelectedVisualNovel)));
+                    (_OpenVisualNovelFolder = new RelayCommand(x => _VNService.OpenFolder(_SelectedVisualNovel), x => _SelectedVisualNovel != null && _VNService.CheckIfInstallationPathExists(_SelectedVisualNovel)));
             }
         }
 
@@ -414,7 +417,7 @@ namespace VNDBUpdater.GUI.ViewModels.MainView
             get
             {
                 return _SetExePath ??
-                    (_SetExePath = new RelayCommand(async x => await _VNService.SetExePath(_SelectedVisualNovel, _DialogService.GetPathToExecuteable())));
+                    (_SetExePath = new RelayCommand(async x => await _VNService.SetExePathAsync(_SelectedVisualNovel, _DialogService.GetPathToExecuteable())));
             }
         }
 
@@ -425,7 +428,7 @@ namespace VNDBUpdater.GUI.ViewModels.MainView
             get
             {
                 return _OpenWalkthrough ??
-                    (_OpenWalkthrough = new RelayCommand(x => _VNService.OpenWalkthrough(_SelectedVisualNovel), x => _SelectedVisualNovel != null && _VNService.WalkthroughAvailable(_SelectedVisualNovel)));
+                    (_OpenWalkthrough = new RelayCommand(x => _VNService.OpenWalkthrough(_SelectedVisualNovel), x => _SelectedVisualNovel != null && _VNService.CheckIfWalkthroughExists(_SelectedVisualNovel)));
             }
         }
 
@@ -436,7 +439,7 @@ namespace VNDBUpdater.GUI.ViewModels.MainView
             get
             {
                 return _CreateWalkthrough ??
-                    (_CreateWalkthrough = new RelayCommand(async x => await _VNService.CreateWalkthrough(_SelectedVisualNovel), x => _SelectedVisualNovel != null && _VNService.InstallationPathExists(_SelectedVisualNovel) && !_VNService.WalkthroughAvailable(_SelectedVisualNovel)));
+                    (_CreateWalkthrough = new RelayCommand(async x => await _VNService.CreateWalkthroughAsync(_SelectedVisualNovel), x => _SelectedVisualNovel != null && _VNService.CheckIfInstallationPathExists(_SelectedVisualNovel) && !_VNService.CheckIfWalkthroughExists(_SelectedVisualNovel)));
             }
         }
 
@@ -458,7 +461,7 @@ namespace VNDBUpdater.GUI.ViewModels.MainView
             get
             {
                 return _UpdateVisualNovel ??
-                    (_UpdateVisualNovel = new RelayCommand(async x => await Task.Factory.StartNew(() => { _VNService.Update(_SelectedVisualNovel); OnPropertyChanged(nameof(SelectedVisualNovel)); }), x => _SelectedVisualNovel != null));
+                    (_UpdateVisualNovel = new RelayCommand(async x => await Task.Factory.StartNew(() => { _VNService.UpdateAsync(_SelectedVisualNovel); OnPropertyChanged(nameof(SelectedVisualNovel)); }), x => _SelectedVisualNovel != null));
             }
         }
 
@@ -469,7 +472,7 @@ namespace VNDBUpdater.GUI.ViewModels.MainView
             get
             {
                 return _DeleteVisualNovel ??
-                    (_DeleteVisualNovel = new RelayCommand(async x => { await _VNService.Delete(_SelectedVisualNovel); }, x => _SelectedVisualNovel != null));
+                    (_DeleteVisualNovel = new RelayCommand(async x => { await _VNService.DeleteAsync(_SelectedVisualNovel); }, x => _SelectedVisualNovel != null));
             }
         }
 
@@ -536,15 +539,22 @@ namespace VNDBUpdater.GUI.ViewModels.MainView
         {
             await Task.Factory.StartNew(async () =>
             {
-                var category = (VisualNovelModel.VisualNovelCatergory)Enum.Parse(typeof(VisualNovelModel.VisualNovelCatergory), parameter.ToString(), true);
-                var oldCategory = _SelectedVisualNovel.Category;
+                try
+                {
+                    var category = (VisualNovelModel.VisualNovelCatergory)Enum.Parse(typeof(VisualNovelModel.VisualNovelCatergory), parameter.ToString(), true);
+                    var oldCategory = _SelectedVisualNovel.Category;
 
-                await _VNService.SetCategory(_SelectedVisualNovel, category);
+                    await _VNService.SetCategoryAsync(_SelectedVisualNovel, category);
 
-                _TabMapper[oldCategory].Remove(_SelectedVisualNovel);
+                    _TabMapper[oldCategory].Remove(_SelectedVisualNovel);
 
-                OnPropertyChanged(_CategoryToPropertyMapper[oldCategory]);
-                OnPropertyChanged(nameof(SelectedVisualNovel));
+                    OnPropertyChanged(_CategoryToPropertyMapper[oldCategory]);
+                    OnPropertyChanged(nameof(SelectedVisualNovel));
+                }     
+                catch (Exception ex)
+                {
+                    _LoggerService.Log(ex);
+                }           
             });
         }
 
@@ -563,7 +573,7 @@ namespace VNDBUpdater.GUI.ViewModels.MainView
 
                 if (double.TryParse(score, NumberStyles.Any, CultureInfo.InvariantCulture, out convertedScore))
                 {
-                    await _VNService.SetScore(_SelectedVisualNovel, Convert.ToInt32(10 * convertedScore));
+                    await _VNService.SetScoreAsync(_SelectedVisualNovel, Convert.ToInt32(10 * convertedScore));
                 }
             }
             else
@@ -572,7 +582,7 @@ namespace VNDBUpdater.GUI.ViewModels.MainView
 
                 if (int.TryParse(score, NumberStyles.Any, CultureInfo.InvariantCulture, out convertedScore))
                 {
-                    await _VNService.SetScore(_SelectedVisualNovel, 10 * convertedScore);
+                    await _VNService.SetScoreAsync(_SelectedVisualNovel, 10 * convertedScore);
                 }
             }
 

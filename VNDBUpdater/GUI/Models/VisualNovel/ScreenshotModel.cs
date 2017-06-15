@@ -34,7 +34,7 @@ namespace VNDBUpdater.GUI.Models.VisualNovel
         public string Path
         {
             get;
-            private set;
+            set;
         }
 
         public bool NSFW

@@ -18,43 +18,43 @@ namespace VNDBUpdater.Communication.Database
             _RedisService = redisService;
         }
 
-        public async Task Add(FilterModel model)
+        public async Task AddAsync(FilterModel model)
         {
-            await _RedisService.WriteEntity(_FilterKey + model.Name, new FilterEntity(model));
+            await _RedisService.WriteAsync(_FilterKey + model.Name, new FilterEntity(model));
         }
 
-        public async Task Delete(string name)
+        public async Task DeleteAsync(string name)
         {
-            await _RedisService.DeleteKey(_FilterKey + name);
+            await _RedisService.DeleteKeyAsync(_FilterKey + name);
         }
 
-        public async Task Delete(int ID)
+        public async Task DeleteAsync(int ID)
         {
-            await _RedisService.DeleteKey(_FilterKey + ID);
+            await _RedisService.DeleteKeyAsync(_FilterKey + ID);
         }
 
-        public async Task<IList<FilterModel>> Get()
+        public async Task<IList<FilterModel>> GetAsync()
         {
             var filters = new List<FilterModel>();
 
-            foreach (string key in await _RedisService.GetAllKeys(_FilterKey + "*"))
+            foreach (string key in await _RedisService.GetAllKeysAsync(_FilterKey + "*"))
             {
-                filters.Add(await Get(key.Replace(_FilterKey, "")));
+                filters.Add(await GetAsync(key.Replace(_FilterKey, "")));
             }
 
             return filters;
         }
 
-        public async Task<FilterModel> Get(string name)
+        public async Task<FilterModel> GetAsync(string name)
         {
-            var entity = await _RedisService.ReadEntity<FilterEntity>(_FilterKey + name);
+            var entity = await _RedisService.ReadAsync<FilterEntity>(_FilterKey + name);
 
             return new FilterModel(entity);
         }
 
-        public async Task<FilterModel> Get(int ID)
+        public async Task<FilterModel> GetAsync(int ID)
         {
-            var entity = await _RedisService.ReadEntity<FilterEntity>(_FilterKey + ID);
+            var entity = await _RedisService.ReadAsync<FilterEntity>(_FilterKey + ID);
 
             return new FilterModel(entity);
         }

@@ -7,10 +7,10 @@ namespace VNDBUpdater.Communication.VNDB.Interfaces
 {
     public interface IVNDBGetter
     {
-        Task<VisualNovelModel> Get(int ID);
-        Task<IList<VisualNovelModel>> Get(List<int> IDs);
-        Task<IList<VisualNovelModel>> Get(string title);
-        Task<IList<VN>> GetVNList();
-        Task<IList<Vote>> GetVoteList();
+        Task<VisualNovelModel> GetAsync(int ID);
+        Task<IList<VisualNovelModel>> GetAsync(List<int> IDs);
+        Task<IList<VisualNovelModel>> GetAsync(string title);
+        Task<IList<VN>> GetVNListAsync();
+        Task<IList<Vote>> GetVoteListAsync();
     }
 }

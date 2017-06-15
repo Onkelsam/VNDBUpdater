@@ -5,6 +5,6 @@ namespace VNDBUpdater.BackgroundTasks.Interfaces
 {
     public interface IBackgroundTask
     {
-        Task ExecuteTask(Action<bool> OnTaskCompleted);
+        Task ExecuteTaskAsync(Action<bool> OnTaskCompleted);
     }
 }

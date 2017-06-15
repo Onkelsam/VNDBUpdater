@@ -55,13 +55,13 @@ namespace VNDBUpdater.Communication.VNDB
             get { return _Throttled; }
         }
 
-        public async Task Connect()
+        public async Task ConnectAsync()
         {
             if (!_LoggedIn || !_Connection.IsConnected)
             {
                 try
                 {
-                    var user = await _UserRepository.Get(0);
+                    var user = await _UserRepository.GetAsync(0);
 
                     _Connection = new CommunicationLib.Communication().GetVNDBCommunication();
                     VndbResponse response = await _Connection.Connect(user.Username, Convert.ToBase64String(user.EncryptedPassword));
@@ -73,7 +73,7 @@ namespace VNDBUpdater.Communication.VNDB
                         if (result == ErrorResponse.Throttled)
                         {
                             _Logger.Log("Connecting to VNDB failed because of throttling error. Trying reconnect.");
-                            await Connect();
+                            await ConnectAsync();
                         }
                         else if (result == ErrorResponse.AuthenticationFailed)
                         {
@@ -106,7 +106,7 @@ namespace VNDBUpdater.Communication.VNDB
                     if (_ConnectionTries != _MaxConnectionTries)
                     {
                         _Logger.Log("Error was handled. Trying reconnect. Current tries: " + _ConnectionTries.ToString());
-                        await Connect();
+                        await ConnectAsync();
                     }
                     else
                     {
@@ -125,10 +125,10 @@ namespace VNDBUpdater.Communication.VNDB
             }
         }
 
-        public async Task Reconnect()
+        public async Task ReconnectAsync()
         {
             Disconnect();
-            await Connect();
+            await ConnectAsync();
         }
 
         public void Disconnect()
@@ -168,57 +168,57 @@ namespace VNDBUpdater.Communication.VNDB
             }
         }
 
-        public async Task<VndbResponse> SetVNList(int ID, SetJSONObjects.State state)
+        public async Task<VndbResponse> SetVNListAsync(int ID, SetJSONObjects.State state)
         {
             return await _Connection.SetVNList(ID, state);
         }
 
-        public async Task<VndbResponse> SetVote(int ID, SetJSONObjects.Vote vote)
+        public async Task<VndbResponse> SetVoteAsync(int ID, SetJSONObjects.Vote vote)
         {
             return await _Connection.SetVote(ID, vote);
         }
 
-        public async Task<VndbResponse> DeleteVote(int ID)
+        public async Task<VndbResponse> DeleteVoteAsync(int ID)
         {
             return await _Connection.DeleteVote(ID);
         }
 
-        public async Task<VndbResponse> DeleteVNFromVNList(int ID)
+        public async Task<VndbResponse> DeleteVNFromVNListAsync(int ID)
         {
             return await _Connection.DeleteVNFromVNList(ID);
         }
 
-        public async Task<VndbResponse> QueryCharacterInformation(int[] IDs, int page)
+        public async Task<VndbResponse> QueryCharacterInformationAsync(int[] IDs, int page)
         {
             return await _Connection.QueryCharacterInformation(IDs, page);
         }
 
-        public async Task<VndbResponse> QueryCharacterInformation(int ID)
+        public async Task<VndbResponse> QueryCharacterInformationAsync(int ID)
         {
             return await _Connection.QueryCharacterInformation(ID);
         }
 
-        public async Task<VndbResponse> QueryInformation(int ID)
+        public async Task<VndbResponse> QueryInformationAsync(int ID)
         {
             return await _Connection.QueryInformation(ID);
         }
 
-        public async Task<VndbResponse> SearchByTitle(string title, int page)
+        public async Task<VndbResponse> SearchByTitleAsync(string title, int page)
         {
             return await _Connection.SearchByTitle(title, page);
         }
 
-        public async Task<VndbResponse> QueryInformation(int[] IDs)
+        public async Task<VndbResponse> QueryInformationAsync(int[] IDs)
         {
             return await _Connection.QueryInformation(IDs);
         }
 
-        public async Task<VndbResponse> QueryVNList(int page = 1)
+        public async Task<VndbResponse> QueryVNListAsync(int page = 1)
         {
             return await _Connection.QueryVNList(page);
         }
 
-        public async Task<VndbResponse> QueryVoteList(int page = 1)
+        public async Task<VndbResponse> QueryVoteListAsync(int page = 1)
         {
             return await _Connection.QueryVoteList(page);
         }

@@ -25,7 +25,7 @@ namespace VNDBUpdater.Services.Launch
         {
             IBackgroundTask task = _TaskFactory.CreateStartUpTask();
 
-            task.ExecuteTask(StartSynchronizer);
+            task.ExecuteTaskAsync(StartSynchronizer);
         }
 
         private void StartSynchronizer(bool startUpSuccessfull)
@@ -34,7 +34,7 @@ namespace VNDBUpdater.Services.Launch
             {
                 IBackgroundTask task = _TaskFactory.CreateSynchronizerTask();
 
-                task.ExecuteTask(_OnLaunchFinished);
+                task.ExecuteTaskAsync(_OnLaunchFinished);
             }
             else
             {

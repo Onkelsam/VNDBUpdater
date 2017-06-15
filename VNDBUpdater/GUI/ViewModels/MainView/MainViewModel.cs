@@ -274,7 +274,7 @@ namespace VNDBUpdater.GUI.ViewModels.MainView
 
         public async Task ExecuteLogin(LoginDialogData answer)
         {
-            bool loginSuccessfull = await _LoginService.Login(answer);
+            bool loginSuccessfull = await _LoginService.LoginAsync(answer);
 
             if (loginSuccessfull)
             {

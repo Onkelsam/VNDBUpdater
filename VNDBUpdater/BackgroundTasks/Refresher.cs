@@ -19,7 +19,7 @@ namespace VNDBUpdater.BackgroundTasks
             _VNService = VNService;
         }
 
-        public override async Task ExecuteTask(Action<bool> OnTaskCompleted)
+        public override async Task ExecuteTaskAsync(Action<bool> OnTaskCompleted)
         {
             _OnTaskCompleted = OnTaskCompleted;
 
@@ -30,9 +30,9 @@ namespace VNDBUpdater.BackgroundTasks
         {
             var updatedVNs = new List<VisualNovelModel>();
 
-            foreach (var vn in await GetUpdatedVNs(await _VNService.GetLocal()))
+            foreach (var vn in await GetUpdatedVNs(await _VNService.GetLocalAsync()))
             {
-                VisualNovelModel vnToUpdate = await _VNService.GetLocal(vn.Basics.ID);
+                VisualNovelModel vnToUpdate = await _VNService.GetLocalAsync(vn.Basics.ID);
 
                 if (vnToUpdate != null)
                 {
@@ -43,7 +43,7 @@ namespace VNDBUpdater.BackgroundTasks
                 }
             }
 
-            await _VNService.Add(updatedVNs);
+            await _VNService.AddAsync(updatedVNs);
         }
 
         private async Task<List<VisualNovelModel>> GetUpdatedVNs(IEnumerable<VisualNovelModel> localVNs)
@@ -61,7 +61,7 @@ namespace VNDBUpdater.BackgroundTasks
             {
                 for (int round = 0; round < idSplitter.NumberOfRequests; round++)
                 {
-                    var updated = await _VNService.Get(Take(idSplitter.IDs, round * idSplitter.MaxVNsPerRequest, idSplitter.MaxVNsPerRequest).ToList());
+                    var updated = await _VNService.GetAsync(Take(idSplitter.IDs, round * idSplitter.MaxVNsPerRequest, idSplitter.MaxVNsPerRequest).ToList());
 
                     updatedVNs.AddRange(updated);
                     UpdateProgess(idSplitter.MaxVNsPerRequest, "Visual Novels have been updated...");
@@ -69,7 +69,7 @@ namespace VNDBUpdater.BackgroundTasks
 
                 if (idSplitter.Remainder > 0)
                 {
-                    var updated = await _VNService.Get(Take(idSplitter.IDs, idSplitter.IDs.Length - idSplitter.Remainder, idSplitter.Remainder).ToList());
+                    var updated = await _VNService.GetAsync(Take(idSplitter.IDs, idSplitter.IDs.Length - idSplitter.Remainder, idSplitter.Remainder).ToList());
 
                     updatedVNs.AddRange(updated);
                     UpdateProgess(idSplitter.Remainder, "Visual Novels have been updated...");
@@ -77,7 +77,7 @@ namespace VNDBUpdater.BackgroundTasks
             }
             else
             {
-                var updated = await _VNService.Get(idSplitter.IDs.ToList());
+                var updated = await _VNService.GetAsync(idSplitter.IDs.ToList());
 
                 updatedVNs.AddRange(updated);
                 UpdateProgess(idSplitter.IDs.Length, "Visual Novels have been updated...");

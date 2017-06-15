@@ -5,6 +5,6 @@ namespace VNDBUpdater.Communication.Database.Interfaces
 {
     public interface IVNRepository : IRepository<VisualNovelModel>
     {
-        Task<bool> VisualNovelExists(int ID);
+        Task<bool> CheckIfVisualNovelExistsAsync(int ID);
     }
 }

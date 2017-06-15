@@ -36,7 +36,7 @@ namespace VNDBUpdater.GUI.ViewModels
 
         private async Task Initialize()
         {
-            _ExistingVisualNovels = new List<VisualNovelModel>(await _VNService.GetLocal());
+            _ExistingVisualNovels = new List<VisualNovelModel>(await _VNService.GetLocalAsync());
         }        
 
         private AsyncObservableCollection<VisualNovelModel> _FoundVisualNovels;
@@ -115,19 +115,19 @@ namespace VNDBUpdater.GUI.ViewModels
         {
             var category = (VisualNovelModel.VisualNovelCatergory)Enum.Parse(typeof(VisualNovelModel.VisualNovelCatergory), parameter.ToString(), true);
 
-            var newVN = await _VNService.Get(_SelectedVisualNovel.Basics.ID);
+            var newVN = await _VNService.GetAsync(_SelectedVisualNovel.Basics.ID);
 
             newVN.Category = category;
 
-            await _VNService.Add(newVN);
-            await _VNService.SetVNList(newVN);
+            await _VNService.AddAsync(newVN);
+            await _VNService.SetVNListAsync(newVN);
 
             FoundVisualNovels.Remove(_SelectedVisualNovel);
         }
 
         public async Task ExecuteFetchVisualNovels(object paramter)
         {
-            var newVNs = await _VNService.Get(_Title);
+            var newVNs = await _VNService.GetAsync(_Title);
 
             FoundVisualNovels = new AsyncObservableCollection<VisualNovelModel>(newVNs.Where(x => !_ExistingVisualNovels.Any(y => y.Basics.ID == x.Basics.ID)), _Context);
         }

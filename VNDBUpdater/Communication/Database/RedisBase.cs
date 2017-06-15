@@ -98,11 +98,11 @@ namespace VNDBUpdater.Communication.Database
             }
         }
 
-        public async Task Reset()
+        public async Task ResetAsync()
         {
-            foreach (var key in await GetAllKeys("*"))
+            foreach (var key in await GetAllKeysAsync("*"))
             {
-                await DeleteKey(key);
+                await DeleteKeyAsync(key);
             }                
         }        
 
@@ -121,33 +121,33 @@ namespace VNDBUpdater.Communication.Database
             }
         }
 
-        public async Task<T> ReadEntity<T>(string key) where T : class
+        public async Task<T> ReadAsync<T>(string key) where T : class
         {
             CheckConnection();
 
             return await _Connection.ReadEntity<T>(key);
         }
 
-        public async Task WriteEntity<T>(string key, T entity) where T : class
+        public async Task WriteAsync<T>(string key, T entity) where T : class
         {
             CheckConnection();
 
             await _Connection.WriteEntity<T>(key, entity);
         }
 
-        public async Task<bool> KeyExists(string key)
+        public async Task<bool> CheckIfKeyExistsAsync(string key)
         {
             return await _Connection.KeyExists(key);
         }
 
-        public async Task DeleteKey(string key)
+        public async Task DeleteKeyAsync(string key)
         {
             CheckConnection();
 
             await _Connection.DeleteKey(key);
         }
 
-        public async Task<IList<string>> GetAllKeys(string pattern)
+        public async Task<IList<string>> GetAllKeysAsync(string pattern)
         {
             CheckConnection();
 

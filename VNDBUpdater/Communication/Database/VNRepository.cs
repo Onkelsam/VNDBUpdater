@@ -20,11 +20,11 @@ namespace VNDBUpdater.Communication.Database
             _CacheService = cacheService;
         }
 
-        public async Task Add(VisualNovelModel model)
+        public async Task AddAsync(VisualNovelModel model)
         {
-            await _RedisService.WriteEntity(_VisualNovelKey + model.Basics.ID, new VisualNovelEntity(model));
+            await _RedisService.WriteAsync(_VisualNovelKey + model.Basics.ID, new VisualNovelEntity(model));
 
-            var newList = new List<VisualNovelModel>(await _CacheService.GetList("VisualNovels", async () => await GetAll()));
+            var newList = new List<VisualNovelModel>(await _CacheService.GetAsync("VisualNovels", async () => await GetAll()));
 
             if (newList.Any(x => x.Basics.ID == model.Basics.ID))
             {
@@ -33,35 +33,35 @@ namespace VNDBUpdater.Communication.Database
             
             newList.Add(model);
 
-            await _CacheService.Set<IList<VisualNovelModel>>("VisualNovels", newList);
+            await _CacheService.SetAsync<IList<VisualNovelModel>>("VisualNovels", newList);
         }
 
-        public async Task Delete(int ID)
+        public async Task DeleteAsync(int ID)
         {
-            await _RedisService.DeleteKey(_VisualNovelKey + ID);
+            await _RedisService.DeleteKeyAsync(_VisualNovelKey + ID);
 
-            var newList = new List<VisualNovelModel>(await _CacheService.GetList("VisualNovels", async () => await GetAll()));
+            var newList = new List<VisualNovelModel>(await _CacheService.GetAsync("VisualNovels", async () => await GetAll()));
 
             newList.Remove(newList.First(x => x.Basics.ID == ID));
 
-            await _CacheService.Set<IList<VisualNovelModel>>("VisualNovels", newList);
+            await _CacheService.SetAsync<IList<VisualNovelModel>>("VisualNovels", newList);
         }
 
-        public async Task<IList<VisualNovelModel>> Get()
+        public async Task<IList<VisualNovelModel>> GetAsync()
         {
-            return await _CacheService.GetList("VisualNovels", async () => await GetAll());
+            return await _CacheService.GetAsync("VisualNovels", async () => await GetAll());
         }
 
-        public async Task<VisualNovelModel> Get(int ID)
+        public async Task<VisualNovelModel> GetAsync(int ID)
         {
-            var cache = await _CacheService.GetList("VisualNovels", async () => await GetAll());
+            var cache = await _CacheService.GetAsync("VisualNovels", async () => await GetAll());
 
             return cache.First(x => x.Basics.ID == ID);
         }
 
-        public async Task<bool> VisualNovelExists(int ID)
+        public async Task<bool> CheckIfVisualNovelExistsAsync(int ID)
         {
-            var cache = await _CacheService.GetList("VisualNovels", async () => await GetAll());
+            var cache = await _CacheService.GetAsync("VisualNovels", async () => await GetAll());
 
             return cache.Any(x => x.Basics.ID == ID);
         }
@@ -70,9 +70,9 @@ namespace VNDBUpdater.Communication.Database
         {
             var visualNovels = new List<VisualNovelEntity>();
 
-            foreach (string vn in await _RedisService.GetAllKeys(_VisualNovelKey + "*"))
+            foreach (string vn in await _RedisService.GetAllKeysAsync(_VisualNovelKey + "*"))
             {
-                visualNovels.Add(await _RedisService.ReadEntity<VisualNovelEntity>(vn));
+                visualNovels.Add(await _RedisService.ReadAsync<VisualNovelEntity>(vn));
             }
 
             return visualNovels.Select(x => new VisualNovelModel(x)).ToList();
